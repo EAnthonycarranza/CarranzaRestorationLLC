@@ -6,7 +6,6 @@
 "scripts": {
   "start": "node server/server.js",
   "heroku-postbuild": "cd client && npm install && npm run build",
-  "install": "cd server && npm i && cd ../client && npm i",
   "dev": "concurrently \"cd server && npm run watch\" \"cd client && npm start\""
 },
   "keywords": [],
