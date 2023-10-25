@@ -1,0 +1,40 @@
+{
+  "files": {
+    "main.css": "/static/css/main.5536a433.css",
+    "main.js": "/static/js/main.7b35fd87.js",
+    "static/js/651.2f52053c.chunk.js": "/static/js/651.2f52053c.chunk.js",
+    "static/media/carousel-1.jpg": "/static/media/carousel-1.699cd263f508eff9e40a.jpg",
+    "static/media/portfolio-4.jpg": "/static/media/portfolio-4.19e909ecfd4e4fe2492b.jpg",
+    "static/media/portfolio-3.jpg": "/static/media/portfolio-3.70cd7e6915cf9c8fa1c4.jpg",
+    "static/media/carousel-2.jpg": "/static/media/carousel-2.753a07f9930faf9d35f1.jpg",
+    "static/media/portfolio-2.jpg": "/static/media/portfolio-2.889d17956fd0d9917d78.jpg",
+    "static/media/blog-1.jpg": "/static/media/blog-1.c1d51eb731966d549ca5.jpg",
+    "static/media/blog-3.jpg": "/static/media/blog-3.a23a49c787f8e8a0efef.jpg",
+    "static/media/service-1.jpg": "/static/media/service-1.2736eb334b3b989b27bf.jpg",
+    "static/media/portfolio-1.jpg": "/static/media/portfolio-1.59d8de5645f8ae4caedf.jpg",
+    "static/media/blog-2.jpg": "/static/media/blog-2.bbd4c4260498ed7ac68d.jpg",
+    "static/media/portfolio-6.jpg": "/static/media/portfolio-6.a1515ec0fa381af08152.jpg",
+    "static/media/portfolio-5.jpg": "/static/media/portfolio-5.85c057c02de78ce3b601.jpg",
+    "static/media/about.jpg": "/static/media/about.1e523e2c811915705258.jpg",
+    "static/media/service-6.jpg": "/static/media/service-6.3e2b33cd97a5d681ee27.jpg",
+    "static/media/testimonial.jpg": "/static/media/testimonial.5d3e4977fb647ab4e21d.jpg",
+    "static/media/service-3.jpg": "/static/media/service-3.d6fb6191e243214819f6.jpg",
+    "static/media/service-4.jpg": "/static/media/service-4.be1216bfccee7de9c91d.jpg",
+    "static/media/service-2.jpg": "/static/media/service-2.9d33eed6b0d60f239247.jpg",
+    "static/media/service-5.jpg": "/static/media/service-5.79e082d2a1dd9172e154.jpg",
+    "static/media/testimonial-1.jpg": "/static/media/testimonial-1.8bb235e9388f438aec94.jpg",
+    "static/media/team-3.jpg": "/static/media/team-3.a9aa1a74822ffb1b2833.jpg",
+    "static/media/team-1.jpg": "/static/media/team-1.e09f0d37a492e4541288.jpg",
+    "static/media/team-2.jpg": "/static/media/team-2.cf78b171caea63bf0291.jpg",
+    "static/media/testimonial-2.jpg": "/static/media/testimonial-2.ee11adb46e66f8858449.jpg",
+    "static/media/team-4.jpg": "/static/media/team-4.64297908428f86cf24d9.jpg",
+    "index.html": "/index.html",
+    "main.5536a433.css.map": "/static/css/main.5536a433.css.map",
+    "main.7b35fd87.js.map": "/static/js/main.7b35fd87.js.map",
+    "651.2f52053c.chunk.js.map": "/static/js/651.2f52053c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5536a433.css",
+    "static/js/main.7b35fd87.js"
+  ]
+}
