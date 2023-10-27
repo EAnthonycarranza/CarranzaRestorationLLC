@@ -1,11 +1,14 @@
 {
-  "name": "carranza-restoration",
+  "name": "music-verse",
   "version": "1.0.0",
   "description": " ",
-  "main": "server.js","scripts": {
+  "main": "server/server.js",
+  "scripts": {
     "start": "node server/server.js",
-    "heroku-postbuild": "cd client && npm install && npm run build",
-    "install": "cd server && npm i && cd ../client && npm i",
+    "heroku-postbuild": "npm run build-client",
+    "build-client": "cd client && npm install && npm run build",
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
     "dev": "concurrently \"cd server && npm run watch\" \"cd client && npm start\""
   },
   "keywords": [],
