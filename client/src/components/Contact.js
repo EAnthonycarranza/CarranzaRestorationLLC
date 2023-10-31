@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 const Contact = () => {
-  const [feedbackMessage, setFeedbackMessage] = useState('');
-
+  
+    const [feedbackMessage, setFeedbackMessage] = useState('');
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFeedbackMessage(''); // Reset feedback message on new submission
@@ -23,11 +23,19 @@ const Contact = () => {
       });
   
       if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setFeedbackMessage('Email sent successfully. Thank you for contacting us!');
+        // Check the content type of the response
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          if (data.success) {
+            setFeedbackMessage('Email sent successfully. Thank you for contacting us!');
+          } else {
+            setFeedbackMessage(`Error: ${data.message}`);
+          }
         } else {
-          setFeedbackMessage(`Error: ${data.message}`);
+          // Handle non-JSON response here
+          const text = await response.text();
+          setFeedbackMessage(text);
         }
       } else {
         setFeedbackMessage('Error sending email. Please try again later.');
@@ -38,8 +46,6 @@ const Contact = () => {
     }
   };
   
-
-
   return (
     <div className="container-fluid py-6 px-5">
       <div className="text-center mx-auto mb-5" style={{ maxWidth: '600px' }}>
