@@ -3,32 +3,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const nodemailer = require('nodemailer');
 const app = express();
-
 app.use(express.json());
 
 const cors = require('cors');
 app.use(cors());
-
-const multer = require('multer');
-
-const fs = require('fs');
-
-// Check if the uploads directory exists, and create it if it doesn't
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
 
 
 // Serve static files from the React app
@@ -42,9 +20,8 @@ app.get('*', (req, res) => {
 console.log('Email:', process.env.EMAIL);
 console.log('Password:', process.env.EMAIL_PASSWORD);
 
-app.post('/send-email', upload.array('images'), async (req, res) => {
+app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
-  const files = req.files;
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -55,39 +32,24 @@ app.post('/send-email', upload.array('images'), async (req, res) => {
     },
   });
 
-  // Email options with attachment
+  // Email options
   const mailOptions = {
     from: email,
-    to: process.env.RECEIVER_EMAIL,
+    to: process.env.RECEIVER_EMAIL, // Use environment variable for receiver email
     subject: subject,
     text: `Message from ${name} (${email}): ${message}`,
-    attachments: files.map(file => ({
-      filename: file.originalname,
-      path: path.join(uploadsDir, file.filename)
-    }))    
   };
 
+  // Send email
   try {
-    // Send email
     await transporter.sendMail(mailOptions);
-
-    // Email sent successfully, now delete the files
-    files.forEach(file => {
-      fs.unlink(path.join(uploadsDir, file.filename), err => {
-        if (err) {
-          console.error('Error deleting file:', file.filename, err);
-        } else {
-          console.log('File deleted:', file.filename);
-        }
-      });
-    });
-
     res.status(200).json({ success: true, message: 'Email sent successfully' });
   } catch (error) {
     console.error('Error sending email:', error);
     res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
   }
 });
+
 
 const subscribers = []; // This should be replaced with a database in a real application
 
