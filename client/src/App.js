@@ -10,7 +10,7 @@ import Appointment from './components/Appointment';
 import Portfolio from './components/Portfolio';
 import Team from './components/Team';
 import Testimonial from './components/Testimonial';
-
+import Review from './components/Review';
 import Footer from './components/Footer';
 import AboutPage from './components/AboutPage';
 import ServicePage from './components/ServicePage'; // Import the ServicePage component
@@ -36,6 +36,7 @@ function App() {
       <div className="App">
         <Topbar />
         <Navbar />
+        <Review /> 
         <ScrollToTop>
 
         <Routes>
