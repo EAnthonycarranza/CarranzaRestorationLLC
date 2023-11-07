@@ -34,7 +34,6 @@ function Testimonial() {
             {/* Trust.Reviews widget div */}
             <div className="tr-widget" data-id="5309" data-view="flash" data-lang="">
                 <a href="https://trust.reviews/" className="trcr" target="_blank">
-                    Powered by <span>Trust.Reviews</span>
                 </a>
             </div>
         </div>
