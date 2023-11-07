@@ -26,7 +26,6 @@ function Review() {
     return (
         <div className="tr-widget" data-id="5310" data-view="flash" data-lang="">
             <a href="https://trust.reviews/" className="trcr" target="_blank">
-                Powered by <span>Trust.Reviews</span>
             </a>
         </div>
     );
