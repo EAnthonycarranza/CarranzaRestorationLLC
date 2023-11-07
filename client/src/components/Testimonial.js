@@ -9,25 +9,37 @@ function Testimonial() {
     }
 
     useEffect(() => {
-        const elfScript = document.createElement('script');
-        elfScript.src = "https://static.elfsight.com/platform/platform.js";
-        elfScript.async = true;
-        elfScript.defer = true;
-        document.body.appendChild(elfScript);
+        // Load the Revue widget
+        loadRevueWidget();
 
-        loadRevueWidget();  // Call the function to load the Revue widget
+        // Create a script element for Trust.Reviews widget
+        const trustScript = document.createElement('script');
+        trustScript.src = "https://cdn.trust.reviews/widget/embed.min.js";
+        trustScript.defer = true;
 
+        // Append the Trust.Reviews script to the body
+        document.body.appendChild(trustScript);
+
+        // Clean up the Trust.Reviews script when the component unmounts
         return () => {
-            document.body.removeChild(elfScript);
-        }
+            document.body.removeChild(trustScript);
+        };
     }, []);
 
     return (
         <div>
-            <div className="elfsight-app-43145a1a-b618-44bc-bf99-ee3d0714b7b4" data-elfsight-app-lazy></div>
-            <div data-rw-grid="38205"></div>  {/* Revue widget div */}
+            {/* Revue widget div */}
+            <div data-rw-grid="38205"></div>
+
+            {/* Trust.Reviews widget div */}
+            <div className="tr-widget" data-id="5309" data-view="flash" data-lang="">
+                <a href="https://trust.reviews/" className="trcr" target="_blank">
+                    Powered by <span>Trust.Reviews</span>
+                </a>
+            </div>
         </div>
     );
 }
 
 export default Testimonial;
+
