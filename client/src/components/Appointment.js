@@ -28,7 +28,6 @@ const Appointment = () => {
         },
         body: JSON.stringify(formData),
       });
-      // handle response...
     } catch (error) {
 
     try {
@@ -117,6 +116,12 @@ const Appointment = () => {
       </div>
     </div>
   </form>
+              {/* Feedback message display */}
+              {feedbackMessage && (
+              <div className="feedback-message">
+                <p>{feedbackMessage}</p>
+              </div>
+            )}
 </div>
           </div>
         </div>
