@@ -69,9 +69,18 @@ const Contact = () => {
             title="Map of Our Office" // Add a descriptive title here
           ></iframe>
         </div>
+        
         <div className="col-lg-6">
         <form onSubmit={handleSubmit} className="contact-form bg-light p-5">
-  <div className="row g-3">
+                    {/* Contact details and business hours */}
+                    <div className="contact-details mt-5" style={{textAlign: "center"}}>
+    <h3>Contact Information</h3>
+    <p>Email: <a href="mailto:admin@carranzarestoration.com">admin@carranzarestoration.com</a></p>
+    <p>Phone: <a href="tel:2102671008">(210) 267-1008</a></p>
+    <h3>Business Office Hours</h3>
+    <p>Monday - Friday: 8:30 AM - 5:30 PM</p>
+</div>
+<div className="row g-3" style={{ paddingTop: "70px" }}>
     <div className="col-12 col-sm-6">
       <input
         type="text"
@@ -117,11 +126,11 @@ const Contact = () => {
         {feedbackMessage && (
           <div className="mt-3">
             <p>{feedbackMessage}</p>
-          </div>
-        )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
+    </div>
   );
 };
 
