@@ -19,7 +19,7 @@ const Appointment = () => {
             <div className="mb-4">
               <h1 className="display-5 text-uppercase mb-4">Request A <span className="text-primary">Call Back</span></h1>
             </div>
-            <p className="mb-5">Nonumy ipsum amet tempor takimata vero ea elitr...</p>
+            <p className="mb-5">Our experts are ready to listen to your needs and offer tailored solutions. Reach out now and let's discuss your home renovation project.</p>
             <button className="btn btn-primary py-3 px-5" onClick={handleQuoteRequest}>Get A Quote</button>
           </div>
           <div className="col-lg-8">

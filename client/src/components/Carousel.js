@@ -1,18 +1,28 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import carousel1Image from '../img/carousel-1.jpg';
 import carousel2Image from '../img/carousel-2.jpg';
+import carousel3Image from '../img/carousel-3.jpg';
 
 const Carousel = () => {
-  // Define the handleGetQuote function
+  const navigate = useNavigate(); // Use useNavigate hook
+
   const handleGetQuote = () => {
-    // Implement the logic for handling a quote request
-    console.log("Get Quote button clicked"); // Placeholder action
+    console.log("Get Quote button clicked");
+    // Navigate to '/estimate' when Get Quote button is clicked
+    navigate('/about');
   };
 
-  // Define the handleContactUs function
   const handleContactUs = () => {
-    // Implement the logic for handling contact us action
-    console.log("Contact Us button clicked"); // Placeholder action
+    console.log("Contact Us button clicked");
+    // Navigate to '/contact' when Contact Us button is clicked
+    navigate('/contact');
+  };
+
+  const handleGetSerive = () => {
+    console.log("Service button clicked");
+    // Navigate to '/contact' when Contact Us button is clicked
+    navigate('/services');
   };
   
   return (
@@ -25,8 +35,8 @@ const Carousel = () => {
               <div className="carousel-caption d-flex flex-column align-items-center justify-content-center">
                 <div className="p-3" style={{ maxWidth: '900px' }}>
                   <i className="fa fa-home fa-4x text-primary mb-4 d-none d-sm-block"></i>
-                  <h1 className="display-2 text-uppercase text-white mb-md-4">Restore Your Dream House With Us</h1>
-                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleGetQuote}>Get A Quote</button>
+                  <h1 className="display-2 text-uppercase text-white mb-md-4">Restoring Homes, Restoring Dreams</h1>
+                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleContactUs}>Contact Us</button>
                 </div>
               </div>
             </div>
@@ -36,7 +46,18 @@ const Carousel = () => {
                 <div className="p-3" style={{ maxWidth: '900px' }}>
                   <i className="fa fa-tools fa-4x text-primary mb-4 d-none d-sm-block"></i>
                   <h1 className="display-2 text-uppercase text-white mb-md-4">We Are Trusted For Your Project</h1>
-                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleContactUs}>Contact Us</button>
+                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleGetSerive}>Services</button>
+                </div>
+              </div>
+            </div>
+            <div className="carousel-item">
+              <img className="w-100" src={carousel3Image} alt="Carousel 3" />
+              <div className="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                <div className="p-3" style={{ maxWidth: '900px' }}>
+                <i className="fa fa-calculator fa-4x text-primary mb-4 d-none d-sm-block"></i>
+                  <h1 className="display-2 text-uppercase text-white mb-md-4">Estimates That Empower</h1>
+                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleGetQuote}>Get A Quote</button>
+                  {/* Add your desired content for Carousel 3 */}
                 </div>
               </div>
             </div>

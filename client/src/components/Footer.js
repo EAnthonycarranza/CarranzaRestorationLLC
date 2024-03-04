@@ -55,7 +55,7 @@ const Footer = () => {
                 </h1>
               )}
             </button>
-            <p>Aliquyam sed elitr elitr erat sed diam ipsum eirmod eos lorem nonumy. Tempor sea ipsum diam  sed clita dolore eos dolores magna erat dolore sed stet justo et dolor.</p>
+            <p>Welcome to Carranza Restoration LLC, your trusted partner in home improvement. Our comprehensive services include expert estimates, meticulous home renovations, construction cleaning, content manipulation, and interior design solutions. With a commitment to excellence and personalized customer service, we're here to transform your vision into reality. Trust Carranza Restoration LLC for all your home improvement needs.</p>
             <button className="btn btn-link" onClick={() => window.open("https://maps.google.com?q=100%20Commercial%20Place,%20Schertz,%20TX", "_blank")}>
               <p><i className="fa fa-map-marker-alt me-2"></i>100 Commercial Place, Schertz, TX</p>
             </button>
@@ -67,11 +67,13 @@ const Footer = () => {
             </button>
 
             <div className="d-flex justify-content-start mt-4">
-              <button className="btn btn-lg btn-primary btn-lg-square rounded-0 me-2"><i className="fab fa-x-twitter"></i></button>
-              <button className="btn btn-lg btn-primary btn-lg-square rounded-0 me-2"><i className="fab fa-facebook-f"></i></button>
-              <button className="btn btn-lg btn-primary btn-lg-square rounded-0 me-2"><i className="fab fa-linkedin-in"></i></button>
-              <button className="btn btn-lg btn-primary btn-lg-square rounded-0"><i className="fab fa-instagram"></i></button>
-            </div>
+  <a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" rel="noopener noreferrer">
+    <button className="btn btn-lg btn-primary btn-lg-square rounded-0 me-2">
+      <i className="fab fa-google"></i>
+    </button>
+  </a>
+</div>
+
           </div>
           <div className="col-lg-6 ps-lg-5">
             <div className="row g-5">
@@ -87,9 +89,9 @@ const Footer = () => {
   <Link to="/services" className="btn btn-link text-white-50 mb-2">
     <i className="fa fa-angle-right me-2"></i>Our Services
   </Link>
-  <Link to="/team" className="btn btn-link text-white-50 mb-2">
-    <i className="fa fa-angle-right me-2"></i>Meet The Team
-  </Link>
+  {/* <Link to="/team" className="btn btn-link text-white-50 mb-2"> */}
+  {/* <i className="fa fa-angle-right me-2"></i>Meet The Team */}
+  {/* </Link> */}
   <Link to="/contact" className="btn btn-link text-white-50">
     <i className="fa fa-angle-right me-2"></i>Contact Us
   </Link>
@@ -101,13 +103,13 @@ const Footer = () => {
                   <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Home</button>
                   <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>About Us</button>
                   <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Our Services</button>
-                  <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Meet The Team</button>
+                  {/* <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Meet The Team</button> */}
                   <button className="btn btn-link text-white-50"><i className="fa fa-angle-right me-2"></i>Contact Us</button>
                 </div>
               </div>
             <div className="col-sm-12">
-                <h4 className="text-white text-uppercase mb-4">Newsletter</h4>
-                <form onSubmit={handleSubscribe} className="w-100">
+                {/* <h4 className="text-white text-uppercase mb-4">Newsletter</h4>
+                  <form onSubmit={handleSubscribe} className="w-100">
                     <div className="input-group">
                         <input 
                             type="email" 
@@ -120,7 +122,7 @@ const Footer = () => {
                         <button type="submit" className="btn btn-primary px-4">Sign Up</button>
                     </div>
                 </form>
-                {message && <p className="text-white mt-2">{message}</p>} {/* Display the message */}
+                {message && <p className="text-white mt-2">{message}</p>} */}
             </div>
             </div>
           </div>
