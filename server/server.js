@@ -62,15 +62,28 @@ app.post('/send-quote', async (req, res) => {
     },
   });
 
-  // Convert date and time to more readable formats if necessary
-  const formattedDate = date; // Adjust this line to format the date as you prefer
-  const formattedTime = time; // Adjust this line to format the time as you prefer
+  // Parse date and time to Date objects
+  const dateObj = new Date(date);
+  const timeObj = new Date(time);
+
+  // Format date and time
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: '2-digit'
+  }).format(dateObj);
+
+  const formattedTime = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  }).format(timeObj);
 
   // Email options
   const mailOptions = {
     from: email,
     to: process.env.RECEIVER_EMAIL, // Use environment variable for receiver email
-    subject: `Quote Request from ${name}`,
+    subject: `Inspection Request from ${name}`,
     text: `Name: ${name}\nEmail: ${email}\nDate: ${formattedDate}\nTime: ${formattedTime}\nMessage: ${message}`,
   };
 
