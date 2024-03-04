@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import carranzaLogo from '../img/0juOOO01.svg';
 
 // Custom Link Component for scrolling to top
 const ScrollToTopLink = ({ to, className, children, closeDropdown }) => {
@@ -57,11 +58,13 @@ const Navbar = () => {
   }, [navbarRef]);
 
   return (
-    <div className="container-fluid sticky-top bg-dark bg-light-radial shadow-sm px-5 pe-lg-0" ref={navbarRef}>
-      <nav className="navbar navbar-expand-lg bg-dark bg-light-radial navbar-dark py-3 py-lg-0">
-      <ScrollToTopLink to="/" className="navbar-brand">
+    <div className="container-fluid sticky-top bg-dark bg-light-radial shadow-sm " ref={navbarRef}>
+      <nav className="navbar navbar-expand-lg bg-dark bg-light-radial navbar-dark ">
+      <ScrollToTopLink to="/" className="navbar-brand-1">
   <h1 className="brand-title">
-    <i className="bi bi-building text-primary me-2"></i>
+  <span className="brand-logo">
+  <img src={carranzaLogo} alt="Carranza Restoration LLC Logo" />
+   </span>
     <span className="brand-name">Carranza</span>
     <span className="brand-description">Restoration LLC</span>
   </h1>
@@ -79,7 +82,7 @@ const Navbar = () => {
               <button className={`nav-link dropdown-toggle ${isDropdownActive() ? 'active' : ''}`} onClick={toggleDropdown}>Pages</button>
               <div className={`dropdown-menu m-0 ${isDropdownOpen ? 'show' : ''}`}>
                 <ScrollToTopLink to="/project" className="dropdown-item" closeDropdown={closeDropdown}>Our Project</ScrollToTopLink>
-                <ScrollToTopLink to="/team" className="dropdown-item" closeDropdown={closeDropdown}>The Team</ScrollToTopLink>
+                {/*<ScrollToTopLink to="/team" className="dropdown-item" closeDropdown={closeDropdown}>The Team</ScrollToTopLink> */}
                 <ScrollToTopLink to="/testimonial" className="dropdown-item" closeDropdown={closeDropdown}>Testimonial</ScrollToTopLink>
               </div>
             </div>

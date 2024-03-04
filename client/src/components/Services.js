@@ -23,12 +23,12 @@ const Services = () => {
                 <div className="service-item bg-white d-flex flex-column align-items-center text-center">
                 <img className="img-fluid" src={service1} alt="Service 1" />
                     <div className="service-icon bg-white">
-                        <i className="fa fa-3x fa-building text-primary"></i>
+                        <i className="fa fa-3x fa-calculator text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
                         <h4 className="text-uppercase mb-3">Estimates</h4>
-                        <p>Duo dolore et diam sed ipsum stet amet duo diam. Rebum amet ut amet sed erat sed sed amet magna elitr amet kasd diam duo</p>
-                        <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>
+                        <p>With our services, you can expect detailed estimates crafted with industry-standard pricing, providing you with confidence and peace of mind in every home improvement endeavor.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
             </div>
@@ -39,9 +39,9 @@ const Services = () => {
                         <i className="fa fa-3x fa-home text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
-                        <h4 className="text-uppercase mb-3">House Renovation</h4>
-                        <p>Duo dolore et diam sed ipsum stet amet duo diam. Rebum amet ut amet sed erat sed sed amet magna elitr amet kasd diam duo</p>
-                        <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>
+                        <h4 className="text-uppercase mb-3">Home Renovation</h4>
+                        <p>Transform your living space with professional renovation services renowned for our exceptional quality and craftsmanship.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
             </div>
@@ -49,12 +49,12 @@ const Services = () => {
                 <div className="service-item bg-white rounded d-flex flex-column align-items-center text-center">
                 <img className="img-fluid" src={service3} alt="Service 3" />
                     <div className="service-icon bg-white">
-                    <i className="fa-solid fa-house-flood-water fa-3x text-primary"></i>
+                    <i className="fa-solid fa-truck-moving fa-3x text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
-                        <h4 className="text-uppercase mb-3">Water Mitigation</h4>
-                        <p>Duo dolore et diam sed ipsum stet amet duo diam. Rebum amet ut amet sed erat sed sed amet magna elitr amet kasd diam duo</p>
-                        <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>
+                        <h4 className="text-uppercase mb-3">Moving Services</h4>
+                        <p>Count on our fast-moving services that never compromise on the safety and protection of your belongings.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
             </div>
@@ -62,12 +62,12 @@ const Services = () => {
                 <div className="service-item bg-white rounded d-flex flex-column align-items-center text-center">
                 <img className="img-fluid" src={service4} alt="Service 4" />
                     <div className="service-icon bg-white">
-                        <i className="fa fa-3x fa-palette text-primary"></i>
+                        <i className="fa fa-3x fa-spray-can-sparkles text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
-                        <h4 className="text-uppercase mb-3">Interior Design</h4>
-                        <p>Duo dolore et diam sed ipsum stet amet duo diam. Rebum amet ut amet sed erat sed sed amet magna elitr amet kasd diam duo</p>
-                        <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>
+                        <h4 className="text-uppercase mb-3">Construction Cleaning Service</h4>
+                        <p>We understand the importance of a clean and safe environment during renovations. Our professional cleaning service goes above and beyond, ensuring your space remains pristine throughout the entire improvement process and beyond.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
             </div>
@@ -78,9 +78,9 @@ const Services = () => {
                         <i className="fa fa-3x fa-tools text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
-                        <h4 className="text-uppercase mb-3">Fixing & Support</h4>
-                        <p>Duo dolore et diam sed ipsum stet amet duo diam. Rebum amet ut amet sed erat sed sed amet magna elitr amet kasd diam duo</p>
-                        <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>
+                        <h4 className="text-uppercase mb-3">Customer Support</h4>
+                        <p>Customer satisfaction is at the heart of everything we do. Our commitment to professional service means clear communication and flexible solutions designed to exceed your expectations. Trust us to improve your home with clarity and flexibility in mind.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
             </div>
@@ -91,9 +91,9 @@ const Services = () => {
                         <i className="fa fa-3x fa-paint-brush text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
-                        <h4 className="text-uppercase mb-3">Painting</h4>
-                        <p>Duo dolore et diam sed ipsum stet amet duo diam. Rebum amet ut amet sed erat sed sed amet magna elitr amet kasd diam duo</p>
-                        <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>
+                        <h4 className="text-uppercase mb-3">Interior design</h4>
+                        <p>Experience professional interior design execution with our expert team. We prioritize your vision from start to finish, ensuring your space reflects your style and preferences.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
             </div>

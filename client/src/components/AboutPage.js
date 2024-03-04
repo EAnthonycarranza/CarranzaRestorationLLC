@@ -11,7 +11,7 @@ function AboutPage() {
       <PageHeader title="About" header="About Us"/>
       <About />
       <Appointment />
-      <Team />
+      {/* <Team /> */}
     </div>
   );
 }
