@@ -20,7 +20,7 @@ const Appointment = () => {
               <h1 className="display-5 text-uppercase mb-4">Request A <span className="text-primary">Call Back</span></h1>
             </div>
             <p className="mb-5">Our experts are ready to listen to your needs and offer tailored solutions. Reach out now and let's discuss your home renovation project.</p>
-            <button className="btn btn-primary py-3 px-5" onClick={handleQuoteRequest}>Get A Quote</button>
+            <button className="btn btn-primary py-3 px-5" onClick={handleQuoteRequest}>Schedule and inspection</button>
           </div>
           <div className="col-lg-8">
             <div className="bg-light text-center p-5">
@@ -59,7 +59,7 @@ const Appointment = () => {
                     <textarea className="form-control border-0" rows="5" placeholder="Message"></textarea>
                   </div>
                   <div className="col-12">
-                    <button className="btn btn-primary py-3 px-5" type="button" onClick={handleQuoteRequest}>Get A Quote</button>
+                    <button className="btn btn-primary py-3 px-5" type="button" onClick={handleQuoteRequest}>Schedule an inspection</button>
                   </div>
                 </div>
               </form>
