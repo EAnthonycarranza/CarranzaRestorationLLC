@@ -11,26 +11,25 @@ const Appointment = () => {
     event.preventDefault(); // Prevent the form from submitting in the traditional way
     setFeedbackMessage(''); // Reset feedback message on new submission
 
-    // Format the date and time
-    const formattedDate = new Intl.DateTimeFormat('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: '2-digit' 
-    }).format(startDate);
-
-    const formattedTime = new Intl.DateTimeFormat('en-US', { 
-      hour: 'numeric', 
-      minute: 'numeric', 
-      hour12: true 
-    }).format(startTime);
-
+    // Send the raw startDate and startTime directly without formatting
     const formData = {
       name: event.target.elements.name.value,
       email: event.target.elements.email.value,
-      date: formattedDate,
-      time: formattedTime,
+      date: startDate.toISOString(), // Send as ISO string for easy parsing on the server
+      time: startTime.toISOString(), // Send as ISO string for easy parsing on the server
       message: event.target.elements.message.value,
     };
+
+    try {
+      const response = await fetch('/send-quote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      // handle response...
+    } catch (error) {
 
     try {
       const response = await fetch('/send-quote', {
@@ -64,7 +63,7 @@ const Appointment = () => {
       setFeedbackMessage('An error occurred. Please try again later.');
     }
   };
-
+  }
 
   return (
     <>
