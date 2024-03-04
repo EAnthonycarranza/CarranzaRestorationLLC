@@ -12,11 +12,24 @@ const Appointment = () => {
     event.preventDefault(); // Prevent the form from submitting in the traditional way
     setFeedbackMessage(''); // Reset feedback message on new submission
 
+    // Format the date and time
+    const formattedDate = new Intl.DateTimeFormat('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: '2-digit' 
+    }).format(startDate);
+
+    const formattedTime = new Intl.DateTimeFormat('en-US', { 
+      hour: 'numeric', 
+      minute: 'numeric', 
+      hour12: true 
+    }).format(startTime);
+
     const formData = {
       name: event.target.elements.name.value,
       email: event.target.elements.email.value,
-      date: startDate,
-      time: startTime,
+      date: formattedDate,
+      time: formattedTime,
       message: event.target.elements.message.value,
     };
 
@@ -35,7 +48,7 @@ const Appointment = () => {
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
           if (data.success) {
-            setFeedbackMessage('Quote request sent successfully. Thank you!');
+            setFeedbackMessage('Message sent successfully. Thank you! We will get back to you as soon as possible! Thank you!');
           } else {
             setFeedbackMessage(`Error: ${data.message}`);
           }
