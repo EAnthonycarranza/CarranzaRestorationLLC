@@ -71,11 +71,25 @@ const InputField = ({ placeholder, name, type = 'text' }) => (
   </div>
 );
 
-const DatePickerField = ({ label, date, setDate, showTimeSelectOnly = false }) => (
-  <div className="col-12 col-sm-6">
-    <DatePicker selected={date} onChange={setDate} className="form-control border-0" placeholderText={label} showTimeSelect={showTimeSelectOnly} showTimeSelectOnly={showTimeSelectOnly} timeIntervals={15} timeCaption="Time" dateFormat="h:mm aa" style={{ height: '55px' }} />
-  </div>
-);
+const DatePickerField = ({ label, date, setDate, showTimeSelectOnly = false }) => {
+  const isTimePicker = showTimeSelectOnly;
+  return (
+    <div className="col-12 col-sm-6">
+      <DatePicker
+        selected={date}
+        onChange={setDate}
+        className="form-control border-0"
+        placeholderText={label}
+        showTimeSelect={isTimePicker}
+        showTimeSelectOnly={isTimePicker}
+        timeIntervals={15}
+        timeCaption="Time"
+        dateFormat={isTimePicker ? "h:mm aa" : "MMMM d, yyyy"} // Adjust dateFormat based on whether it's a time picker
+        style={{ height: '55px' }}
+      />
+    </div>
+  );
+};
 
 const MessageField = () => (
   <div className="col-12">
