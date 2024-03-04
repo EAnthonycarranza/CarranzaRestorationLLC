@@ -50,6 +50,39 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
+app.post('/send-quote', async (req, res) => {
+  const { name, email, date, time, message } = req.body;
+
+  // Configure Nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL, // Use environment variable
+      pass: process.env.EMAIL_PASSWORD, // Use environment variable
+    },
+  });
+
+  // Convert date and time to more readable formats if necessary
+  const formattedDate = date; // Adjust this line to format the date as you prefer
+  const formattedTime = time; // Adjust this line to format the time as you prefer
+
+  // Email options
+  const mailOptions = {
+    from: email,
+    to: process.env.RECEIVER_EMAIL, // Use environment variable for receiver email
+    subject: `Quote Request from ${name}`,
+    text: `Name: ${name}\nEmail: ${email}\nDate: ${formattedDate}\nTime: ${formattedTime}\nMessage: ${message}`,
+  };
+
+  // Send email
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ success: true, message: 'Quote request sent successfully' });
+  } catch (error) {
+    console.error('Error sending quote request email:', error);
+    res.status(500).json({ success: false, message: 'Error sending quote request', error: error.message });
+  }
+});
 
 const subscribers = []; // This should be replaced with a database in a real application
 
@@ -77,13 +110,13 @@ async function sendConfirmationEmail(userEmail) {
   const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-          user: 'anthonycarranza123@gmail.com', // Your email
+          user: process.env.SENDER_EMAIL, // Your email
           pass: process.env.EMAIL_PASSWORD, // Your email password from .env
       },
   });
 
   const mailOptions = {
-      from: 'anthonycarranza123@gmail.com',
+      from: process.env.SENDER_EMAIL,
       to: userEmail,
       subject: 'Subscription Confirmation',
       text: 'You are Subscribed!',
