@@ -81,10 +81,10 @@ const Portfolio = () => {
         {/* Hidden Anchor Tag for Lightbox */}
         <a href={portfolio1} data-lightbox="portfolio" style={{ display: 'none' }} ref={portfolio1Ref}></a>
 
-        <div className="portfolio-title shadow-sm">
-            <p className="h4 text-uppercase">Carpet Instaliation</p>
-            <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span>
-        </div>
+        {/*<div className="portfolio-title shadow-sm">*/}
+            {/* <p className="h4 text-uppercase">Carpet Instaliation</p> */}
+            {/* <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span> */}
+        {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
         <button className="portfolio-btn" onClick={() => portfolio1Ref.current.click()}>
@@ -102,10 +102,10 @@ const Portfolio = () => {
         {/* Hidden Anchor Tag for Lightbox */}
         <a href={portfolio2} data-lightbox="portfolio" style={{ display: 'none' }} ref={portfolio2Ref}></a>
 
-        <div className="portfolio-title shadow-sm">
-            <p className="h4 text-uppercase">Fire Restoration</p>
-            <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span>
-        </div>
+        {/*<div className="portfolio-title shadow-sm">*/}
+           {/* <p className="h4 text-uppercase">Bathroom Remodel</p> */}
+            {/* <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span> */}
+        {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
         <button className="portfolio-btn" onClick={() => portfolio2Ref.current.click()}>
@@ -122,10 +122,10 @@ const Portfolio = () => {
         {/* Hidden Anchor Tag for Lightbox */}
         <a href={portfolio3} data-lightbox="portfolio" style={{ display: 'none' }} ref={portfolio3Ref}></a>
 
-        <div className="portfolio-title shadow-sm">
-            <p className="h4 text-uppercase">Tile Instaliation</p>
-            <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span>
-        </div>
+        {/*<div className="portfolio-title shadow-sm">*/}
+            {/* <p className="h4 text-uppercase">Tile Instaliation</p> */}
+            {/* <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span> */}
+        {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
         <button className="portfolio-btn" onClick={() => portfolio3Ref.current.click()}>
@@ -142,10 +142,10 @@ const Portfolio = () => {
         {/* Hidden Anchor Tag for Lightbox */}
         <a href={portfolio4} data-lightbox="portfolio" style={{ display: 'none' }} ref={portfolio4Ref}></a>
 
-        <div className="portfolio-title shadow-sm">
-            <p className="h4 text-uppercase">Cabinet Instaliation</p>
-            <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span>
-        </div>
+        {/*<div className="portfolio-title shadow-sm">*/}
+            {/* <p className="h4 text-uppercase">Cabinet Instaliation</p> */}
+            {/* <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span> */}
+        {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
         <button className="portfolio-btn" onClick={() => portfolio4Ref.current.click()}>
@@ -162,10 +162,10 @@ const Portfolio = () => {
         {/* Hidden Anchor Tag for Lightbox */}
         <a href={portfolio5} data-lightbox="portfolio" style={{ display: 'none' }} ref={portfolio5Ref}></a>
 
-        <div className="portfolio-title shadow-sm">
-            <p className="h4 text-uppercase">Painting</p>
-            <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span>
-        </div>
+        {/*<div className="portfolio-title shadow-sm">*/}
+            {/* <p className="h4 text-uppercase">Painting</p> */}
+            {/* <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span> */}
+        {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
         <button className="portfolio-btn" onClick={() => portfolio5Ref.current.click()}>
@@ -182,10 +182,10 @@ const Portfolio = () => {
         {/* Hidden Anchor Tag for Lightbox */}
         <a href={portfolio6} data-lightbox="portfolio" style={{ display: 'none' }} ref={portfolio6Ref}></a>
 
-        <div className="portfolio-title shadow-sm">
-            <p className="h4 text-uppercase">Roofing</p>
-            <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span>
-        </div>
+        {/*<div className="portfolio-title shadow-sm">*/}
+            {/* <p className="h4 text-uppercase">Roofing</p> */}
+            {/* <span className="text-body"><i className="fa fa-map-marker-alt text-primary me-2"></i>San Antonio, TX, USA</span> */}
+        {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
         <button className="portfolio-btn" onClick={() => portfolio6Ref.current.click()}>

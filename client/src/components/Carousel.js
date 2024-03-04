@@ -56,7 +56,7 @@ const Carousel = () => {
                 <div className="p-3" style={{ maxWidth: '900px' }}>
                 <i className="fa fa-calculator fa-4x text-primary mb-4 d-none d-sm-block"></i>
                   <h1 className="display-2 text-uppercase text-white mb-md-4">Estimates That Empower</h1>
-                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleGetQuote}>Get A Quote</button>
+                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleGetQuote}>Schedule an inspection</button>
                   {/* Add your desired content for Carousel 3 */}
                 </div>
               </div>
