@@ -62,22 +62,24 @@ app.post('/send-quote', async (req, res) => {
     },
   });
 
-  // Parse date and time to Date objects
-  const dateObj = new Date(date);
-  const timeObj = new Date(time);
+  let formattedDate = "Invalid date"; // Default value for invalid date
+  let formattedTime = "Invalid time"; // Default value for invalid time
 
-  // Format date and time
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: '2-digit'
-  }).format(dateObj);
-
-  const formattedTime = new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  }).format(timeObj);
+  // Validate and format date
+  if (date && !isNaN(new Date(date).getTime())) {
+    const dateObj = new Date(date);
+    formattedDate = new Intl.DateTimeFormat('en-US', { 
+      year: 'numeric', month: 'long', day: '2-digit' 
+    }).format(dateObj);
+  }
+  
+  // Validate and format time
+  if (time && !isNaN(new Date(time).getTime())) {
+    const timeObj = new Date(time);
+    formattedTime = new Intl.DateTimeFormat('en-US', { 
+      hour: '2-digit', minute: '2-digit', hour12: true 
+    }).format(timeObj);
+  }
 
   // Email options
   const mailOptions = {
@@ -87,7 +89,7 @@ app.post('/send-quote', async (req, res) => {
     text: `Name: ${name}\nEmail: ${email}\nDate: ${formattedDate}\nTime: ${formattedTime}\nMessage: ${message}`,
   };
 
-  // Send email
+  // Attempt to send email
   try {
     await transporter.sendMail(mailOptions);
     res.status(200).json({ success: true, message: 'Quote request sent successfully' });
