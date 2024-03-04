@@ -17,9 +17,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
-console.log('Email:', process.env.EMAIL);
-console.log('Password:', process.env.EMAIL_PASSWORD);
-
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
 
@@ -27,28 +24,31 @@ app.post('/send-email', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL, // Use environment variable
-      pass: process.env.EMAIL_PASSWORD, // Use environment variable
+      user: process.env.EMAIL, // Use environment variable for your email
+      pass: process.env.EMAIL_PASSWORD, // Use environment variable for your password
     },
   });
 
-  // Email options
+  // Email options, including CC
   const mailOptions = {
-    from: email,
-    to: process.env.RECEIVER_EMAIL, // Use environment variable for receiver email
+    from: process.env.EMAIL, // Use your email as the sender
+    to: process.env.RECEIVER_EMAIL, // Primary recipient email address from environment variable
+    cc: `${email}, ${process.env.COMPANY_EMAIL}`,
     subject: subject,
     text: `Message from ${name} (${email}): ${message}`,
   };
-
   // Send email
   try {
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true, message: 'Email sent successfully' });
+    // Success feedback
+    res.status(200).json({ success: true, message: 'Email sent successfully. Thank you for contacting us!' });
   } catch (error) {
     console.error('Error sending email:', error);
-    res.status(500).json({ success: false, message: 'Error sending email', error: error.message });
+    res.status(500).json({ success: false, message: 'Error sending email. Please try again later.' });
   }
 });
+
+
 
 app.post('/send-quote', async (req, res) => {
   const { name, email, date, time, message } = req.body;
@@ -131,11 +131,13 @@ async function sendConfirmationEmail(userEmail) {
   });
 
   const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: userEmail,
-      subject: 'Subscription Confirmation',
-      text: 'You are Subscribed!',
+    from: process.env.EMAIL, // Sender's email address
+    to: process.env.RECEIVER_EMAIL, // Primary recipient's email address
+    cc: `${email}, ${process.env.COMPANY_EMAIL}`, // CC multiple recipients
+    subject: subject,
+    text: `Message from ${name} (${email}): ${message}`,
   };
+  
 
   await transporter.sendMail(mailOptions);
 }
