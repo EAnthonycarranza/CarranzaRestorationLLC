@@ -230,15 +230,6 @@
     right: 0;
 }
 
-.portfolio-item:hover .portfolio-box::before {
-    left: 0;
-    width: 50%;
-}
-
-.portfolio-item:hover .portfolio-box::after {
-    right: 0;
-    width: 50%;
-}
 
 @media (min-width: 992px) {
     .testimonial,
