@@ -210,17 +210,6 @@
     opacity: 1;
 }
 
-.portfolio-box::before,
-.portfolio-box::after {
-    position: absolute;
-    content: "";
-    width: 0;
-    height: 100%;
-    top: 0;
-    transition: .5s;
-    z-index: 1;
-    background: rgba(4, 15, 40, .7);
-}
 
 .portfolio-box::before {
     left: 0;
