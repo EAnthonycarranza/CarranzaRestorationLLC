@@ -75,7 +75,7 @@ const Portfolio = () => {
         <div className="row g-5 portfolio-container">
 {/* Portfolio Item 1 */}
 <div className="col-xl-4 col-lg-6 col-md-6 portfolio-item first">
-    <div className="position-relative portfolio-box">
+    <div className="position-relative portfolio-box1">
         <img className="img-fluid w-100" src={portfolio1} alt="Portfolio 1" />
 
         {/* Hidden Anchor Tag for Lightbox */}
@@ -96,7 +96,7 @@ const Portfolio = () => {
 
 {/* Portfolio Item 2 */}
 <div className="col-xl-4 col-lg-6 col-md-6 portfolio-item second">
-    <div className="position-relative portfolio-box">
+    <div className="position-relative portfolio-box1">
         <img className="img-fluid w-100" src={portfolio2} alt="Portfolio 2" />
 
         {/* Hidden Anchor Tag for Lightbox */}
@@ -116,7 +116,7 @@ const Portfolio = () => {
 
 {/* Portfolio Item 3 */}
 <div className="col-xl-4 col-lg-6 col-md-6 portfolio-item first">
-    <div className="position-relative portfolio-box">
+    <div className="position-relative portfolio-box1">
         <img className="img-fluid w-100" src={portfolio3} alt="Portfolio 3" />
 
         {/* Hidden Anchor Tag for Lightbox */}
@@ -136,7 +136,7 @@ const Portfolio = () => {
 
 {/* Portfolio Item 4 */}
 <div className="col-xl-4 col-lg-6 col-md-6 portfolio-item second">
-    <div className="position-relative portfolio-box">
+    <div className="position-relative portfolio-box1">
         <img className="img-fluid w-100" src={portfolio4} alt="Portfolio 4" />
 
         {/* Hidden Anchor Tag for Lightbox */}
@@ -156,7 +156,7 @@ const Portfolio = () => {
 
 {/* Portfolio Item 5 */}
 <div className="col-xl-4 col-lg-6 col-md-6 portfolio-item first">
-    <div className="position-relative portfolio-box">
+    <div className="position-relative portfolio-box1">
         <img className="img-fluid w-100" src={portfolio5} alt="Portfolio 5" />
 
         {/* Hidden Anchor Tag for Lightbox */}
@@ -176,7 +176,7 @@ const Portfolio = () => {
 
 {/* Portfolio Item 6 */}
 <div className="col-xl-4 col-lg-6 col-md-6 portfolio-item second">
-    <div className="position-relative portfolio-box">
+    <div className="position-relative portfolio-box1">
         <img className="img-fluid w-100" src={portfolio6} alt="Portfolio 6" />
 
         {/* Hidden Anchor Tag for Lightbox */}
