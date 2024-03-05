@@ -1,6 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import React, { useRef, useEffect } from 'react'; // Import useEffect here as well
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom'; // Import useLocation
 import './App.css';
 import Topbar from './components/Topbar';
 import Navbar from './components/Navbar';
@@ -8,6 +7,7 @@ import Carousel from './components/Carousel';
 import Services from './components/Services';
 import Appointment from './components/Appointment';
 import Portfolio from './components/Portfolio';
+import About from './components/About';
 import Team from './components/Team';
 import Testimonial from './components/Testimonial';
 import Review from './components/Review';
@@ -21,7 +21,7 @@ import TestimonialPage from './components/TestimonialPage'; // Import ProjectPag
 import ContactPage from './components/ContactPage'; // Import ProjectPage
 
 const ScrollToTop = ({ children }) => {
-  const location = useLocation();
+  const location = useLocation(); // Now useLocation is defined
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -31,6 +31,14 @@ const ScrollToTop = ({ children }) => {
 };
 
 function App() {
+  const appointmentRef = useRef(null); // Moved inside App component
+
+  const scrollToAppointment = () => { // Moved inside App component
+    if(appointmentRef.current) {
+      appointmentRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <Router>
       <div className="App">
@@ -48,9 +56,10 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/" element={
             <>
-              <Carousel />
+              <Carousel scrollToAppointment={scrollToAppointment} />
+              <About />
               <Services />
-              <Appointment />
+              <div ref={appointmentRef}><Appointment /></div>
               <Portfolio />
               {/*<Team /> */}
               <Testimonial />
