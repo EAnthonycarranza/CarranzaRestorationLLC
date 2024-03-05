@@ -8,11 +8,7 @@ app.use(express.json());
 const cors = require('cors');
 app.use(cors());
 
-
-// Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
-
-// The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
@@ -48,24 +44,23 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
-
-
+// This is the correct and only needed /send-quote handler
 app.post('/send-quote', async (req, res) => {
-  const { name, email, date, time, message } = req.body;
+  const { name, email, date, time, message, address, phoneNumber, projectDetails, previousWork, insuranceClaim, insuranceCompany, claimNumber } = req.body;
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL, // Use environment variable
-      pass: process.env.EMAIL_PASSWORD, // Use environment variable
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
-  let formattedDate = "Invalid date"; // Default value for invalid date
-  let formattedTime = "Invalid time"; // Default value for invalid time
+  let formattedDate = "Invalid date";
+  let formattedTime = "Invalid time";
 
-  // Validate and format date
+  // Validate and format date and time
   if (date && !isNaN(new Date(date).getTime())) {
     const dateObj = new Date(date);
     formattedDate = new Intl.DateTimeFormat('en-US', { 
@@ -73,7 +68,6 @@ app.post('/send-quote', async (req, res) => {
     }).format(dateObj);
   }
   
-  // Validate and format time
   if (time && !isNaN(new Date(time).getTime())) {
     const timeObj = new Date(time);
     formattedTime = new Intl.DateTimeFormat('en-US', { 
@@ -81,12 +75,27 @@ app.post('/send-quote', async (req, res) => {
     }).format(timeObj);
   }
 
-  // Email options
+  // Constructing the email body with new fields
+  const emailBody = `Name: ${name}
+  Email: ${email}
+  Date: ${formattedDate}
+  Time: ${formattedTime}
+  Message: ${message}
+  Address: ${address}
+  Callback Phone Number: ${phoneNumber}
+  Project Details: ${projectDetails}
+  Previous Work Done: ${previousWork}
+  Insurance Claim: ${insuranceClaim}
+  Insurance Company: ${insuranceCompany}
+  Claim Number: ${claimNumber}`;
+
+  // Email options, now including additional information
   const mailOptions = {
-    from: email,
-    to: process.env.RECEIVER_EMAIL, // Use environment variable for receiver email
+    from: process.env.EMAIL, // This should likely be your EMAIL variable or a specific sender email
+    to: process.env.RECEIVER_EMAIL,
+    cc: `${email}, ${process.env.COMPANY_EMAIL}`,
     subject: `Inspection Request from ${name}`,
-    text: `Name: ${name}\nEmail: ${email}\nDate: ${formattedDate}\nTime: ${formattedTime}\nMessage: ${message}`,
+    text: emailBody,
   };
 
   // Attempt to send email
@@ -99,7 +108,7 @@ app.post('/send-quote', async (req, res) => {
   }
 });
 
-const subscribers = []; // This should be replaced with a database in a real application
+const subscribers = [];
 
 app.post('/subscribe', async (req, res) => {
   const { email } = req.body;
@@ -125,20 +134,18 @@ async function sendConfirmationEmail(userEmail) {
   const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-          user: process.env.SENDER_EMAIL, // Your email
-          pass: process.env.EMAIL_PASSWORD, // Your email password from .env
+          user: process.env.SENDER_EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
       },
   });
 
   const mailOptions = {
-    from: process.env.EMAIL, // Sender's email address
-    to: process.env.RECEIVER_EMAIL, // Primary recipient's email address
-    cc: `${email}, ${process.env.COMPANY_EMAIL}`, // CC multiple recipients
+    from: process.env.EMAIL,
+    to: process.env.RECEIVER_EMAIL,
+    cc: `${email}, ${process.env.COMPANY_EMAIL}`,
     subject: subject,
     text: `Message from ${name} (${email}): ${message}`,
   };
-  
-
   await transporter.sendMail(mailOptions);
 }
 
