@@ -206,7 +206,7 @@
     opacity: 0;
 }
 
-.portfolio-item:hover .portfolio-btn {
+ .portfolio-btn {
     opacity: 1;
 }
 
