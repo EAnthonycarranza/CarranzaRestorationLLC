@@ -77,10 +77,10 @@ const Contact = () => {
     <h3>Contact Information</h3>
     <p>Email: <a href="mailto:admin@carranzarestoration.com">admin@carranzarestoration.com</a></p>
     <p>Phone: <a href="tel:2102671008">(210) 267-1008</a></p>
-    <h3>Business Office Hours</h3>
-    <p>Monday - Friday: 8:30 AM - 5:30 PM</p>
+    <h3>Contact Us</h3>
+    <p>Enter your information here and we will get back to you shortly.</p>
 </div>
-<div className="row g-3" style={{ paddingTop: "70px" }}>
+<div className="row g-3">
     <div className="col-12 col-sm-6">
       <input
         type="text"

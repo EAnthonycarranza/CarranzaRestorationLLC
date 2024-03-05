@@ -4,13 +4,12 @@ import carousel1Image from '../img/carousel-1.jpg';
 import carousel2Image from '../img/carousel-2.jpg';
 import carousel3Image from '../img/carousel-3.jpg';
 
-const Carousel = () => {
+const Carousel = ({ scrollToAppointment }) => { 
   const navigate = useNavigate(); // Use useNavigate hook
 
   const handleGetQuote = () => {
     console.log("Get Quote button clicked");
-    // Navigate to '/estimate' when Get Quote button is clicked
-    navigate('/about');
+    scrollToAppointment(); // Use scrollToAppointment to scroll
   };
 
   const handleContactUs = () => {

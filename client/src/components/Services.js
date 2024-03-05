@@ -16,7 +16,7 @@ const Services = () => {
     <>
       <div className="container-fluid bg-light py-6 px-5">
         <div className="text-center mx-auto mb-5" style={{ maxWidth: '600px' }}>
-            <h1 className="display-5 text-uppercase mb-4">We Provide <span className="text-primary">The Best</span> Construction Services</h1>
+            <h1 className="display-5 text-uppercase mb-4">We Provide <span className="text-primary">The Best</span> Home Improvement Services</h1>
         </div>
         <div className="row g-5">
             <div className="col-lg-4 col-md-6">
@@ -92,7 +92,7 @@ const Services = () => {
                     </div>
                     <div className="px-4 pb-4">
                         <h4 className="text-uppercase mb-3">Interior design</h4>
-                        <p>Experience professional interior design execution with our expert team. We prioritize your vision from start to finish, ensuring your space reflects your style and preferences.</p>
+                        <p>Experience professional interior design execution with our expert team. We prioritize your vision from start to finish, ensuring your space reflects your style and preferences. Additionally, we have an extensive array of samples available to provide and showcase to customers!</p>
                         {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
