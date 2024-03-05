@@ -347,6 +347,7 @@ textarea.form-control-lg {
   }
 }
 
+
 /* Styling for the navbar brand */
 .navbar-brand h1 {
   margin: 0;
@@ -478,18 +479,34 @@ textarea.form-control-lg {
 }
 
 @media (max-width: 540px) {
-  .navbar-brand h1 {
-    flex-direction: column;
-    font-size: 20px;
+  .brand-title {
+    display: flex; /* Align children horizontally */
+    align-items: center; /* Center children vertically */
+    gap: 1px; /* Optional: Add some space between the logo and the text */
   }
+}  
+
+@media (max-width: 540px){
+  .brand-logo img {
+    width: 60px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+  }  
 }
 
 @media (max-width: 540px) {
-  .navbar-brand-1 h1 {
+  .navbar-brand h1, .navbar-brand-1 h1 {
     flex-direction: column;
-    font-size: 20px;
+    font-size: 15px;
+    flex-direction: row;
   }
 }
+
+
+.navbar-brand-1 h1 {
+  display: flex;
+  align-items: center; /* Align the icon and text */
+}
+
 
 @media (min-width: 992px) { /* lg breakpoint */
   .nav-item.nav-link.bg-primary {
