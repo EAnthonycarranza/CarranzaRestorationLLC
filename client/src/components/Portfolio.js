@@ -87,9 +87,9 @@ const Portfolio = () => {
         {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
-        <button className="portfolio-btn" onClick={() => portfolio1Ref.current.click()}>
-            <i className="bi bi-plus text-white"></i>
-        </button>
+        {/* <button className="portfolio-btn" onClick={() => portfolio1Ref.current.click()}> */}
+            {/*<i className="bi bi-plus text-white"></i>*/}
+        {/*</button>*/}
     </div>
 </div>
 
@@ -108,9 +108,9 @@ const Portfolio = () => {
         {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
-        <button className="portfolio-btn" onClick={() => portfolio2Ref.current.click()}>
-            <i className="bi bi-plus text-white"></i>
-        </button>
+        {/* <button className="portfolio-btn" onClick={() => portfolio2Ref.current.click()}> */}
+            {/*<i className="bi bi-plus text-white"></i>*/}
+        {/*</button>*/}
     </div>
 </div>
 
@@ -128,9 +128,9 @@ const Portfolio = () => {
         {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
-        <button className="portfolio-btn" onClick={() => portfolio3Ref.current.click()}>
-            <i className="bi bi-plus text-white"></i>
-        </button>
+        {/* <button className="portfolio-btn" onClick={() => portfolio3Ref.current.click()}> */}
+            {/*<i className="bi bi-plus text-white"></i>*/}
+        {/*</button>*/}
     </div>
 </div>
 
@@ -148,9 +148,9 @@ const Portfolio = () => {
         {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
-        <button className="portfolio-btn" onClick={() => portfolio4Ref.current.click()}>
-            <i className="bi bi-plus text-white"></i>
-        </button>
+        {/* <button className="portfolio-btn" onClick={() => portfolio4Ref.current.click()}> */}
+            {/*<i className="bi bi-plus text-white"></i>*/}
+        {/*</button>*/}
     </div>
 </div>
 
@@ -168,9 +168,9 @@ const Portfolio = () => {
         {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
-        <button className="portfolio-btn" onClick={() => portfolio5Ref.current.click()}>
-            <i className="bi bi-plus text-white"></i>
-        </button>
+        {/* <button className="portfolio-btn" onClick={() => portfolio5Ref.current.click()}> */}
+            {/*<i className="bi bi-plus text-white"></i>*/}
+        {/*</button>*/}
     </div>
 </div>
 
@@ -188,9 +188,9 @@ const Portfolio = () => {
         {/* </div> */}
 
         {/* Button to Trigger Lightbox */}
-        <button className="portfolio-btn" onClick={() => portfolio6Ref.current.click()}>
-            <i className="bi bi-plus text-white"></i>
-        </button>
+        {/* <button className="portfolio-btn" onClick={() => portfolio6Ref.current.click()}> */}
+            {/*<i className="bi bi-plus text-white"></i>*/}
+        {/*</button>*/}
     </div>
 </div>
                   {/* Portfolio Item ends */}
