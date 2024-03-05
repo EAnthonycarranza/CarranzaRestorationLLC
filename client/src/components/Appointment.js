@@ -6,6 +6,18 @@ const Appointment = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [insuranceClaim, setInsuranceClaim] = useState('no'); // Declare insuranceClaim state
+
+  const SelectField = ({ label, name, options, onChange }) => (
+    <div className="col-12 col-sm-6">
+      <select name={name} className="form-control border-0" style={{ height: '55px' }} onChange={onChange}>
+        <option value="">{label}</option>
+        {options.map(option => (
+          <option key={option} value={option.toLowerCase()}>{option}</option>
+        ))}
+      </select>
+    </div>
+  );
 
   const handleQuoteRequest = async (event) => {
     event.preventDefault();
@@ -17,6 +29,12 @@ const Appointment = () => {
       date: startDate.toISOString(),
       time: startTime.toISOString(),
       message: event.target.elements.message.value,
+      address: event.target.elements.address.value,
+      phoneNumber: event.target.elements.phoneNumber.value,
+      projectType: event.target.elements.projectType.value,
+      insuranceClaim: insuranceClaim,
+      insuranceCompany: insuranceClaim === 'yes' ? event.target.elements.insuranceCompany.value : '',
+      claimNumber: insuranceClaim === 'yes' ? event.target.elements.claimNumber.value : ''
     };
 
     try {
@@ -42,8 +60,8 @@ const Appointment = () => {
     <div className="container-fluid py-6 px-5">
       <div className="row gx-5">
         <div className="col-lg-4 mb-5 mb-lg-0">
-          <h1 className="display-5 text-uppercase mb-4">Request A <span className="text-primary">Call Back</span></h1>
-          <p className="mb-5">Our experts are ready to listen to your needs and offer tailored solutions. Reach out now and let's discuss your home renovation project.</p>
+          <h1 className="display-5 text-uppercase mb-4">Request An <span className="text-primary">estimate and inspection</span></h1>
+          <p className="mb-5">Benefit from the precision, accuracy, and speed of our estimation and inspection process, ensuring reliable solutions for your home renovation project. Fill out our form to get started!</p>
         </div>
         <div className="col-lg-8">
           <div className="bg-light text-center p-5">
@@ -53,6 +71,16 @@ const Appointment = () => {
                 <InputField placeholder="Your Email" name="email" type="email" />
                 <DatePickerField label="Call Back Date" date={startDate} setDate={setStartDate} />
                 <DatePickerField label="Call Back Time" date={startTime} setDate={setStartTime} showTimeSelectOnly={true} />
+                <InputField placeholder="Property Address" name="address" />
+        <InputField placeholder="Callback Phone Number" name="phoneNumber" type="tel" />
+        <SelectField label="Project Type" name="projectType" options={['Water Damage', 'Fire Damage', 'Other']} />
+        <SelectField label="Is this an insurance claim?" name="insuranceClaim" options={['Yes', 'No (OOP)', 'I do not know']} onChange={(e) => setInsuranceClaim(e.target.value)} />
+        {insuranceClaim === 'yes' && (
+          <>
+            <InputField placeholder="Insurance Company" name="insuranceCompany" />
+            <SelectField label="Is there a claim number?" name="hasClaimNumber" options={['Yes', 'No', 'I do not know']} />
+          </>
+        )}
                 <MessageField />
                 <SubmitButton />
               </div>
@@ -100,7 +128,7 @@ const MessageField = () => (
 
 const SubmitButton = () => (
   <div className="col-12">
-    <button type="submit" className="btn btn-primary py-3 px-5">Schedule an inspection</button>
+    <button type="submit" className="btn btn-primary py-3 px-5">Schedule NOW</button>
   </div>
 );
 
