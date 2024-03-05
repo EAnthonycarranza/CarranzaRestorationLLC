@@ -25,14 +25,45 @@ app.post('/send-email', async (req, res) => {
     },
   });
 
-  // Email options, including CC
-  const mailOptions = {
-    from: process.env.EMAIL, // Use your email as the sender
-    to: process.env.RECEIVER_EMAIL, // Primary recipient email address from environment variable
-    cc: `${email}, ${process.env.COMPANY_EMAIL}`,
-    subject: subject,
-    text: `Message from ${name} (${email}): ${message}`,
-  };
+// Email options for /send-email, including CC and structuring the HTML body
+const mailOptions = {
+  from: process.env.EMAIL, // Use your email as the sender
+  to: process.env.RECEIVER_EMAIL, // Primary recipient email address from environment variable
+  cc: `${email}, ${process.env.COMPANY_EMAIL}`,
+  subject: subject,
+  html: `
+    <div>
+      <p><strong>From:</strong> ${name} (${email})</p>
+      <hr>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+      <hr>
+      <div style="margin-top: 20px;">
+        <a href="http://www.carranzarestoration.org" target="_blank">
+        <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
+        </a>
+        <div style="margin-top: 10px;">
+        <p style="margin: 0; font-weight: bold;">Carranza Restoration LLC; FWR General Contractors</p>
+        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" ">
+          <p style="margin: 5px 0;">100 Commercial Place</p>
+          <p style="margin: 0;">Schertz, TX 78154</p>
+        </a>
+        <p style="margin: 5px 0;">
+          <a href="tel:+12102671008" ">(210) 267-1008</a> Office
+        </p>
+        <p style="margin: 0;">
+          <a href="tel:+12104285610" ">(210) 428-5610</a> Cell
+        </p>
+      </div>      
+        <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
+        <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
+        <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angli List Review</a></p>
+      </div>
+    </div>
+  `, // Use HTML formatting
+};
+
+
   // Send email
   try {
     await transporter.sendMail(mailOptions);
@@ -46,7 +77,7 @@ app.post('/send-email', async (req, res) => {
 
 // This is the correct and only needed /send-quote handler
 app.post('/send-quote', async (req, res) => {
-  const { name, email, date, time, message, address, phoneNumber, projectDetails, previousWork, insuranceClaim, insuranceCompany, claimNumber } = req.body;
+  const { name, email, date, time, message, address, phoneNumber, projectType, insuranceClaim, insuranceCompany, claimNumber } = req.body;
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -76,27 +107,54 @@ app.post('/send-quote', async (req, res) => {
   }
 
   // Constructing the email body with new fields
-  const emailBody = `Name: ${name}
-  Email: ${email}
-  Date: ${formattedDate}
-  Time: ${formattedTime}
-  Message: ${message}
-  Address: ${address}
-  Callback Phone Number: ${phoneNumber}
-  Project Details: ${projectDetails}
-  Previous Work Done: ${previousWork}
-  Insurance Claim: ${insuranceClaim}
-  Insurance Company: ${insuranceCompany}
-  Claim Number: ${claimNumber}`;
+  const emailBody = `  
+  <div>
+  <h1>Inspection/Estimate Request</h1>
+  <p><strong>Name:</strong> ${name}</p>
+  <p><strong>Email:</strong> ${email}</p>
+  <p><strong>Date:</strong> ${formattedDate}</p>
+  <p><strong>Time:</strong> ${formattedTime}</p>
+  <p><strong>Address:</strong> ${address}</p>
+  <p><strong>Callback Phone Number:</strong> ${phoneNumber}</p>
+  <p><strong>Project Type:</strong> ${projectType}</p>
+  <p><strong>Insurance Claim:</strong> ${insuranceClaim}</p>
+  <p><strong>Insurance Company:</strong> ${insuranceCompany}</p>
+  <p><strong>Claim Number:</strong> ${claimNumber}</p>
+  <hr>
+  <p><strong>Message:</strong> ${message}</p>
+  <hr>
+  <div style="margin-top: 30px;">
+  <a href="http://www.carranzarestoration.org" target="_blank">
+  <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
+  </a>
+  <div style="margin-top: 10px;">
+  <p style="margin: 0; font-weight: bold;">Carranza Restoration LLC; FWR General Contractors</p>
+  <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" ">
+    <p style="margin: 5px 0;">100 Commercial Place</p>
+    <p style="margin: 0;">Schertz, TX 78154</p>
+  </a>
+  <p style="margin: 5px 0;">
+    <a href="tel:+12102671008" ">(210) 267-1008</a> Office
+  </p>
+  <p style="margin: 0;">
+    <a href="tel:+12104285610" ">(210) 428-5610</a> Cell
+  </p>
+</div>      
+  <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
+  <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
+  <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angli List Review</a></p>
+</div>
 
-  // Email options, now including additional information
-  const mailOptions = {
-    from: process.env.EMAIL, // This should likely be your EMAIL variable or a specific sender email
-    to: process.env.RECEIVER_EMAIL,
-    cc: `${email}, ${process.env.COMPANY_EMAIL}`,
-    subject: `Inspection Request from ${name}`,
-    text: emailBody,
-  };
+</div>`;
+
+// Email options for /send-email, including CC and using HTML for body
+const mailOptions = {
+  from: process.env.EMAIL, // This should likely be your EMAIL variable or a specific sender email
+  to: process.env.RECEIVER_EMAIL,
+  cc: `${email}, ${process.env.COMPANY_EMAIL}`,
+  subject: `Inspection/Estimate Request from ${name}`,
+  html: emailBody, // Use html key instead of text
+};
 
   // Attempt to send email
   try {
