@@ -9,7 +9,8 @@
     "build-client": "cd client && npm install && npm run build",
     "install-server": "cd server && npm install",
     "install-client": "cd client && npm install",
-    "dev": "concurrently \"cd server && nodemon server.js\" \"cd client && npm start\""
+    "dev": "concurrently \"cd server && nodemon server.js\" \"cd client && npm start\"",
+      "postinstall": "npm install --prefix server"
   },
   "keywords": [],
   "author": "",
