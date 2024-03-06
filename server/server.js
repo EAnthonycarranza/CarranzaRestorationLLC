@@ -1,20 +1,67 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const nodemailer = require('nodemailer');
-const app = express();
-app.use(express.json());
-
+const juice = require('juice');
 const cors = require('cors');
-app.use(cors());
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
+const app = express();
+app.use(cors());
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/build')));
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
+  
+  const emailStyles = `
+    <style>
+      body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+      p { margin: 0 0 10px; }
+      h1, h2, h3 { margin: 10px 0; }
+      .ql-size-small { font-size: 0.75em; }
+      .ql-size-large { font-size: 1.5em; }
+      .ql-size-huge { font-size: 2.5em; }
+      .ql-align-center { text-align: center; }
+      .ql-align-right { text-align: right; }
+      .ql-align-justify { text-align: justify; }
+    </style>
+  `;
+
+  const emailHtmlContent = `
+    <div>
+      <p><strong>From:</strong> ${name} (${email})</p>
+      <p><strong>Message:</strong></p>
+      <div>${message}</div>
+  <hr>
+  <div style="margin-top: 20px;">
+    <a href="http://www.carranzarestoration.org" target="_blank">
+    <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
+    </a>
+    <div style="margin-top: 10px;">
+    <p style="margin: 0; font-weight: bold;">Carranza Restoration LLC; FWR General Contractors</p>
+    <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" ">
+      <p style="margin: 5px 0;">100 Commercial Place</p>
+      <p style="margin: 0;">Schertz, TX 78154</p>
+    </a>
+    <p style="margin: 5px 0;">
+      <a href="tel:+12102671008" ">(210) 267-1008</a> Office
+    </p>
+    <p style="margin: 0;">
+      <a href="tel:+12104285610" ">(210) 428-5610</a> Cell
+    </p>
+  </div>      
+    <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
+    <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
+    <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angli List Review</a></p>
+  </div>
+</div>
+`;
+
+const emailHtml = juice(`${emailStyles} ${emailHtmlContent}`);
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -27,47 +74,16 @@ app.post('/send-email', async (req, res) => {
 
 // Email options for /send-email, including CC and structuring the HTML body
 const mailOptions = {
-  from: process.env.EMAIL, // Use your email as the sender
-  to: process.env.RECEIVER_EMAIL, // Primary recipient email address from environment variable
-  cc: `${email}, ${process.env.COMPANY_EMAIL}`,
+  from: process.env.EMAIL,
+  to: process.env.RECEIVER_EMAIL, // The recipient's email address
+  cc: `${email}`, // CC to the sender
   subject: subject,
-  html: `
-    <div>
-      <p><strong>From:</strong> ${name} (${email})</p>
-      <hr>
-      <p><strong>Message:</strong></p>
-      <p>${message}</p>
-      <hr>
-      <div style="margin-top: 20px;">
-        <a href="http://www.carranzarestoration.org" target="_blank">
-        <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
-        </a>
-        <div style="margin-top: 10px;">
-        <p style="margin: 0; font-weight: bold;">Carranza Restoration LLC; FWR General Contractors</p>
-        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" ">
-          <p style="margin: 5px 0;">100 Commercial Place</p>
-          <p style="margin: 0;">Schertz, TX 78154</p>
-        </a>
-        <p style="margin: 5px 0;">
-          <a href="tel:+12102671008" ">(210) 267-1008</a> Office
-        </p>
-        <p style="margin: 0;">
-          <a href="tel:+12104285610" ">(210) 428-5610</a> Cell
-        </p>
-      </div>      
-        <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
-        <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
-        <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angli List Review</a></p>
-      </div>
-    </div>
-  `, // Use HTML formatting
+  html: emailHtml,
 };
-
 
   // Send email
   try {
     await transporter.sendMail(mailOptions);
-    // Success feedback
     res.status(200).json({ success: true, message: 'Email sent successfully. Thank you for contacting us!' });
   } catch (error) {
     console.error('Error sending email:', error);
