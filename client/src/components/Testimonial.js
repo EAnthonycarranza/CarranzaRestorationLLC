@@ -27,14 +27,19 @@ function Testimonial() {
     }, []);
 
     return (
-        <div>
-            {/* Revue widget div */}
-            <div data-rw-grid="38205"></div>
+<div className="text-center" style={{ paddingTop: "90px" }}> {/* Wrapper div with text-centering class */}
+            {/* Header for the testimonials section with specific class and margin */}
+            <h1 className="display-5 text-uppercase mb-4">see our <span className="text-primary">amazing</span> testimonies</h1>
 
-            {/* Trust.Reviews widget div */}
-            <div className="tr-widget" data-id="5309" data-view="flash" data-lang="">
-                <a href="https://trust.reviews/" className="trcr" target="_blank">
-                </a>
+            <div>
+                {/* Revue widget div */}
+                <div data-rw-grid="38205"></div>
+
+                {/* Trust.Reviews widget div */}
+                <div className="tr-widget" data-id="5309" data-view="flash" data-lang="">
+                    <a href="https://trust.reviews/" className="trcr" target="_blank">
+                    </a>
+                </div>
             </div>
         </div>
     );
