@@ -1,29 +1,66 @@
 import React, { useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Include styles
 
 const Contact = () => {
-  
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+  const modules = {
+    toolbar: [
+      [{ 'font': [] }], // Font family
+      [{ 'size': ['small', false, 'large'] }], // Font size
+      [{ 'align': [] }], // Text align
+      ['bold', 'italic', 'underline'], // Bold, italic, underline, strike
+      [{ 'header': '1' }, { 'header': '2' }, { 'header': [] }], // Heading
+      [{ 'indent': '+1' }], // Indent
+      ['clean'] // Remove formatting button
+    ]
+  };
+  
+  const formats = [
+    'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'script', 'header', 'list', 'indent', 'direction', 'align',
+    'link', 'image', 'video', 'blockquote', 'code-block'
+  ];
+  // Right before the handleSubmit function
+const isFormValid = () => {
+  return name.trim() && email.trim() && subject.trim() && message.trim();
+};
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setFeedbackMessage(''); // Reset feedback message on new submission
+
+    if (!isFormValid()) {
+      setFeedbackMessage('Please fill in all fields before submitting.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFeedbackMessage('');
+
     const formData = {
-      name: event.target.elements.name.value,
-      email: event.target.elements.email.value,
-      subject: event.target.elements.subject.value,
-      message: event.target.elements.message.value,
+      name: name,
+      email: email,
+      subject: subject,
+      message: message,
     };
-  
+
     try {
       const response = await fetch('/send-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-  
+
       if (response.ok) {
-        // Check the content type of the response
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
@@ -33,7 +70,6 @@ const Contact = () => {
             setFeedbackMessage(`Error: ${data.message}`);
           }
         } else {
-          // Handle non-JSON response here
           const text = await response.text();
           setFeedbackMessage(text);
         }
@@ -44,10 +80,9 @@ const Contact = () => {
       console.error('Error:', error);
       setFeedbackMessage('An error occurred. Please try again later.');
     }
-  };
-  
-  
 
+    setIsSubmitting(false); // Re-enable the form after submission
+  };
 
   return (
     <div className="container-fluid py-6 px-5">
@@ -66,66 +101,72 @@ const Contact = () => {
             allowFullScreen=""
             aria-hidden="false"
             tabIndex="0"
-            title="Map of Our Office" // Add a descriptive title here
+            title="Map of Our Office"
           ></iframe>
         </div>
         
         <div className="col-lg-6">
-        <form onSubmit={handleSubmit} className="contact-form bg-light p-5">
-                    {/* Contact details and business hours */}
-                    <div className="contact-details mt-5" style={{textAlign: "center"}}>
-    <h3>Contact Information</h3>
-    <p>Email: <a href="mailto:admin@carranzarestoration.com">admin@carranzarestoration.com</a></p>
-    <p>Phone: <a href="tel:2102671008">(210) 267-1008</a></p>
-    <h3>Contact Us</h3>
-    <p>Enter your information here and we will get back to you shortly.</p>
-</div>
-<div className="row g-3">
-    <div className="col-12 col-sm-6">
-      <input
-        type="text"
-        className="form-control border-0"
-        placeholder="Your Name"
-        name="name" // Add this line
-        style={{ height: '55px' }}
-      />
-    </div>
-    <div className="col-12 col-sm-6">
-      <input
-        type="email"
-        className="form-control border-0"
-        placeholder="Your Email"
-        name="email" // Add this line
-        style={{ height: '55px' }}
-      />
-    </div>
-    <div className="col-12">
-      <input
-        type="text"
-        className="form-control border-0"
-        placeholder="Subject"
-        name="subject" // Add this line
-        style={{ height: '55px' }}
-      />
-    </div>
-    <div className="col-12">
-      <textarea
-        className="form-control border-0"
-        rows="4"
-        placeholder="Message"
-        name="message" // Add this line
-      ></textarea>
-    </div>
-    <div className="col-12">
-      <button className="btn btn-primary w-100 py-3" type="submit">
-        Send Message
-      </button>
-    </div>
-  </div>
-</form>
-        {feedbackMessage && (
-          <div className="mt-3">
-            <p>{feedbackMessage}</p>
+          <form onSubmit={handleSubmit} className="contact-form bg-light p-5">
+            <div className="contact-details mt-5" style={{ textAlign: "center" }}>
+              <h3>Contact Information</h3>
+              <p>Email: <a href="mailto:admin@carranzarestoration.com">admin@carranzarestoration.com</a></p>
+              <p>Phone: <a href="tel:2102671008">(210) 267-1008</a></p>
+              <h3>Contact Us</h3>
+              <p>Enter your information here and we will get back to you shortly.</p>
+            </div>
+            <div className="row g-3">
+              <div className="col-12 col-sm-6">
+              <input
+  type="text"
+  className="form-control border-0"
+  placeholder="Your Name"
+  name="name"
+  value={name}
+  onChange={(e) => setName(e.target.value)}
+  required
+  style={{ height: '55px' }}
+/>
+              </div>
+              <div className="col-12 col-sm-6">
+
+              <input
+  type="email"
+  className="form-control border-0"
+  placeholder="Your Email"
+  name="email"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  required
+  style={{ height: '55px' }}
+/>
+              </div>
+              <div className="col-12">
+              <input
+  type="text"
+  className="form-control border-0"
+  placeholder="Subject"
+  name="subject"
+  value={subject}
+  onChange={(e) => setSubject(e.target.value)}
+  required
+  style={{ height: '55px' }}
+/>
+              </div>
+              <ReactQuill
+  theme="snow"
+  modules={modules}
+  formats={formats} // Pass the formats if you are customizing them
+        />
+              <div className="col-12">
+        <button className="btn btn-primary w-100 py-3" type="submit" disabled={!isFormValid() || isSubmitting}>
+          Send Message
+        </button>
+        </div>
+            </div>
+          </form>
+          {feedbackMessage && (
+            <div className="mt-3">
+              <p>{feedbackMessage}</p>
             </div>
           )}
         </div>

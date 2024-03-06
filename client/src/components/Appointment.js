@@ -1,20 +1,44 @@
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
+import ReactQuill from 'react-quill';
 import 'react-datepicker/dist/react-datepicker.css';
+import 'react-quill/dist/quill.snow.css'; // Ensure ReactQuill styles are loaded
 
 const Appointment = () => {
+  // Initial state setup
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [insuranceClaim, setInsuranceClaim] = useState('no');
+  const [message, setMessage] = useState('');
+  const [insuranceClaim, setInsuranceClaim] = useState('');
   const [projectType, setProjectType] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [insuranceCompany, setInsuranceCompany] = useState('');
-  const [claimNumber, setClaimNumber] = useState("I don't know");
+  const [claimNumber, setClaimNumber] = useState('');
 
+
+    const modules = {
+      toolbar: [
+        [{ 'font': [] }], // Font family
+        [{ 'size': ['small', false, 'large'] }], // Font size
+        [{ 'align': [] }], // Text align
+        ['bold', 'italic', 'underline'], // Bold, italic, underline, strike
+        [{ 'header': '1' }, { 'header': '2' }, { 'header': [] }], // Heading
+        [{ 'indent': '+1' }], // Indent
+        ['clean'] // Remove formatting button
+      ]
+    };
+    
+    const formats = [
+      'font', 'size',
+      'bold', 'italic', 'underline', 'strike',
+      'color', 'background',
+      'script', 'header', 'list', 'indent', 'direction', 'align',
+      'link', 'image', 'video', 'blockquote', 'code-block'
+    ];
 
   const handleQuoteRequest = async (event) => {
     event.preventDefault();
@@ -25,11 +49,11 @@ const Appointment = () => {
       email,
       date: startDate.toISOString(),
       time: startTime.toISOString(),
-      message: event.target.elements.message.value,
+      message,
       address,
       phoneNumber,
       projectType,
-      insuranceClaim,
+      insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
       insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '',
       claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
     };
@@ -68,88 +92,74 @@ const Appointment = () => {
           <div className="bg-light text-center p-5">
             <form onSubmit={handleQuoteRequest}>
               <div className="row g-3">
-                <InputField placeholder="Your Name" name="name" value={name} onChange={(e) => setName(e.target.value)} />
-                <InputField placeholder="Your Email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <div className="col-12 col-sm-6">
+                  <input type="text" className="form-control border-0" placeholder="Your Name" value={name} onChange={e => setName(e.target.value)} style={{ height: '55px' }} />
+                </div>
+                <div className="col-12 col-sm-6">
+                  <input type="email" className="form-control border-0" placeholder="Your Email" value={email} onChange={e => setEmail(e.target.value)} style={{ height: '55px' }} />
+                </div>
+                <div className="col-12 col-sm-6">
+                  <DatePicker selected={startDate} onChange={date => setStartDate(date)} className="form-control border-0" placeholderText="Select Date" />
+                </div>
+                <div className="col-12 col-sm-6">
+                  <DatePicker selected={startTime} onChange={time => setStartTime(time)} className="form-control border-0" placeholderText="Select Time" showTimeSelect showTimeSelectOnly timeIntervals={15} timeCaption="Time" dateFormat="h:mm aa" />
+                </div>
                 <div className="col-12">
-    <p>Please provide your preferred inspection schedule date:</p>
-  </div>
-  <DatePickerField label="Call Back Date" date={startDate} setDate={setStartDate} />
-                <DatePickerField label="Call Back Time" date={startTime} setDate={setStartTime} showTimeSelectOnly={true} />
-                <InputField placeholder="Property Address" name="address" value={address} onChange={(e) => setAddress(e.target.value)} />
-                <InputField placeholder="Callback Phone Number" name="phoneNumber" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-                <SelectField label="Project Type" name="projectType" options={['Water', 'Fire', 'Other']} value={projectType} onChange={(e) => setProjectType(e.target.value)} />
-                <SelectField label="Is this an insurance claim?" name="insuranceClaim" options={['Yes', 'No (OOP)', 'I do not know']} value={insuranceClaim} onChange={(e) => setInsuranceClaim(e.target.value)} />
+                  <input type="text" className="form-control border-0" placeholder="Property Address" value={address} onChange={e => setAddress(e.target.value)} style={{ height: '55px' }} />
+                </div>
+                <div className="col-12">
+                  <input type="tel" className="form-control border-0" placeholder="Phone Number" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} style={{ height: '55px' }} />
+                </div>
+                <div className="col-12">
+                  <select className="form-control border-0" value={projectType} onChange={e => setProjectType(e.target.value)} style={{ height: '55px' }}>
+                    <option value="">Project Type</option>
+                    <option value="water">Water</option>
+                    <option value="fire">Fire</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="col-12">
+                <select className="form-control border-0" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)} style={{ height: '55px' }}>
+                    <option value="">Select if this is an insurance claim</option> {/* Improved for clarity */}
+                    <option value="yes">Yes</option>
+                    <option value="no">No (OOP)</option>
+                    <option value="idk">I don't know</option>
+                  </select>
+                </div>
                 {insuranceClaim === 'yes' && (
-  <>
-    <InputField placeholder="Insurance Company" name="insuranceCompany" value={insuranceCompany} onChange={(e) => setInsuranceCompany(e.target.value)} />
-    <SelectField 
-      label="Is there a claim number?" 
-      name="claimNumber" 
-      options={['Yes', 'No', "I don't know"]} 
-      value={claimNumber} 
-      onChange={(e) => setClaimNumber(e.target.value)} 
-    />
-  </>
-)}
-
-                <MessageField />
+                  <>
+                    <div className="col-12">
+                      <input type="text" className="form-control border-0" placeholder="Insurance Company" value={insuranceCompany} onChange={e => setInsuranceCompany(e.target.value)} style={{ height: '55px' }} />
+                    </div>
+                    <div className="col-12">
+                      <select className="form-control border-0" value={claimNumber} onChange={e => setClaimNumber(e.target.value)} style={{ height: '55px' }}>
+                        <option value="">Is there a claim number?</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="idk">I don't know</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+                <div className="col-12">
+                  <label htmlFor="additionalNotes">Additional Notes:</label>
+                  <ReactQuill theme="snow" value={message} onChange={setMessage} modules={modules} formats={formats} />
+                 </div>
                 <div className="col-12">
                   <button type="submit" className="btn btn-primary py-3 px-5" disabled={!isFormValid()}>Schedule NOW</button>
                 </div>
               </div>
             </form>
-            {feedbackMessage && <FeedbackMessage message={feedbackMessage} />}
+            {feedbackMessage && (
+              <div className="mt-3">
+                <p>{feedbackMessage}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-const InputField = ({ placeholder, name, type, value, onChange }) => (
-  <div className="col-12 col-sm-6">
-    <input type={type} className="form-control border-0" placeholder={placeholder} name={name} value={value} onChange={onChange} style={{ height: '55px' }} />
-  </div>
-);
-
-const DatePickerField = ({ label, date, setDate, showTimeSelectOnly }) => (
-  <div className="col-12 col-sm-6">
-    <DatePicker
-      selected={date}
-      onChange={setDate}
-      className="form-control border-0"
-      placeholderText={label}
-      showTimeSelect={showTimeSelectOnly}
-      showTimeSelectOnly={showTimeSelectOnly}
-      timeIntervals={15}
-      timeCaption="Time"
-      dateFormat={showTimeSelectOnly ? "h:mm aa" : "MMMM d, yyyy"}
-      style={{ height: '55px' }}
-    />
-  </div>
-);
-
-const SelectField = ({ label, name, options, onChange, value }) => (
-  <div className="col-12 col-sm-6">
-    <select name={name} value={value} className="form-control border-0" style={{ height: '55px' }} onChange={onChange}>
-      <option value="">{label}</option>
-      {options.map((option) => (
-        <option key={option} value={option.toLowerCase()}>{option}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const MessageField = () => (
-  <div className="col-12">
-    <textarea name="message" className="form-control border-0" rows="5" placeholder="Additional Notes..."></textarea>
-  </div>
-);
-
-const FeedbackMessage = ({ message }) => (
-  <div className="feedback-message">
-    <p>{message}</p>
-  </div>
-);
 
 export default Appointment;
