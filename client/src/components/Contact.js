@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Include styles
+import 'react-quill/dist/quill.snow.css'; // Include styles for ReactQuill
 
 const Contact = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -9,7 +9,6 @@ const Contact = () => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
 
   const modules = {
     toolbar: [
@@ -30,68 +29,47 @@ const Contact = () => {
     'script', 'header', 'list', 'indent', 'direction', 'align',
     'link', 'image', 'video', 'blockquote', 'code-block'
   ];
-  // Right before the handleSubmit function
-const isFormValid = () => {
-  return name.trim() && email.trim() && subject.trim() && message.trim();
-};
+
+  const isFormValid = () => {
+    return name.trim() && email.trim() && subject.trim() && message.trim();
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     if (!isFormValid()) {
       setFeedbackMessage('Please fill in all fields before submitting.');
       return;
     }
-
     setIsSubmitting(true);
-    setFeedbackMessage('');
-
-    const formData = {
-      name: name,
-      email: email,
-      subject: subject,
-      message: message,
-    };
-
+    // Assuming your API endpoint for sending email is '/send-email'
     try {
       const response = await fetch('/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ name, email, subject, message }),
       });
-
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json();
-          if (data.success) {
-            setFeedbackMessage('Email sent successfully. Thank you for contacting us!');
-          } else {
-            setFeedbackMessage(`Error: ${data.message}`);
-          }
-        } else {
-          const text = await response.text();
-          setFeedbackMessage(text);
-        }
-      } else {
-        setFeedbackMessage('Error sending email. Please try again later.');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setFeedbackMessage(data.message || 'Email sent successfully. Thank you for contacting us!');
     } catch (error) {
       console.error('Error:', error);
       setFeedbackMessage('An error occurred. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false); // Re-enable the form after submission
   };
 
   return (
     <div className="container-fluid py-6 px-5">
+      {/* Page header and introduction */}
       <div className="text-center mx-auto mb-5" style={{ maxWidth: '600px' }}>
         <h1 className="display-5 text-uppercase mb-4">
           Please <span className="text-primary">Feel Free</span> To Contact Us
         </h1>
       </div>
+      {/* Contact form and map */}
       <div className="row gx-0 align-items-center">
+        {/* Google Maps Embed */}
         <div className="col-lg-6 mb-5 mb-lg-0" style={{ height: '600px' }}>
           <iframe
             className="w-100 h-100"
@@ -104,7 +82,7 @@ const isFormValid = () => {
             title="Map of Our Office"
           ></iframe>
         </div>
-        
+        {/* Contact form */}
         <div className="col-lg-6">
           <form onSubmit={handleSubmit} className="contact-form bg-light p-5">
             <div className="contact-details mt-5" style={{ textAlign: "center" }}>
@@ -114,56 +92,61 @@ const isFormValid = () => {
               <h3>Contact Us</h3>
               <p>Enter your information here and we will get back to you shortly.</p>
             </div>
+            {/* Form fields */}
             <div className="row g-3">
               <div className="col-12 col-sm-6">
-              <input
-  type="text"
-  className="form-control border-0"
-  placeholder="Your Name"
-  name="name"
-  value={name}
-  onChange={(e) => setName(e.target.value)}
-  required
-  style={{ height: '55px' }}
-/>
+                <input
+                  type="text"
+                  className="form-control border-0"
+                  placeholder="Your Name"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  style={{ height: '55px' }}
+                />
               </div>
               <div className="col-12 col-sm-6">
-
-              <input
-  type="email"
-  className="form-control border-0"
-  placeholder="Your Email"
-  name="email"
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-  required
-  style={{ height: '55px' }}
-/>
+                <input
+                  type="email"
+                  className="form-control border-0"
+                  placeholder="Your Email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{ height: '55px' }}
+                />
               </div>
               <div className="col-12">
-              <input
-  type="text"
-  className="form-control border-0"
-  placeholder="Subject"
-  name="subject"
-  value={subject}
-  onChange={(e) => setSubject(e.target.value)}
-  required
-  style={{ height: '55px' }}
-/>
+                <input
+                  type="text"
+                  className="form-control border-0"
+                  placeholder="Subject"
+                  name="subject"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  required
+                  style={{ height: '55px' }}
+                />
               </div>
-              <ReactQuill
-  theme="snow"
-  modules={modules}
-  formats={formats} // Pass the formats if you are customizing them
-        />
               <div className="col-12">
-        <button className="btn btn-primary w-100 py-3" type="submit" disabled={!isFormValid() || isSubmitting}>
-          Send Message
-        </button>
-        </div>
+                <ReactQuill
+                  theme="snow"
+                  value={message}
+                  onChange={setMessage}
+                  modules={modules}
+                  formats={formats}
+                />
+              </div>
+              <div className="col-12">
+                <button className="btn btn-primary w-100 py-3" type="submit" disabled={isSubmitting}>
+                  Send Message
+                </button>
+              </div>
             </div>
           </form>
+          {/* Feedback message */}
           {feedbackMessage && (
             <div className="mt-3">
               <p>{feedbackMessage}</p>
