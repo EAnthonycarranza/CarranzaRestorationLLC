@@ -1,4 +1,4 @@
-/* Custom CSS for the navbar brand button */
+
 *, *::before, *::after {
     box-sizing: border-box;
     background: none;
@@ -286,6 +286,39 @@ textarea.form-control-lg {
 
 }
 
+/* Add this to your CSS file */
+.ql-editor {
+  color: black; /* This sets the text color to black */
+}
+
+.ql-snow {
+  padding-bottom:100px ;
+}
+
+@media (max-width: 540px){
+  .btn-primary:disabled, .btn-primary.disabled, .btn-primary {
+    margin-top: 100px;
+}
+}
+
+@media (min-width: 992px){
+  .btn-primary:disabled, .btn-primary.disabled, .btn-primary {
+    margin-top: 70px;
+  }
+}
+
+@media (max-width: 992px){
+  .btn-primary:disabled, .btn-primary.disabled, .btn-primary {
+    margin-top: 80px;
+  }
+}
+
+@media (max-width: 464px){
+  .btn-primary:disabled, .btn-primary.disabled, .btn-primary {
+    margin-top: 110px;
+  }
+}
+
 .dropzone {
   border: 2px dashed #FD5D14;
   border-radius: 5px;
@@ -487,7 +520,7 @@ textarea.form-control-lg {
 
 @media (max-width: 540px){
   .brand-logo img {
-    width: 30px; /* Adjust the width as needed */
+    width: 60px; /* Adjust the width as needed */
     height: auto; /* Maintain aspect ratio */
   }  
 }
@@ -499,7 +532,6 @@ textarea.form-control-lg {
     flex-direction: row;
   }
 }
-
 
 .navbar-brand-1 h1 {
   display: flex;
