@@ -21,7 +21,8 @@
 }
 
 .brand-name {
-  margin-right: 10px; /* Adjust the right margin to create space */
+  margin-right: 8px;
+  margin-left: 10px;
 }
 
 .form-control {
@@ -270,7 +271,7 @@ textarea.form-control-lg {
 }
 
 .brand-logo img {
-  width: 100px; /* Adjust the width as needed */
+  width: 40px; /* Adjust the width as needed */
   height: auto; /* Maintain aspect ratio */
 }
 
