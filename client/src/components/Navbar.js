@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import carranzaLogo from '../img/0juOOO01.svg';
 
 // Custom Link Component for scrolling to top
+// Custom Link Component for scrolling to top
 const ScrollToTopLink = ({ to, className, children, closeDropdown }) => {
   const navigate = useNavigate();
 
@@ -10,8 +11,16 @@ const ScrollToTopLink = ({ to, className, children, closeDropdown }) => {
     e.preventDefault();
     navigate(to);
     window.scrollTo(0, 0);
+    
     if (closeDropdown) {
       closeDropdown(); // Close dropdown when link is clicked
+    }
+
+    // Check if navbar is expanded
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const isNavbarExpanded = navbarToggler.getAttribute('aria-expanded') === 'true';
+    if (isNavbarExpanded) {
+      navbarToggler.click(); // Programmatically click the toggler to collapse the navbar
     }
   };
 
@@ -21,6 +30,7 @@ const ScrollToTopLink = ({ to, className, children, closeDropdown }) => {
     </button>
   );
 };
+
 
 // Navbar Component
 const Navbar = () => {
