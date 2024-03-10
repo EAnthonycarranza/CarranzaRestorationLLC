@@ -51,38 +51,6 @@
 .visible { opacity: 1; }
 .hidden { opacity: 0; }
 
-
-/* styles.css (or any CSS file you use in your project) */
-
-#contact-info {
-  text-align: center;
-}
-#contact-info a {
-  color: blue; /* Change the color as desired */
-  text-decoration: underline;
-}
-
-
-#currency-input-group .input-group-text {
-  background: transparent;
-  border: none;
-  border-right: none;
-  position: absolute;
-  z-index: 10;
-  padding-left: 10px;
-  color: #495057; /* Adjust the color as needed */
-  pointer-events: none;
-}
-
-#currency-input {
-  padding-left: 30px; /* Adjust the padding to ensure the dollar sign does not overlap the text */
-}
-
-#currency-input-group {
-  position: relative;
-}
-
-
 @media (prefers-reduced-motion: reduce) {
   .form-control {
       transition: none
@@ -434,7 +402,7 @@ textarea.form-control-lg {
 /* Styling for the navbar brand */
 .navbar-brand-1 h1 {
   margin: 0;
-  font-size: 1.875rem; /* text-3xl */
+  font-size: 25px;
   text-transform: uppercase;
   color: white;
 }
@@ -561,7 +529,7 @@ textarea.form-control-lg {
 
 @media (max-width: 540px){
   .brand-logo img {
-    width: 60px; /* Adjust the width as needed */
+    width: 20px; /* Adjust the width as needed */
     height: auto; /* Maintain aspect ratio */
   }  
 }
