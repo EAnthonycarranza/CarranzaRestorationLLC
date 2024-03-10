@@ -4,11 +4,24 @@ const nodemailer = require('nodemailer');
 const juice = require('juice');
 const cors = require('cors');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const axios = require('axios');
+
+  // Configure Nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL, // Use environment variable for your email
+      pass: process.env.EMAIL_PASSWORD, // Use environment variable for your password
+    },
+  });
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/build')));
+app.use('/.well-known', express.static(path.join(__dirname, 'public/.well-known'), {
+  dotfiles: 'allow' // this is crucial for .well-known directory
+}));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
@@ -56,21 +69,12 @@ app.post('/send-email', async (req, res) => {
   </div>      
     <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
     <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
-    <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angli List Review</a></p>
+    <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angi Review</a></p>
   </div>
 </div>
 `;
 
 const emailHtml = juice(`${emailStyles} ${emailHtmlContent}`);
-
-  // Configure Nodemailer transporter
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL, // Use environment variable for your email
-      pass: process.env.EMAIL_PASSWORD, // Use environment variable for your password
-    },
-  });
 
 // Email options for /send-email, including CC and structuring the HTML body
 const mailOptions = {
@@ -158,7 +162,7 @@ app.post('/send-quote', async (req, res) => {
 </div>      
   <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
   <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
-  <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angli List Review</a></p>
+  <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angi Review</a></p>
 </div>
 
 </div>`;
