@@ -94,6 +94,7 @@ const Navbar = () => {
                 <ScrollToTopLink to="/project" className="dropdown-item" closeDropdown={closeDropdown}>Our Project</ScrollToTopLink>
                 {/*<ScrollToTopLink to="/team" className="dropdown-item" closeDropdown={closeDropdown}>The Team</ScrollToTopLink> */}
                 <ScrollToTopLink to="/testimonial" className="dropdown-item" closeDropdown={closeDropdown}>Testimonial</ScrollToTopLink>
+                <ScrollToTopLink to="/pay" className="dropdown-item" closeDropdown={closeDropdown}>Payment</ScrollToTopLink>
               </div>
             </div>
             <ScrollToTopLink to="/contact" className={`nav-item nav-link ${isActive('/contact') ? 'active' : ''}`}>Contact</ScrollToTopLink>
