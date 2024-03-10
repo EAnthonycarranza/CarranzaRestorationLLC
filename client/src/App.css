@@ -4,6 +4,7 @@
     background: none;
     border: none;
 }
+
 .navbar-brand {
   /* Add your custom styles for the button here */
   background: none;
@@ -25,6 +26,12 @@
   margin-left: 10px;
 }
 
+/* Hypothetical class name; replace with the actual class/ID as necessary */
+.sdk-payment-button {
+  max-width: 480px !important;
+}
+
+
 .form-control {
   display: block;
   width: 100%;
@@ -40,6 +47,41 @@
   border-radius: false;
   transition: border-color 0.15s ease-in-out,box-shadow 0.15s ease-in-out
 }
+
+.visible { opacity: 1; }
+.hidden { opacity: 0; }
+
+
+/* styles.css (or any CSS file you use in your project) */
+
+#contact-info {
+  text-align: center;
+}
+#contact-info a {
+  color: blue; /* Change the color as desired */
+  text-decoration: underline;
+}
+
+
+#currency-input-group .input-group-text {
+  background: transparent;
+  border: none;
+  border-right: none;
+  position: absolute;
+  z-index: 10;
+  padding-left: 10px;
+  color: #495057; /* Adjust the color as needed */
+  pointer-events: none;
+}
+
+#currency-input {
+  padding-left: 30px; /* Adjust the padding to ensure the dollar sign does not overlap the text */
+}
+
+#currency-input-group {
+  position: relative;
+}
+
 
 @media (prefers-reduced-motion: reduce) {
   .form-control {
@@ -185,7 +227,6 @@ textarea.form-control-sm {
 textarea.form-control-lg {
   min-height: calc(1.5em + 1rem + 2px)
 }
-
 
 .form-control-color {
   max-width: 3rem;
@@ -520,7 +561,7 @@ textarea.form-control-lg {
 
 @media (max-width: 540px){
   .brand-logo img {
-    width: 35px; /* Adjust the width as needed */
+    width: 60px; /* Adjust the width as needed */
     height: auto; /* Maintain aspect ratio */
   }  
 }
