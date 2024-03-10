@@ -120,7 +120,7 @@ const Appointment = () => {
                 </div>
                 <div className="col-12">
                 <select className="form-control border-0" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)} style={{ height: '55px' }}>
-                    <option value="">Select if this is an insurance claim</option> {/* Improved for clarity */}
+                    <option value="">Is there an insurance claim</option> {/* Improved for clarity */}
                     <option value="yes">Yes</option>
                     <option value="no">No (OOP)</option>
                     <option value="idk">I don't know</option>
@@ -133,7 +133,7 @@ const Appointment = () => {
                     </div>
                     <div className="col-12">
                       <select className="form-control border-0" value={claimNumber} onChange={e => setClaimNumber(e.target.value)} style={{ height: '55px' }}>
-                        <option value="">Is there a claim number?</option>
+                        <option value="">Do you have the claim number?</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="idk">I don't know</option>
