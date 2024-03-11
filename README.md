@@ -58,8 +58,6 @@ This project is built using a variety of technologies and dependencies, split ac
 - **React Router Dom**: For routing and navigation.
 - **Lightbox, Isotope, Imagesloaded**: For enhanced image galleries.
 - **Axios**: For HTTP requests.
-- **React Google ReCaptcha**: For integrating Google's ReCaptcha for spam protection.
-- **React DatePicker, React Dropzone, React Select**: For advanced form elements.
 - **React Square Web Payments SDK**: For integrating Square payments.
 
 ### Development Tools
