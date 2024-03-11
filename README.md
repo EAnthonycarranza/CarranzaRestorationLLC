@@ -41,7 +41,19 @@ GitHub repository: https://github.com/EAnthonycarranza/CarranzaRestorationLLC
 * **Additional Tools**: Axios, React Router, Service Workers (for PWA capabilities), Nodemailer (for email services)
 
 ## Installation and Setup
-Follow the [installation and setup guide](#installation-and-setup) provided in this document to get the application up and running on your local environment.
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+- [Node.js](https://nodejs.org/en/) (version 18.x or higher recommended)
+- [npm](https://www.npmjs.com/) (version 7.x or higher recommended)
+- Git (for cloning the repository)
+
+#### Step 1: Clone the Repository
+
+First, clone the Carranza Restoration LLC repository to your local machine using Git. Open a terminal and run the following command:
+```sh
+git clone https://github.com/EAnthonycarranza/CarranzaRestorationLLC.git
 
 ## Project Requirements
 * Implement a **Progressive Web Application (PWA)** for offline access and improved performance.
