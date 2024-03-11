@@ -34,11 +34,44 @@ GitHub repository: https://github.com/EAnthonycarranza/CarranzaRestorationLLC
 
 ## Technologies Used
 
-* **Frontend**: React, Bootstrap, Owl Carousel, Lightbox, Isotope
-* **Backend**: Node.js, Express.js
-* **Database**: Managed via third-party service integrations
-* **Deployment**: Heroku
-* **Additional Tools**: Axios, React Router, Service Workers (for PWA capabilities), Nodemailer (for email services)
+This project is built using a variety of technologies and dependencies, split across the frontend (client) and backend (server) for a full-stack web application experience.
+
+### Backend (Server)
+
+- **Node.js**: A JavaScript runtime built on Chrome's V8 JavaScript engine.
+- **Express**: A minimal and flexible Node.js web application framework.
+- **Axios**: Promise based HTTP client for making requests.
+- **Cors**: Package for providing a Connect/Express middleware that can be used to enable CORS.
+- **Dotenv**: Loads environment variables from a `.env` file into `process.env`.
+- **Google APIs**: For accessing Google services.
+- **Juice**: Inlines CSS for better email template support.
+- **Multer**: Middleware for handling `multipart/form-data`, primarily used for uploading files.
+- **Nodemailer**: Module for sending emails.
+- **Path**: Utilities for working with file and directory paths.
+- **Square**: For processing payments.
+
+### Frontend (Client)
+
+- **React**: A JavaScript library for building user interfaces.
+- **Bootstrap & React-Bootstrap**: For styling and layout with pre-defined components.
+- **Owl Carousel & React Owl Carousel**: For creating responsive carousel sliders.
+- **Quill & React Quill**: For rich text editing.
+- **React Router Dom**: For routing and navigation.
+- **Lightbox, Isotope, Imagesloaded**: For enhanced image galleries.
+- **Axios**: For HTTP requests.
+- **React Google ReCaptcha**: For integrating Google's ReCaptcha for spam protection.
+- **React DatePicker, React Dropzone, React Select**: For advanced form elements.
+- **React Square Web Payments SDK**: For integrating Square payments.
+
+### Development Tools
+
+- **Webpack & Babel**: For bundling and transpiling JavaScript.
+- **Node-Sass & Sass**: For working with SCSS files.
+- **Stylelint**: For CSS linting.
+- **Concurrently**: For running multiple npm scripts concurrently.
+
+These technologies and tools provide a robust framework for developing, testing, and deploying the application, ensuring a seamless user experience and easy maintenance.
+
 
 ## Installation and Setup
 
