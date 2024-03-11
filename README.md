@@ -45,7 +45,6 @@ This project is built using a variety of technologies and dependencies, split ac
 - **Dotenv**: Loads environment variables from a `.env` file into `process.env`.
 - **Google APIs**: For accessing Google services.
 - **Juice**: Inlines CSS for better email template support.
-- **Multer**: Middleware for handling `multipart/form-data`, primarily used for uploading files.
 - **Nodemailer**: Module for sending emails.
 - **Path**: Utilities for working with file and directory paths.
 - **Square**: For processing payments.
