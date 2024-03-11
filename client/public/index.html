@@ -24,6 +24,7 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!-- JavaScript Libraries -->
+    <script src="https://www.google.com/recaptcha/api.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="%PUBLIC_URL%/lib/easing/easing.min.js"></script>
@@ -34,7 +35,20 @@
     <script src="%PUBLIC_URL%/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="%PUBLIC_URL%/lib/isotope/isotope.pkgd.min.js"></script>
     <script src="%PUBLIC_URL%/lib/lightbox/js/lightbox.min.js"></script>
-    <!-- Template Javascript -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeVyo4pAAAAAEnELeP1eUwbX95HCj3yy5RAkJBu"></script>
     <script src="%PUBLIC_URL%/js/main.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>    
   </body>
 </html>
