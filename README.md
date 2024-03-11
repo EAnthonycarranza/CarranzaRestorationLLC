@@ -56,6 +56,65 @@ First, clone the Carranza Restoration LLC repository to your local machine using
 git clone https://github.com/EAnthonycarranza/CarranzaRestorationLLC.git
 ```
 
+#### Step 2: Install Dependencies
+
+After cloning the project, navigate to the project directory:
+```sh
+cd CarranzaRestorationLLC
+```
+
+This project is structured to include both the client (frontend) and the server (backend) code. You'll need to install dependencies for both. Start with the root dependencies:
+```sh
+npm install
+```
+
+Next, install client dependencies:
+```sh
+npm run install-client
+```
+
+Finally, install server dependencies:
+```sh
+npm run install-server
+```
+
+### Step 3: Configure Environment Variables
+
+Create a '.env' file in the 'server' directory to store your environment variables such as email credentials for Nodemailer. Your .env file might look something like this:
+```sh
+EMAIL=your_email@example.com
+EMAIL_PASSWORD=your_email_password
+```
+
+#### Step 4: Run the Application
+To run the application in development mode with both the frontend and backend servers concurrently, use the following command:
+
+```sh
+npm run dev
+```
+
+This command uses `concurrently` to run both servers at the same time. The frontend React app will be available at [http://localhost:3000](http://localhost:3000), and the backend Express server will run on [http://localhost:3001](http://localhost:3001).
+
+#### Step 5: Build and Run for Production
+
+To prepare the application for production, you can build the frontend which creates a build directory with a production 'build' of your app:
+```sh
+npm run build-client
+```
+
+After building the client, you can start the server which will serve both the API and the static frontend files:
+
+```sh
+npm start
+```
+
+Your Carranza Restoration LLC application is now running and accessible.
+
+##### Additional Configuration
+
+- **Deployment**: If deploying to Heroku or another platform, ensure you set up environment variables through their platform-specific configuration tools.
+- **Database Configuration**: If your application requires database integration, ensure you configure the connection settings accordingly in your server code.
+
 ## Project Requirements
 * Implement a **Progressive Web Application (PWA)** for offline access and improved performance.
 * Use **React** for the frontend for a dynamic single-page application experience.
