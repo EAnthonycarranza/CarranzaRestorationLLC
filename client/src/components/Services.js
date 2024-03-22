@@ -27,7 +27,7 @@ const Services = () => {
                     </div>
                     <div className="px-4 pb-4">
                         <h4 className="text-uppercase mb-3">Estimates</h4>
-                        <p>With our services, you can expect detailed estimates crafted with industry-standard pricing, providing you with confidence and peace of mind in every home improvement endeavor.</p>
+                        <p>With our services, get detailed estimates with industry-standard pricing, ensuring confidence in every home improvement project.</p>
                         {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
                 </div>
@@ -43,6 +43,7 @@ const Services = () => {
                         <p>Transform your living space with professional renovation services renowned for our exceptional quality and craftsmanship.</p>
                         {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
                     </div>
+                    
                 </div>
             </div>
             <div className="col-lg-4 col-md-6">
@@ -88,12 +89,12 @@ const Services = () => {
                 <div className="service-item bg-white rounded d-flex flex-column align-items-center text-center">
                 <img className="img-fluid" src={service6} alt="Service 6" />
                     <div className="service-icon bg-white">
-                        <i className="fa fa-3x fa-paint-brush text-primary"></i>
+                        <i className="fa fa-3x fa-solid fa-hammer text-primary"></i>
                     </div>
                     <div className="px-4 pb-4">
-                        <h4 className="text-uppercase mb-3">Interior design</h4>
-                        <p>Experience professional interior design execution with our expert team. We prioritize your vision from start to finish, ensuring your space reflects your style and preferences. Additionally, we have an extensive array of samples available to provide and showcase to customers!</p>
-                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button> */}
+                        <h4 className="text-uppercase mb-3">Roof Restoration Services</h4>
+                        <p>Specializing in repairing damages from hail, storms, and water, our roofing services meticulously restore roofs to their original durability, ensuring your property remains protected. Count on us to deliver tailored roofing solutions, safeguarding your home or business with expertise and reliability.</p>
+                        {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>  */}
                     </div>
                 </div>
             </div>
