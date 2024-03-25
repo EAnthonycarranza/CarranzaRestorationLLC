@@ -328,6 +328,12 @@ textarea.form-control-lg {
   }
 }
 
+.highlight {
+  font-weight: bold; /* Make the text bold */
+  color: #FD5D14; /* Change the text color to orange */
+}
+
+
 .dropzone {
   border: 2px dashed #FD5D14;
   border-radius: 5px;
