@@ -93,7 +93,7 @@ const Services = () => {
                     </div>
                     <div className="px-4 pb-4">
                         <h4 className="text-uppercase mb-3">Roof Restoration Services</h4>
-                        <p>Specializing in repairing damages from hail, storms, and water, our roofing services meticulously restore roofs to their original durability, ensuring your property remains protected. Count on us to deliver tailored roofing solutions, safeguarding your home or business with expertise and reliability.</p>
+                        <p>Specializing in repairing damages from hail, storms, and water, our roofing services meticulously restore roofs to their original durability, ensuring your property remains protected. Count on us to deliver tailored roofing solutions, safeguarding your home with expertise and reliability.</p>
                         {/* <button className="btn text-primary" onClick={handleReadMore}>Read More <i className="bi bi-arrow-right"></i></button>  */}
                     </div>
                 </div>
