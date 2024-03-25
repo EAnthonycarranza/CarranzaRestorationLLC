@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+// Import the TypingEffect component
+import TypingEffect from './TypingEffect'; // Adjust the path as necessary
 
 function Testimonial() {
     function loadRevueWidget() {
@@ -27,9 +29,28 @@ function Testimonial() {
     }, []);
 
     return (
-<div className="text-center" style={{ paddingTop: "90px" }}> {/* Wrapper div with text-centering class */}
+        <div className="text-center" style={{ paddingTop: "90px" }}> {/* Wrapper div with text-centering class */}
             {/* Header for the testimonials section with specific class and margin */}
             <h1 className="display-5 text-uppercase mb-4">see our <span className="text-primary">amazing</span> testimonies</h1>
+
+            {/* Place the TypingEffect component here */}
+            <i className="fa-solid fa-robot" style={{ color: "#FD5D14", fontSize: "32px" }}></i>
+
+            <p style={{ 
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                backgroundImage: "linear-gradient(90deg, rgb(141, 56, 255), rgb(25, 123, 255))",
+                color: "transparent",
+                fontWeight: "bold",
+                fontSize: "34px" // Adjust the font size as needed
+            }}>AI-generated summary</p>
+<p>
+    Based on 
+    <span style={{ color: "#FD5D14" }}> 26 Google Reviews </span> 
+    and 
+    <span style={{ color: "#FD5D14" }}> 51 Angi Reviews</span>
+</p>
+            <TypingEffect />
 
             <div>
                 {/* Revue widget div */}
@@ -46,4 +67,3 @@ function Testimonial() {
 }
 
 export default Testimonial;
-
