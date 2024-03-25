@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 // Import the TypingEffect component
 import TypingEffect from './TypingEffect'; // Adjust the path as necessary
+import AiSvg from '../img/Ai.svg';
 
 function Testimonial() {
     function loadRevueWidget() {
@@ -29,21 +30,29 @@ function Testimonial() {
     }, []);
 
     return (
-        <div className="text-center" style={{ paddingTop: "90px" }}> {/* Wrapper div with text-centering class */}
-            {/* Header for the testimonials section with specific class and margin */}
-            <h1 className="display-5 text-uppercase mb-4">see our <span className="text-primary">amazing</span> testimonies</h1>
-
-            {/* Place the TypingEffect component here */}
-            <i className="fa-solid fa-robot" style={{ color: "#FD5D14", fontSize: "32px" }}></i>
-
-            <p style={{ 
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                backgroundImage: "linear-gradient(90deg, rgb(141, 56, 255), rgb(25, 123, 255))",
-                color: "transparent",
-                fontWeight: "bold",
-                fontSize: "34px" // Adjust the font size as needed
-            }}>AI-generated summary</p>
+        <div className="text-center" style={{ paddingTop: "90px" }}>
+            <h1 className="display-5 text-uppercase mb-4">
+                see our <span className="text-primary">amazing</span> testimonies
+            </h1>
+    
+            {/* Flex container for SVG and paragraph */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* Your SVG Image */}
+                <img src={AiSvg} alt="AI" style={{ width: '40px', height: 'auto', marginRight: '10px' }} />
+    
+                {/* Your paragraph */}
+                <p style={{ 
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    backgroundImage: 'linear-gradient(90deg, rgb(141, 56, 255), rgb(25, 123, 255))',
+                    color: 'transparent',
+                    fontWeight: 'bold',
+                    fontSize: '34px',
+                    margin: 0 // Adjust the font size as needed and remove margin if you want them closer
+                }}>
+                    AI-generated summary
+                </p>
+            </div>
 <p>
     Based on 
     <span style={{ color: "#FD5D14" }}> 26 Google Reviews </span> 
