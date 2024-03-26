@@ -25,7 +25,7 @@ const Portfolio = () => {
         </div>
 
         <div className="elfsight-app-8a9461ed-6b26-46b1-81bb-899d191c5ecc" data-elfsight-app-lazy></div>
-        <div class="elfsight-app-2f3d3eac-9a2e-4906-b699-0163e5e24d68" data-elfsight-app-lazy></div>
+        <div className="elfsight-app-2f3d3eac-9a2e-4906-b699-0163e5e24d68" data-elfsight-app-lazy></div>
       </div>
     </div>
   );
