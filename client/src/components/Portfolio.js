@@ -1,4 +1,4 @@
-// FileName: Portfolio.jsx
+// FileName: Portfolio.js
 import React, { useEffect } from 'react';
 
 const Portfolio = () => {
