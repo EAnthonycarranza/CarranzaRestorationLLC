@@ -13,10 +13,7 @@ const Portfolio = () => {
 
     // Cleanup the script when the component unmounts
     return () => {
-      // It's important to check if the script exists before removing it
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
+      document.body.removeChild(script);
     };
   }, []); // Empty array ensures this effect runs only once
 
@@ -27,14 +24,12 @@ const Portfolio = () => {
           <h1 className="display-5 text-uppercase mb-4">See Our <span className="text-primary">TOP-PICKED</span> Amazing Projects</h1>
         </div>
 
-        {/* First Elfsight Widget */}
         <div className="elfsight-app-8a9461ed-6b26-46b1-81bb-899d191c5ecc" data-elfsight-app-lazy></div>
-
-        {/* Second Elfsight Widget */}
-        <div className="elfsight-app-2f3d3eac-9a2e-4906-b699-0163e5e24d68" data-elfsight-app-lazy></div>
+        <div class="elfsight-app-2f3d3eac-9a2e-4906-b699-0163e5e24d68" data-elfsight-app-lazy></div>
       </div>
     </div>
   );
 }
 
 export default Portfolio;
+
