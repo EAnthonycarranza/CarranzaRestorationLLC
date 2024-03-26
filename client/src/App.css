@@ -69,13 +69,6 @@
   }
 }
 
-
-
-/* CSS file, assuming the filename is style.css */
-.hide-this-link {
-  display: none !important;
-}
-
 .visible { opacity: 1; }
 .hidden { opacity: 0; }
 
