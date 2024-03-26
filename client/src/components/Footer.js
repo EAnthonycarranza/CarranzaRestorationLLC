@@ -5,6 +5,7 @@ import EliteImage from '../img/EliteServiceimg.png';
 import FWRImage from '../img/FWRimg.png';
 import OwenImage from '../img/OwensCorningimg.png';
 import BImage from '../img/BBBimg.png';
+import NRCA from '../img/NRCA.png'
 import { Link } from 'react-router-dom';
 
 
@@ -78,7 +79,8 @@ const Footer = () => {
           <div className="col-lg-6 ps-lg-5">
             <div className="row g-5">
               <div className="col-sm-6">
-                <h4 className="text-white text-uppercase mb-4">Quick Links</h4>
+              <h4 className="text-white text-uppercase mb-4 text-center">Quick Links</h4>
+              <div className="d-flex flex-column justify-content-start">
                 <div className="d-flex flex-column justify-content-start">
   <Link to="/" className="btn btn-link text-white-50 mb-2">
     <i className="fa fa-angle-right me-2"></i>Home
@@ -96,16 +98,7 @@ const Footer = () => {
     <i className="fa fa-angle-right me-2"></i>Contact Us
   </Link>
 </div>
-              </div>
-              <div className="col-sm-6">
-                <h4 className="text-white text-uppercase mb-4">Popular Links</h4>
-                <div className="d-flex flex-column justify-content-start">
-                  <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Home</button>
-                  <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>About Us</button>
-                  <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Our Services</button>
-                  {/* <button className="btn btn-link text-white-50 mb-2"><i className="fa fa-angle-right me-2"></i>Meet The Team</button> */}
-                  <button className="btn btn-link text-white-50"><i className="fa fa-angle-right me-2"></i>Contact Us</button>
-                </div>
+</div>
               </div>
             <div className="col-sm-12">
                 {/* <h4 className="text-white text-uppercase mb-4">Newsletter</h4>
@@ -125,9 +118,11 @@ const Footer = () => {
                 {message && <p className="text-white mt-2">{message}</p>} */}
             </div>
             </div>
+            <div className="flex justify-end"> {/* This div aligns its children to the end (right side) */}
+            <h1 className="text-center text-white" style={{ marginTop: '10rem' }}>Our Trusted Partners</h1> {/* Adjust marginTop value as needed */}
+            </div>
           </div>
         </div>
-
         <div className="footer-images">
   <div className="left-images">
     <img src={AngleImage} alt="Angel" className="footer-image angel-image" />
@@ -137,6 +132,7 @@ const Footer = () => {
   <div className="right-images">
     <img src={OwenImage} alt="Owen" className="footer-image owen-image" />
     <img src={BImage} alt="B" className="footer-image b-image" />
+    <img src={NRCA} alt="NRCA" className="footer-image nrca-image" />
   </div>
 </div>
 
