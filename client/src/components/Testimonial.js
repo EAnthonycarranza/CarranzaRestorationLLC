@@ -38,7 +38,7 @@ function Testimonial() {
             {/* Flex container for SVG and paragraph */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {/* Your SVG Image */}
-                <img src={AiSvg} alt="AI" style={{ width: '40px', height: 'auto', marginRight: '10px' }} />
+            <img src={AiSvg} alt="AI" className="ai-svg-image" />
     
                 {/* Your paragraph */}
                 <p style={{ 
