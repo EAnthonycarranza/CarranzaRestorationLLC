@@ -15,8 +15,9 @@ import AboutPage from './components/AboutPage';
 import ServicePage from './components/ServicePage'; // Import the ServicePage component
 import BackToTopButton from './components/BackToTopButton';
 import ProjectPage from './components/ProjectPage'; // Import ProjectPage
-import PaymentFormComponent from './components/PaymentPage';
-import TypingEffect from './components/TypingEffect';
+//import PaymentFormComponent from './components/PaymentPage';
+//import TypingEffect from './components/TypingEffect';
+import Portfolio2 from './components/Portfolio-2';
 import FormPage from './components/FormPage';
 //import TeamPage from './components/TeamPage'; // Import ProjectPage
 import TestimonialPage from './components/TestimonialPage'; // Import ProjectPage
@@ -62,6 +63,7 @@ function App() {
             <>
               <Carousel scrollToAppointment={scrollToAppointment} />
               <About />
+              <Portfolio2 />
               <Services />
               <div ref={appointmentRef}><Appointment /></div>
               <Portfolio />
