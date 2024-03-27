@@ -16,6 +16,7 @@ import ServicePage from './components/ServicePage'; // Import the ServicePage co
 import BackToTopButton from './components/BackToTopButton';
 import ProjectPage from './components/ProjectPage'; // Import ProjectPage
 import PaymentFormComponent from './components/PaymentPage';
+import TypingEffect from './components/TypingEffect';
 //import TeamPage from './components/TeamPage'; // Import ProjectPage
 import TestimonialPage from './components/TestimonialPage'; // Import ProjectPage
 import ContactPage from './components/ContactPage'; // Import ProjectPage
