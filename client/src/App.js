@@ -17,6 +17,7 @@ import BackToTopButton from './components/BackToTopButton';
 import ProjectPage from './components/ProjectPage'; // Import ProjectPage
 import PaymentFormComponent from './components/PaymentPage';
 import TypingEffect from './components/TypingEffect';
+import FormPage from './components/FormPage';
 //import TeamPage from './components/TeamPage'; // Import ProjectPage
 import TestimonialPage from './components/TestimonialPage'; // Import ProjectPage
 import ContactPage from './components/ContactPage'; // Import ProjectPage
@@ -52,6 +53,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/services" element={<ServicePage />} />
           <Route path="/project" element={<ProjectPage />} />
+          <Route path="/form" element={<FormPage />}/>
           {/*<Route path="/team" element={<TeamPage />} /> */}
           <Route path="/testimonial" element={<TestimonialPage />} />
           <Route path="/contact" element={<ContactPage />} />
