@@ -68,10 +68,8 @@
       margin-bottom: 10px; /* Add space below SVG */
   }
 }
-
 .visible { opacity: 1; }
 .hidden { opacity: 0; }
-
 
 /* styles.css (or any CSS file you use in your project) */
 
@@ -82,7 +80,6 @@
   color: blue; /* Change the color as desired */
   text-decoration: underline;
 }
-
 
 #currency-input-group .input-group-text {
   background: transparent;
@@ -102,7 +99,6 @@
 #currency-input-group {
   position: relative;
 }
-
 
 @media (prefers-reduced-motion: reduce) {
   .form-control {
@@ -425,7 +421,10 @@ textarea.form-control-lg {
   max-width: 100%;
   max-height: 100%;
 }
-
+.image-gallery-thumbnails .image-gallery-thumbnails-container {
+  /* Override the white-space property */
+  white-space: initial !important;
+}
 
 
 /* Styling for large screens */
@@ -464,6 +463,18 @@ textarea.form-control-lg {
 .navbar-toggler {
   /* Add your custom styles for the navbar toggler here */
 }
+
+/* portfolio.css */
+.image-container {
+  margin: auto;
+  width: 80%;
+  max-height: 500px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 
 /* Styling for the navbar collapse */
 .collapsing {
@@ -628,10 +639,7 @@ textarea.form-control-lg {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  object-fit: contain;
-  mix-blend-mode: lighten
 }
-
 
 .left-images, .right-images {
   display: flex;
@@ -639,33 +647,19 @@ textarea.form-control-lg {
   justify-content: center;
 }
 
-
+.footer-image {
+  margin: 5px;
+  height: 100px;
+}
 
 /* Adjusted styles for individual images */
-.angel-image { width: 80px; margin-bottom: 60px; } /* Adjusted width */
-.elite-image { width: 100px; margin-bottom: 60px;} /* Adjusted width */
-.fwr-image { width: 150px; margin-top: 10px;} /* Adjusted width */
-.owen-image { width: 175px; height: auto; margin-left: 00px;} /* Adjusted width */
-.b-image { width: 175px; height: auto; } /* Adjusted width */
-.nrca-image {width: auto; height: 160px;}
+.angel-image { width: 80px; } /* Adjusted width */
+.elite-image { width: 80px; } /* Adjusted width */
+.fwr-image { width: 150px; } /* Adjusted width */
+.owen-image { width: 175px; } /* Adjusted width */
+.b-image { width: 250px; height: 75px; } /* Adjusted width */
 
-.left-images, .right-images {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; /* Adjust the height as needed */
-}
 
-.left-images {
-  float: left;
-  width: 50%; /* Takes half of the page width */
-}
-
-.right-images {
-  float: right;
-  width: 50%; /* Takes half of the page width */
-}
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
@@ -682,7 +676,11 @@ textarea.form-control-lg {
     width: 30%;
   }
 
- .fwr-image{
+ .fwr-image, .owen-image {
     width: 50%; /* Adjust this for other images */
+  }
+
+  .b-image {
+    width: 120%; /* Significantly smaller width for B image */
   }
 }
