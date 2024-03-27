@@ -57,7 +57,7 @@ function App() {
           {/*<Route path="/team" element={<TeamPage />} /> */}
           <Route path="/testimonial" element={<TestimonialPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/pay" element={<PaymentFormComponent />} />
+          {/*<Route path="/pay" element={<PaymentFormComponent />} />*/}
           <Route path="/" element={
             <>
               <Carousel scrollToAppointment={scrollToAppointment} />
