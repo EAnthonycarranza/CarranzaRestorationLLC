@@ -21,6 +21,28 @@
   
 }
 
+
+.address-suggestions {
+  border: 1px solid #ccc;
+  border-top: none; /* If the input has a border, you might not want double borders */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+  position: absolute; /* To position relative to the input field */
+  width: 57.55%;
+  background: white;
+  z-index: 1000; /* Ensure it stacks above other content */
+}
+
+.address-suggestions li {
+  padding: 10px;
+  list-style-type: none; /* Removes bullet points from list items */
+  cursor: pointer;
+}
+
+.address-suggestions li:hover {
+  background-color: #f0f0f0; /* Color change on hover */
+}
+
+
 .brand-name {
   margin-right: 8px;
   margin-left: 10px;
@@ -30,7 +52,6 @@
 .sdk-payment-button {
   max-width: 480px !important;
 }
-
 
 .form-control {
   display: block;
@@ -53,6 +74,30 @@
   color: #FD5D14; /* Change the text color to orange */
 }
 
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-caption-font-size: 18px;
+  --rdp-accent-color: #FD5D14 !important;
+  --rdp-background-color: #fd5d1436 !important;
+  --rdp-accent-color-dark: #3003e1;
+  --rdp-background-color-dark: #180270;
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 3px solid var(--rdp-accent-color);
+  --rdp-selected-color: #fff;
+  margin: 1em;
+}
+
+.error-border {
+  border: 1px solid red; /* Example style for input with error */
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.5rem; /* Example style for error message */
+}
+
+
 /* Add to your CSS file */
 
 .ai-svg-image {
@@ -60,6 +105,12 @@
   height: auto;
 }
 
+@media (min-width: 576px){
+.col-sm-6 {
+    flex: 0 0 auto;
+     width: 100%; 
+}
+}
 
 /* Mobile view adjustments */
 @media (max-width: 480px) {
@@ -653,11 +704,11 @@ textarea.form-control-lg {
 }
 
 /* Adjusted styles for individual images */
-.angel-image { height: 80px; } /* Adjusted width */
-.elite-image { height: 80px; } /* Adjusted width */
-.fwr-image { height: 80px; } /* Adjusted width */
-.owen-image { height: 125px; } /* Adjusted width */
-.b-image {height: 170px; } /* Adjusted width */
+.angel-image { width: 80px; } /* Adjusted width */
+.elite-image { width: 80px; } /* Adjusted width */
+.fwr-image { width: 150px; } /* Adjusted width */
+.owen-image { width: 175px; } /* Adjusted width */
+.b-image { width: 250px; height: 75px; } /* Adjusted width */
 
 
 
@@ -671,5 +722,16 @@ textarea.form-control-lg {
   .left-images, .right-images {
     width: 100%;
     justify-content: center;
+  }
+  .angel-image, .elite-image {
+    width: 30%;
+  }
+
+ .fwr-image, .owen-image {
+    width: 50%; /* Adjust this for other images */
+  }
+
+  .b-image {
+    width: 120%; /* Significantly smaller width for B image */
   }
 }
