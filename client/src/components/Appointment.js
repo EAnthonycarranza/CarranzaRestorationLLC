@@ -76,7 +76,8 @@ const Appointment = () => {
       return;
     }
     const api_key = '29a20688eb5ad490b5477ecf3679e616';
-    const url = `http://api.positionstack.com/v1/forward?access_key=${api_key}&query=${encodeURIComponent(inputValue)}`;
+const url = `https://api.positionstack.com/v1/forward?access_key=${api_key}&query=${encodeURIComponent(inputValue)}`;
+
     try {
       const response = await fetch(url);
       const data = await response.json();
