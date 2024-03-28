@@ -27,6 +27,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
+
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
   
@@ -45,34 +46,35 @@ app.post('/send-email', async (req, res) => {
   `;
 
   const emailHtmlContent = `
-    <div>
-      <p><strong>From:</strong> ${name} (${email})</p>
-      <p><strong>Message:</strong></p>
-      <div>${message}</div>
-  <hr>
-  <div style="margin-top: 20px;">
-    <a href="http://www.carranzarestoration.org" target="_blank">
-    <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
-    </a>
-    <div style="margin-top: 10px;">
-    <p style="margin: 0; font-weight: bold;">Carranza Restoration LLC; FWR General Contractors</p>
-    <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" ">
-      <p style="margin: 5px 0;">100 Commercial Place</p>
-      <p style="margin: 0;">Schertz, TX 78154</p>
-    </a>
-    <p style="margin: 5px 0;">
-      <a href="tel:+12102671008" ">(210) 267-1008</a> Office
-    </p>
-    <p style="margin: 0;">
-      <a href="tel:+12104285610" ">(210) 428-5610</a> Cell
-    </p>
-  </div>      
-    <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
-    <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
-    <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angi Review</a></p>
+  <div>
+    <p><strong style="color: black;">From:</strong> <span style="color: black;">${name} (${email})</span></p>
+    <p><strong style="color: black;">Message:</strong></p>
+    <div style="color: black;">${message}</div>
+    <hr>
+    <div style="margin-top: 20px;">
+      <a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">
+        <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
+      </a>
+      <div style="margin-top: 10px;">
+        <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
+        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: blue;">
+          <p style="margin: 5px 0;">100 Commercial Place</p>
+          <p style="margin: 0;">Schertz, TX 78154</p>
+        </a>
+        <p style="margin: 5px 0">
+          <a href="tel:+12102671008" style="color: blue;"> (210) 267-1008</a> <span style="color: black;">Office</span>
+        </p>
+        <p style="margin: 0;">
+          <a href="tel:+12104285610" style="color: blue;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
+        </p>
+      </div>      
+      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: blue;">Google Review</a></p>
+      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">Carranza Restoration LLC Website</a></p>
+      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: blue;">Angi Review</a></p>
+    </div>
   </div>
-</div>
 `;
+
 
 const emailHtml = juice(`${emailStyles} ${emailHtmlContent}`);
 
@@ -95,9 +97,61 @@ const mailOptions = {
   }
 });
 
+// Function to format phone number
+function formatPhoneNumber(phoneNumber) {
+  // Remove all non-digit characters from the phone number
+  const digits = phoneNumber.replace(/\D/g, '');
+  // Check if the phone number has 10 digits as expected for US numbers
+  if (digits.length === 10) {
+    // Reformat to (xxx) xxx-xxxx
+    return `(${digits.substr(0,3)}) ${digits.substr(3,3)}-${digits.substr(6)}`;
+  } else {
+    // If not 10 digits, return the original input
+    return phoneNumber;
+  }
+}
+
 // This is the correct and only needed /send-quote handler
 app.post('/send-quote', async (req, res) => {
-  const { name, email, date, time, message, address, phoneNumber, projectType, insuranceClaim, insuranceCompany, claimNumber } = req.body;
+  const {
+    name,
+    email,
+    date,
+    time,
+    message,
+    address,
+    phoneNumber,
+    projectType,
+    insuranceClaim,
+    insuranceCompany,
+    claimNumber,
+    country, // New field
+    state,   // New field
+    city     // New field
+  } = req.body;
+
+    // Assuming fullAddress is a string like "5915 Oak Country Way, San Antonio, TX, USA"
+    const fullAddress = req.body.address;
+
+    // Use a regex pattern to extract address components
+    // This pattern assumes that the address is always in the format "Address, City, State, Country"
+    // Note: This might not be robust for all address formats, especially international ones.
+    const addressRegex = /^(.*),\s*(.*),\s*(.*),\s*(.*)$/;
+    const addressMatch = fullAddress.match(addressRegex);
+  
+    let extractedAddress = {};
+    if (addressMatch) {
+      extractedAddress = {
+        address: addressMatch[1].trim(),
+        city: addressMatch[2].trim(),
+        state: addressMatch[3].trim(),
+        country: addressMatch[4].trim(),
+      };
+    } else {
+      // Handle case where address doesn't match the expected format
+      console.error('Address format is not as expected:', fullAddress);
+      // Send back a response or handle accordingly
+    }
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -110,7 +164,17 @@ app.post('/send-quote', async (req, res) => {
 
   let formattedDate = "Invalid date";
   let formattedTime = "Invalid time";
+  
+// Conditional logic to append insurance company information if it exists
+let insuranceCompanyHtml = insuranceCompany
+  ? `<p><strong style="color: black;">Insurance Company:</strong> <span style="color: black;">${insuranceCompany}</span></p>`
+  : '';
 
+// Conditional logic to append claim number information if it exists
+let claimNumberHtml = claimNumber
+  ? `<p><strong style="color: black;">Claim Number:</strong> <span style="color: black;">${claimNumber}</span></p>`
+  : '';
+  
   // Validate and format date and time
   if (date && !isNaN(new Date(date).getTime())) {
     const dateObj = new Date(date);
@@ -126,46 +190,51 @@ app.post('/send-quote', async (req, res) => {
     }).format(timeObj);
   }
 
+  const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+
   // Constructing the email body with new fields
   const emailBody = `  
   <div>
-  <h1>Inspection/Estimate Request</h1>
-  <p><strong>Name:</strong> ${name}</p>
-  <p><strong>Email:</strong> ${email}</p>
-  <p><strong>Date:</strong> ${formattedDate}</p>
-  <p><strong>Time:</strong> ${formattedTime}</p>
-  <p><strong>Address:</strong> ${address}</p>
-  <p><strong>Callback Phone Number:</strong> ${phoneNumber}</p>
-  <p><strong>Project Type:</strong> ${projectType}</p>
-  <p><strong>Insurance Claim:</strong> ${insuranceClaim}</p>
-  <p><strong>Insurance Company:</strong> ${insuranceCompany}</p>
-  <p><strong>Claim Number:</strong> ${claimNumber}</p>
-  <hr>
-  <p><strong>Message:</strong> ${message}</p>
-  <hr>
-  <div style="margin-top: 30px;">
-  <a href="http://www.carranzarestoration.org" target="_blank">
-  <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
-  </a>
-  <div style="margin-top: 10px;">
-  <p style="margin: 0; font-weight: bold;">Carranza Restoration LLC; FWR General Contractors</p>
-  <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" ">
-    <p style="margin: 5px 0;">100 Commercial Place</p>
-    <p style="margin: 0;">Schertz, TX 78154</p>
-  </a>
-  <p style="margin: 5px 0;">
-    <a href="tel:+12102671008" ">(210) 267-1008</a> Office
-  </p>
-  <p style="margin: 0;">
-    <a href="tel:+12104285610" ">(210) 428-5610</a> Cell
-  </p>
-</div>      
-  <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a></p>
-  <p><a href="http://www.carranzarestoration.org" target="_blank">Carranza Restoration LLC Website</a></p>
-  <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angi Review</a></p>
-</div>
+    <h1 style="color: black;">Inspection/Estimate Request</h1>
+    <p><strong style="color: black;">Name:</strong> <span style="color: black;">${name}</span></p>
+    <p><strong style="color: black;">Email:</strong> ${email}</p>
+    <p><strong style="color: black;">Callback Phone Number:</strong> <a href="tel:${formattedPhoneNumber}" style="color: #15c;">${formattedPhoneNumber}</a></p>
+    <p><strong style="color: black;">Date:</strong> <span style="color: black;">${formattedDate}</span></p>
+    <p><strong style="color: black;">Time:</strong> <span style="color: black;">${formattedTime}</span></p>
+    <p><strong style="color: black;">Address:</strong> <span style="color: black;">${extractedAddress.address}</span></p>
+    <p><strong style="color: black;">City:</strong> <span style="color: black;">${extractedAddress.city}</span></p>
+    <p><strong style="color: black;">State:</strong> <span style="color: black;">${extractedAddress.state}</span></p>
+    <p><strong style="color: black;">Country:</strong> <span style="color: black;">${extractedAddress.country}</span></p>
+    <p><strong style="color: black;">Project Type:</strong> <span style="color: black;">${projectType}</span></p>
+    <p><strong>Insurance Claim:</strong> <span style="color: black;">${insuranceClaim}</span></p>
+    ${insuranceCompanyHtml}
+    ${claimNumberHtml} 
+    <hr>
+    <p><strong style="color: black;">Message:</strong> <span style="color: black;">${message}</span></p>
+    <hr>
+    <div style="margin-top: 30px;">
+      <a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">
+        <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
+      </a>
+      <div style="margin-top: 10px;">
+        <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
+        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: blue;">
+          <p style="margin: 5px 0;">100 Commercial Place</p>
+          <p style="margin: 0;">Schertz, TX 78154</p>
+        </a>
+        <p style="margin: 5px 0; color: black;">
+          <a href="tel:+12102671008" style="color: blue;"> (210) 267-1008</a> <span style="color: black;">Office</span>
+        </p>
+        <p style="margin: 0;">
+          <a href="tel:+12104285610" style="color: blue;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
+        </p>
+      </div>      
+      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: blue;">Google Review</a></p>
+      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">Carranza Restoration LLC Website</a></p>
+      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: blue;">Angi Review</a></p>
+    </div>
+  </div>`;
 
-</div>`;
 
 // Email options for /send-email, including CC and using HTML for body
 const mailOptions = {
