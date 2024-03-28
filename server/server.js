@@ -52,25 +52,25 @@ app.post('/send-email', async (req, res) => {
     <div style="color: black;">${message}</div>
     <hr>
     <div style="margin-top: 20px;">
-      <a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">
+      <a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">
         <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
       </a>
       <div style="margin-top: 10px;">
         <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
-        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: blue;">
+        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: #15c;">
           <p style="margin: 5px 0;">100 Commercial Place</p>
           <p style="margin: 0;">Schertz, TX 78154</p>
         </a>
         <p style="margin: 5px 0">
-          <a href="tel:+12102671008" style="color: blue;"> (210) 267-1008</a> <span style="color: black;">Office</span>
+          <a href="tel:+12102671008" style="color: #15c;"> (210) 267-1008</a> <span style="color: black;">Office</span>
         </p>
         <p style="margin: 0;">
-          <a href="tel:+12104285610" style="color: blue;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
+          <a href="tel:+12104285610" style="color: #15c;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
         </p>
       </div>      
-      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: blue;">Google Review</a></p>
-      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">Carranza Restoration LLC Website</a></p>
-      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: blue;">Angi Review</a></p>
+      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: #15c;">Google Review</a></p>
+      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">Carranza Restoration LLC Website</a></p>
+      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: #15c;">Angi Review</a></p>
     </div>
   </div>
 `;
@@ -197,7 +197,7 @@ let claimNumberHtml = claimNumber
   <div>
     <h1 style="color: black;">Inspection/Estimate Request</h1>
     <p><strong style="color: black;">Name:</strong> <span style="color: black;">${name}</span></p>
-    <p><strong style="color: black;">Email:</strong> ${email}</p>
+    <p><strong style="color: black;">Email:</strong> <a href="mailto:${email}" style="color: #15c;">${email}</a></p>
     <p><strong style="color: black;">Callback Phone Number:</strong> <a href="tel:${formattedPhoneNumber}" style="color: #15c;">${formattedPhoneNumber}</a></p>
     <p><strong style="color: black;">Date:</strong> <span style="color: black;">${formattedDate}</span></p>
     <p><strong style="color: black;">Time:</strong> <span style="color: black;">${formattedTime}</span></p>
@@ -213,25 +213,25 @@ let claimNumberHtml = claimNumber
     <p><strong style="color: black;">Message:</strong> <span style="color: black;">${message}</span></p>
     <hr>
     <div style="margin-top: 30px;">
-      <a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">
+      <a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">
         <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
       </a>
       <div style="margin-top: 10px;">
         <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
-        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: blue;">
+        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: #15c;">
           <p style="margin: 5px 0;">100 Commercial Place</p>
           <p style="margin: 0;">Schertz, TX 78154</p>
         </a>
         <p style="margin: 5px 0; color: black;">
-          <a href="tel:+12102671008" style="color: blue;"> (210) 267-1008</a> <span style="color: black;">Office</span>
+          <a href="tel:+12102671008" style="color: #15c;"> (210) 267-1008</a> <span style="color: black;">Office</span>
         </p>
         <p style="margin: 0;">
-          <a href="tel:+12104285610" style="color: blue;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
+          <a href="tel:+12104285610" style="color: #15c;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
         </p>
       </div>      
-      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: blue;">Google Review</a></p>
-      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: blue;">Carranza Restoration LLC Website</a></p>
-      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: blue;">Angi Review</a></p>
+      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: #15c;">Google Review</a></p>
+      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">Carranza Restoration LLC Website</a></p>
+      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: #15c;">Angi Review</a></p>
     </div>
   </div>`;
 
