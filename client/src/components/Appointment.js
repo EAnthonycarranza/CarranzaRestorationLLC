@@ -5,10 +5,10 @@ import 'react-day-picker/dist/style.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-quill/dist/quill.snow.css';
 import dayjs from 'dayjs'; // Make sure you've imported dayjs
-
 // Importing necessary components for TimePicker
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import axios from 'axios';
 
 const Appointment = () => {
   // Initial state setup
@@ -70,19 +70,19 @@ const Appointment = () => {
 
   const handleAddressChange = async (inputValue) => {
     setAddress(inputValue);
-    setIsAddressSelected(false); // Reset this to false since the user is typing a new address
+    setIsAddressSelected(false);
     if (inputValue.length < 3) {
       setAddressSuggestions([]);
       return;
     }
     const api_key = '29a20688eb5ad490b5477ecf3679e616';
-const url = `https://api.positionstack.com/v1/forward?access_key=${api_key}&query=${encodeURIComponent(inputValue)}`;
-
+    const url = `https://api.positionstack.com/v1/forward?access_key=${api_key}&query=${encodeURIComponent(inputValue)}`;
+  
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.data) {
-        setAddressSuggestions(data.data); // Assuming 'data' contains the address suggestions
+      // Use axios.get() to make the request
+      const response = await axios.get(url);
+      if (response.data && response.data.data) {
+        setAddressSuggestions(response.data.data); // Assuming 'data' contains the address suggestions
       }
     } catch (error) {
       console.error('Error fetching address suggestions:', error);
