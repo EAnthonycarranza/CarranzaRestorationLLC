@@ -15,13 +15,14 @@ import AboutPage from './components/AboutPage';
 import ServicePage from './components/ServicePage'; // Import the ServicePage component
 import BackToTopButton from './components/BackToTopButton';
 import ProjectPage from './components/ProjectPage'; // Import ProjectPage
-//import PaymentFormComponent from './components/PaymentPage';
-//import TypingEffect from './components/TypingEffect';
+import PaymentFormComponent from './components/PaymentPage';
 import Portfolio2 from './components/Portfolio-2';
 import FormPage from './components/FormPage';
+import TypingEffect from './components/TypingEffect';
 //import TeamPage from './components/TeamPage'; // Import ProjectPage
 import TestimonialPage from './components/TestimonialPage'; // Import ProjectPage
 import ContactPage from './components/ContactPage'; // Import ProjectPage
+
 
 const ScrollToTop = ({ children }) => {
   const location = useLocation(); // Now useLocation is defined
@@ -51,7 +52,7 @@ function App() {
         <ScrollToTop>
 
         <Routes>
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about" element={<AboutPage />}/>
           <Route path="/services" element={<ServicePage />} />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/form" element={<FormPage />}/>
