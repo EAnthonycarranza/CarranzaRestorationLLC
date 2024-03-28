@@ -704,13 +704,9 @@ textarea.form-control-lg {
 }
 
 /* Adjusted styles for individual images */
-.angel-image { width: 80px; } /* Adjusted width */
-.elite-image { width: 80px; } /* Adjusted width */
-.fwr-image { width: 150px; } /* Adjusted width */
-.owen-image { width: 175px; } /* Adjusted width */
-.b-image { width: 250px; height: 75px; } /* Adjusted width */
-
-
+.owen-image { height: 120px; } /* Adjusted width */
+.b-image { height: 155px; } /* Adjusted width */
+.nrca-image {height: 120px;}
 
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
@@ -722,16 +718,5 @@ textarea.form-control-lg {
   .left-images, .right-images {
     width: 100%;
     justify-content: center;
-  }
-  .angel-image, .elite-image {
-    width: 30%;
-  }
-
- .fwr-image, .owen-image {
-    width: 50%; /* Adjust this for other images */
-  }
-
-  .b-image {
-    width: 120%; /* Significantly smaller width for B image */
   }
 }
