@@ -21,7 +21,7 @@ const About = () => {
               <div className="col-sm-6 mb-2">
                 <p className="fw-bold mb-2"><i className="fa fa-check text-primary me-3"></i>Dedicated Customer Service</p>
                 <p className="fw-bold mb-2"><i className="fa fa-check text-primary me-3"></i>Timely Project Management</p>
-                <p className="fw-bold mb-2"><i className="fa fa-check text-primary me-3"></i>Seamless Content Manipulation</p>
+                <p className="fw-bold mb-2"><i className="fa fa-check text-primary me-3"></i>Reliable Roofing Replacements</p>
               </div>
             </div>
             <p className="mb-4">Our team excels at delivering meticulous craftsmanship and personalized service, ensuring your project is completed to the highest standards. Trust Carranza Restoration LLC to bring your vision to life with professionalism and care.</p>
