@@ -37,8 +37,9 @@ app.use('/.well-known', express.static(path.join(__dirname, 'public/.well-known'
   dotfiles: 'allow' // this is crucial for .well-known directory
 }));
 
-app.get('/sitemap.xml', function(req, res) {
-  res.sendFile(path.join(__dirname, 'sitemap.xml'));
+// Serve sitemap.xml at the root URL
+app.get('/sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '../sitemap.xml'));
 });
 
 app.get('*', (req, res) => {
