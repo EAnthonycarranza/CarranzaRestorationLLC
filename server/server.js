@@ -5,6 +5,7 @@ const juice = require('juice');
 const cors = require('cors');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const axios = require('axios');
+const helmet = require('helmet');
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -18,12 +19,15 @@ const axios = require('axios');
 const app = express();
 
 app.use((req, res, next) => {
-  if (req.header('x-forwarded-proto') !== 'https' && process.env.NODE_ENV === 'production') {
-    res.redirect(`https://${req.header('host')}${req.url}`);
-  } else {
-    next();
-  }
+  if (req.header('x-forwarded-proto') !== 'https')
+    res.redirect(`https://${req.header('host')}${req.url}`)
+  else
+    next()
 });
+
+app.use(helmet.hsts({
+  maxAge: 15552000  // 180 days in seconds
+}));
 
 app.use(cors());
 app.use(express.json());
@@ -120,6 +124,68 @@ function formatPhoneNumber(phoneNumber) {
   }
 }
 
+function createDateFromDateTimeCentralTime(date, time) {
+  const [year, month, day] = date.split('-').map(num => parseInt(num, 10));
+  const [hours, minutes] = time.split(':').map(num => parseInt(num, 10));
+
+  // Create a UTC date object
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+
+  // Determine if Central Time is currently in daylight saving time
+  const isCDT = isDaylightSavingTime(utcDate);
+
+  // CST is UTC-6, CDT is UTC-5
+  const offset = isCDT ? 5 : 6;
+
+  // Subtract offset to get Central Time
+  utcDate.setHours(utcDate.getHours() - offset);
+
+  return utcDate;
+}
+
+function isDaylightSavingTime(date) {
+  // Determine the second Sunday in March
+  const march = new Date(Date.UTC(date.getUTCFullYear(), 2, 1));
+  const secondSundayInMarch = new Date(Date.UTC(march.getUTCFullYear(), march.getUTCMonth(), 14 - (march.getUTCDay() || 7)));
+
+  // Determine the first Sunday in November
+  const november = new Date(Date.UTC(date.getUTCFullYear(), 10, 1));
+  const firstSundayInNovember = new Date(Date.UTC(november.getUTCFullYear(), november.getUTCMonth(), 7 - (november.getUTCDay() || 7)));
+
+  // CDT is in effect between the second Sunday in March and the first Sunday in November
+  return date >= secondSundayInMarch && date < firstSundayInNovember;
+}
+
+
+
+// Function to generate .ics format string
+function generateICSContent(eventStart, eventEnd, name, email, message, address, city, state, country) {
+  const formatDate = (date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const dtStamp = formatDate(new Date());
+  const uid = `${dtStamp}@carranzarestoration.org`;
+  const dtStart = formatDate(eventStart);
+  const dtEnd = formatDate(eventEnd);
+  const description = message.replace(/(\r\n|\n|\r)/gm, "\\n");
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Carranza Restoration LLC//EN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${dtStamp}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:Inspection/Estimate Request for ${name}`,
+    `DESCRIPTION:${description}`,
+    `LOCATION:${address}, ${city}, ${state}, ${country}`,
+    `ORGANIZER;CN="Carranza Restoration LLC":mailto:${email}`, // Organizer email added here
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+}
+
+
 // This is the correct and only needed /send-quote handler
 app.post('/send-quote', async (req, res) => {
   const {
@@ -184,20 +250,34 @@ let claimNumberHtml = claimNumber
   ? `<p><strong style="color: black;">Claim Number:</strong> <span style="color: black;">${claimNumber}</span></p>`
   : '';
   
-  // Validate and format date and time
-  if (date && !isNaN(new Date(date).getTime())) {
-    const dateObj = new Date(date);
-    formattedDate = new Intl.DateTimeFormat('en-US', { 
-      year: 'numeric', month: 'long', day: '2-digit' 
-    }).format(dateObj);
-  }
-  
-  if (time && !isNaN(new Date(time).getTime())) {
-    const timeObj = new Date(time);
-    formattedTime = new Intl.DateTimeFormat('en-US', { 
-      hour: '2-digit', minute: '2-digit', hour12: true 
-    }).format(timeObj);
-  }
+// Before using date and time, validate them
+if (!date || !time || isNaN(new Date(date).getTime()) || isNaN(new Date(time).getTime())) {
+  console.error('Invalid date or time provided.');
+  return res.status(400).json({ success: false, message: 'Invalid date or time provided.' });
+}
+
+// Assuming 'date' contains the full ISO datetime string you want to use,
+// and there's no need to manually combine with a separate 'time' string.
+
+console.log('Date:', date);
+let eventStart = new Date(date);
+console.log('eventStart:', eventStart);
+
+// Check if the date is valid
+if (isNaN(eventStart.getTime())) {
+    console.error('Invalid date provided:', date);
+    return res.status(400).json({ success: false, message: 'Invalid date provided.' });
+}
+
+// If you need to adjust the time of eventStart, do it here using setHours, setMinutes etc., if necessary
+// For example, if you have a separate 'time' that you need to apply to 'date'
+// let hours = parseInt(time.split(':')[0], 10);
+// let minutes = parseInt(time.split(':')[1], 10);
+// eventStart.setHours(hours);
+// eventStart.setMinutes(minutes);
+
+let eventEnd = new Date(eventStart.getTime() + 1 * 60 * 60 * 1000); // 1 hour later
+
 
   const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
@@ -244,18 +324,33 @@ let claimNumberHtml = claimNumber
     </div>
   </div>`;
 
-
-// Email options for /send-email, including CC and using HTML for body
-const mailOptions = {
-  from: process.env.EMAIL, // This should likely be your EMAIL variable or a specific sender email
-  to: process.env.RECEIVER_EMAIL,
-  cc: `${email}, ${process.env.COMPANY_EMAIL}`,
-  subject: `Inspection/Estimate Request from ${name}`,
-  html: emailBody, // Use html key instead of text
-};
-
-  // Attempt to send email
+  
   try {
+const eventStart = createDateFromDateTimeCentralTime('2024-03-30', '13:00');
+console.log(eventStart.toString());
+    const eventEnd = new Date(eventStart.getTime() + 60 * 60 * 1000); // Adds 1 hour
+
+// Generate the .ics content
+const icsContent = generateICSContent(eventStart, eventEnd, name, email, message, address, city, state, country);
+
+// Convert the .ics content into a buffer
+const icsBuffer = Buffer.from(icsContent, 'utf-8');
+
+    // Email options for /send-email, including CC and using HTML for body
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: process.env.RECEIVER_EMAIL,
+      cc: `${email}, ${process.env.COMPANY_EMAIL}`,
+      subject: `Inspection/Estimate Request from ${name}`,
+      html: emailBody, // Assuming emailBody is defined elsewhere in your route handler
+      attachments: [{
+        filename: 'appointment.ics',
+        content: icsBuffer,
+        contentType: 'text/calendar;charset=utf-8',
+      }],
+    };
+
+    // Attempt to send email
     await transporter.sendMail(mailOptions);
     res.status(200).json({ success: true, message: 'Quote request sent successfully' });
   } catch (error) {
