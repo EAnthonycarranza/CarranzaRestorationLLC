@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import logoSvg from '../img/Logo2.svg';
+import logoSvg from '../img/0juOOO01.svg';
 import AngleImage from '../img/AngieListimg.png';
 import EliteImage from '../img/EliteServiceimg.png';
 import FWRImage from '../img/FWRimg.png';
@@ -43,8 +43,10 @@ const Footer = () => {
       <div className="footer container-fluid position-relative bg-dark bg-light-radial text-white-50 py-6 px-5">
         <div className="row g-5">
           <div className="col-lg-6 pe-lg-5 d-flex flex-column align-items-center text-center">
-            <button className="navbar-brand">
-              <img src={logoSvg} alt="Carranza Logo" className="mb-2" style={{ height: '2em' }}/>
+          <button 
+  className="navbar-brand top-page-btn" 
+  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <img src={logoSvg} alt="Carranza Logo" className="mb-2 logo-img" style={{ height: '2em' }}/>
               {window.innerWidth <= 1100 ? (
                 <h1 className="m-0 text-3xl text-uppercase text-white">
                   Carranza <br />
