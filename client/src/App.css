@@ -369,7 +369,7 @@ textarea.form-control-lg {
 
 /* Hover state */
 .top-page-btn:hover {
-  background-color: #FD5D14; /* The new background color on hover */
+  background-color: #fd5d14ba; /* The new background color on hover */
   border-radius: 10%;
 }
 
