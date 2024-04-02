@@ -713,7 +713,7 @@ textarea.form-control-lg {
 }
 
 /* Adjusted styles for individual images */
-.owen-image { width: 120px; } /* Adjusted width */
+.owen-image { height: 120px; } /* Adjusted width */
 .b-image {height: 155px; } /* Adjusted width */
 .ncra-image {height: 120px;}
 
