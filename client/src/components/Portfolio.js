@@ -70,8 +70,10 @@ class Portfolio extends React.Component {
   items={images} 
   showThumbnails={true} 
   infinite={true} 
-  showPlayButton={false} 
-  showFullscreenButton={false} 
+  autoPlay={true}
+  slideInterval={3000}
+  showPlayButton={true} 
+  showFullscreenButton={true} 
   thumbnailPosition="bottom" 
 />
 
