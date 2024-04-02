@@ -712,6 +712,11 @@ textarea.form-control-lg {
   height: 100px;
 }
 
+/* Adjusted styles for individual images */
+.owen-image { width: 120px; } /* Adjusted width */
+.b-image {height: 155px; } /* Adjusted width */
+.ncra-image {height: 120px;}
+
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
   .footer-images {
