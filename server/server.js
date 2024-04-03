@@ -7,6 +7,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const axios = require('axios');
 const helmet = require('helmet');
 
+
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -162,17 +163,33 @@ function isDaylightSavingTime(date) {
   return date >= secondSundayInMarch && date < firstSundayInNovember;
 }
 
+const { v4: uuidv4 } = require('uuid'); // Import the function to generate UUID v4
 
-
-// Function to generate .ics format string
 function generateICSContent(eventStart, eventEnd, name, email, message, address, city, state, country) {
-  const formatDate = (date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  // Use the formatDate function as previously defined
+  const formatDate = (date) => {
+    try {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return null;
+    }
+  };
+
   const dtStamp = formatDate(new Date());
-  const uid = `${dtStamp}@carranzarestoration.org`;
+  const uid = uuidv4(); // Generate a unique identifier for the event
   const dtStart = formatDate(eventStart);
   const dtEnd = formatDate(eventEnd);
+  
+  // Ensure date formatting was successful
+  if (!dtStart || !dtEnd) {
+    console.error('Invalid start or end time');
+    return ''; // Return an empty string or handle this error as appropriate for your application
+  }
+
   const description = message.replace(/(\r\n|\n|\r)/gm, "\\n");
 
+  // Construct the .ics content
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -185,12 +202,11 @@ function generateICSContent(eventStart, eventEnd, name, email, message, address,
     `SUMMARY:Inspection/Estimate Request for ${name}`,
     `DESCRIPTION:${description}`,
     `LOCATION:${address}, ${city}, ${state}, ${country}`,
-    `ORGANIZER;CN="Carranza Restoration LLC":mailto:${email}`, // Organizer email added here
+    `ORGANIZER;CN="Carranza Restoration LLC":mailto:${email}`,
     'END:VEVENT',
     'END:VCALENDAR'
   ].join('\r\n');
 }
-
 
 // This is the correct and only needed /send-quote handler
 app.post('/send-quote', async (req, res) => {
@@ -201,14 +217,14 @@ app.post('/send-quote', async (req, res) => {
     time,
     message,
     address,
+    city,
+    state,
+    country,
     phoneNumber,
     projectType,
     insuranceClaim,
     insuranceCompany,
     claimNumber,
-    country, // New field
-    state,   // New field
-    city     // New field
   } = req.body;
 
     // Assuming fullAddress is a string like "5915 Oak Country Way, San Antonio, TX, USA"
@@ -243,8 +259,51 @@ app.post('/send-quote', async (req, res) => {
     },
   });
 
-  let formattedDate = "Invalid date";
-  let formattedTime = "Invalid time";
+// Function to format the date for email display
+function formatDateForEmail(isoDateString) {
+  // Create a new Date object from the ISO string
+  const date = new Date(isoDateString);
+
+  // Check if the date is valid before proceeding
+  if (isNaN(date.getTime())) {
+    return "Invalid date";
+  }
+
+  // Specify your desired options for toLocaleDateString
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+
+  // Return the formatted date
+  return date.toLocaleDateString('en-US', options);
+}
+
+// Function to format the time for email display
+function formatTimeForEmail(isoTimeString) {
+  // Create a new Date object from the ISO string
+  const time = new Date(isoTimeString);
+
+  // Check if the time is valid before proceeding
+  if (isNaN(time.getTime())) {
+    return "Invalid time";
+  }
+
+  // Specify your desired options for toLocaleTimeString
+  const options = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true, // Use 12-hour time with AM/PM
+  };
+
+  // Return the formatted time
+  return time.toLocaleTimeString('en-US', options);
+}
+
+// Use these functions when setting formattedDate and formattedTime:
+let formattedDate = formatDateForEmail(req.body.date); // For date without time
+let formattedTime = formatTimeForEmail(req.body.time); // For time without date
   
 // Conditional logic to append insurance company information if it exists
 let insuranceCompanyHtml = insuranceCompany
@@ -255,35 +314,6 @@ let insuranceCompanyHtml = insuranceCompany
 let claimNumberHtml = claimNumber
   ? `<p><strong style="color: black;">Claim Number:</strong> <span style="color: black;">${claimNumber}</span></p>`
   : '';
-  
-// Before using date and time, validate them
-if (!date || !time || isNaN(new Date(date).getTime()) || isNaN(new Date(time).getTime())) {
-  console.error('Invalid date or time provided.');
-  return res.status(400).json({ success: false, message: 'Invalid date or time provided.' });
-}
-
-// Assuming 'date' contains the full ISO datetime string you want to use,
-// and there's no need to manually combine with a separate 'time' string.
-
-console.log('Date:', date);
-let eventStart = new Date(date);
-console.log('eventStart:', eventStart);
-
-// Check if the date is valid
-if (isNaN(eventStart.getTime())) {
-    console.error('Invalid date provided:', date);
-    return res.status(400).json({ success: false, message: 'Invalid date provided.' });
-}
-
-// If you need to adjust the time of eventStart, do it here using setHours, setMinutes etc., if necessary
-// For example, if you have a separate 'time' that you need to apply to 'date'
-// let hours = parseInt(time.split(':')[0], 10);
-// let minutes = parseInt(time.split(':')[1], 10);
-// eventStart.setHours(hours);
-// eventStart.setMinutes(minutes);
-
-let eventEnd = new Date(eventStart.getTime() + 1 * 60 * 60 * 1000); // 1 hour later
-
 
   const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
@@ -332,29 +362,31 @@ let eventEnd = new Date(eventStart.getTime() + 1 * 60 * 60 * 1000); // 1 hour la
 
   
   try {
-const eventStart = createDateFromDateTimeCentralTime('2024-03-30', '13:00');
-console.log(eventStart.toString());
-    const eventEnd = new Date(eventStart.getTime() + 60 * 60 * 1000); // Adds 1 hour
+    // Correctly use startDateISO and startTimeISO to parse the date and time
+    let eventDateTime = new Date(time); // 'time' already represents the full date-time in your structure
 
-// Generate the .ics content
-const icsContent = generateICSContent(eventStart, eventEnd, name, email, message, address, city, state, country);
-
-// Convert the .ics content into a buffer
-const icsBuffer = Buffer.from(icsContent, 'utf-8');
-
-    // Email options for /send-email, including CC and using HTML for body
+    // Example: Adding 1 hour for the eventEnd, adjust as necessary
+    let eventEnd = new Date(eventDateTime.getTime() + 60 * 60 * 1000);
+  
+    const icsContent = generateICSContent(eventDateTime, eventEnd, name, email, message, address, city, state, country);
+    if (!icsContent) {
+      throw new Error('Failed to generate ICS content');
+    }
+    const icsBuffer = Buffer.from(icsContent, 'utf-8');
+  
     const mailOptions = {
       from: process.env.EMAIL,
       to: process.env.RECEIVER_EMAIL,
       cc: `${email}, ${process.env.COMPANY_EMAIL}`,
       subject: `Inspection/Estimate Request from ${name}`,
-      html: emailBody, // Assuming emailBody is defined elsewhere in your route handler
+      html: emailBody,
       attachments: [{
         filename: 'appointment.ics',
         content: icsBuffer,
         contentType: 'text/calendar;charset=utf-8',
       }],
     };
+  
 
     // Attempt to send email
     await transporter.sendMail(mailOptions);
