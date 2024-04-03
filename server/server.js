@@ -269,6 +269,9 @@ function formatDateForEmail(isoDateString) {
     return "Invalid date";
   }
 
+  // Adjust date to UTC time zone
+  const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+
   // Specify your desired options for toLocaleDateString
   const options = {
     year: 'numeric',
@@ -277,7 +280,7 @@ function formatDateForEmail(isoDateString) {
   };
 
   // Return the formatted date
-  return date.toLocaleDateString('en-US', options);
+  return utcDate.toLocaleDateString('en-US', options);
 }
 
 // Function to format the time for email display
@@ -295,6 +298,7 @@ function formatTimeForEmail(isoTimeString) {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true, // Use 12-hour time with AM/PM
+    timeZone: 'America/Chicago' // Set the time zone to Central Time (CT)
   };
 
   // Return the formatted time
