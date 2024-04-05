@@ -369,8 +369,8 @@ let claimNumberHtml = claimNumber
     // Correctly use startDateISO and startTimeISO to parse the date and time
     let eventDateTime = new Date(time); // 'time' already represents the full date-time in your structure
 
-    // Example: Adding 1 hour for the eventEnd, adjust as necessary
-    let eventEnd = new Date(eventDateTime.getTime() + 60 * 60 * 2000);
+    // Example: Adding 2 hour for the eventEnd, adjust as necessary
+    let eventEnd = new Date(eventDateTime.getTime() + 2 * 60 * 60 * 1000);
   
     const icsContent = generateICSContent(eventDateTime, eventEnd, name, email, message, address, city, state, country);
     if (!icsContent) {
