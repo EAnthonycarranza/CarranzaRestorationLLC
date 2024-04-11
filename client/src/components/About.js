@@ -11,7 +11,7 @@ const About = () => {
           <div className="col-lg-7">
             <h1 className="display-5 text-uppercase mb-4">We are <span className="text-primary">EXPERTS</span> in Home Improvement Industry</h1>
             <h4 className="text-uppercase mb-3 text-body">Experience Excellence in Home Restoration and Renovation Services</h4>
-            <p>With over 21 years of experience in reconstruction and restoration, we proudly serve San Antonio and surrounding areas with unwavering integrity and dedication to fulfilling your project requirements!</p>
+            <p>With over 21 years of experience in reconstruction and restoration, we proudly serve San Antonio, Austin and surrounding areas with unwavering integrity and dedication to fulfilling your project requirements!</p>
             <div className="row gx-5 py-2">
               <div className="col-sm-6 mb-2">
                 <p className="fw-bold mb-2"><i className="fa fa-check text-primary me-3"></i>Expert Estimates</p>
