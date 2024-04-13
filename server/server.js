@@ -5,8 +5,52 @@ const juice = require('juice');
 const cors = require('cors');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const axios = require('axios');
+const mongoose = require('mongoose');
+const BlogPost = require('./models/BlogPost');
+const Comment = require('./models/Comment');
+const { checkAuthentication, adminOnly, canEditComment } = require('./middleware/auth');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('./models/User'); // Adjust the path as necessary
+const { expressjwt: expressJwt } = require('express-jwt');
+// app.js or server.js
+const session = require('express-session');
+const passport = require('passport');
+require('./config/passport'); // Import your passport configuration
+const { OAuth2Client } = require('google-auth-library');
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID_1;
+const client = new OAuth2Client(CLIENT_ID);
 const helmet = require('helmet');
+// Passport JWT Strategy Setup
+const JwtStrategy = require('passport-jwt').Strategy,
+      ExtractJwt = require('passport-jwt').ExtractJwt;
 
+let opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = process.env.JWT_SECRET;
+
+passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
+  try {
+    const user = await User.findById(jwt_payload.id);
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false); // User not found
+    }
+  } catch (error) {
+    return done(error, false);
+  }
+}));
+
+
+// Utility function to generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user._id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+};
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -17,20 +61,22 @@ const helmet = require('helmet');
     },
   });
 
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(301, `https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
+  });
+  
+  app.use(helmet.hsts({
+    maxAge: 15552000  // 180 days in seconds
+  }));
+
 const app = express();
-
-app.use((req, res, next) => {
-  if (req.header('x-forwarded-proto') !== 'https') {
-    res.redirect(301, `https://${req.header('host')}${req.url}`);
-  } else {
-    next();
-  }
-});
-
-app.use(helmet.hsts({
-  maxAge: 15552000  // 180 days in seconds
-}));
-
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/build')));
@@ -45,6 +91,20 @@ app.get('/sitemap.xml', (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Could not connect to MongoDB', err));
+
+const corsOptions = {
+  origin: ['https://www.carranzarestoration.org', 'https://www.carranzarestoration.com', 'http://localhost:3000'],
+  credentials: true,
+};
+
+  
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+
 
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
@@ -306,6 +366,7 @@ function formatTimeForEmail(isoTimeString) {
 // Use these functions when setting formattedDate and formattedTime:
 let formattedDate = formatDateForEmail(req.body.date); // For date without time
 let formattedTime = formatTimeForEmail(req.body.time); // For time without date
+
   
 // Conditional logic to append insurance company information if it exists
 let insuranceCompanyHtml = insuranceCompany
@@ -367,8 +428,8 @@ let claimNumberHtml = claimNumber
     // Correctly use startDateISO and startTimeISO to parse the date and time
     let eventDateTime = new Date(time); // 'time' already represents the full date-time in your structure
 
-    // Example: Adding 2 hour for the eventEnd, adjust as necessary
-    let eventEnd = new Date(eventDateTime.getTime() + 2 * 60 * 60 * 1000);
+    // Example: Adding 1 hour for the eventEnd, adjust as necessary
+    let eventEnd = new Date(eventDateTime.getTime() + 60 * 60 * 1000);
   
     const icsContent = generateICSContent(eventDateTime, eventEnd, name, email, message, address, city, state, country);
     if (!icsContent) {
@@ -445,6 +506,515 @@ function validateEmail(email) {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
+
+async function verify(token) {
+  const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  const userid = payload['sub'];
+  // If request specified a G Suite domain:
+  // const domain = payload['hd'];
+  return payload;
+}
+
+// Admin Registration
+app.post('/api/admin/register', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create a new user
+    const newUser = new User({
+      email,
+      username,
+      password: hashedPassword, // Store the hashed password in the database
+      role: 'admin' // Assuming all registered users are admins
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Respond with a success message
+    return res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Error during registration:', error);
+    return res.status(500).json({ message: 'An error occurred during registration' });
+  }
+});
+
+// Admin Login
+app.post('/api/admin/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      console.log('User not found.');
+      return res.status(401).send('Login failed: User not found.');
+    }
+
+    // Ensure user has admin role
+    if (user.role !== 'admin') {
+      console.log('Access denied: Admin only area.');
+      return res.status(403).send('Access denied: Admin only area.');
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).send('Login failed: Incorrect password.');
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not defined.');
+      return res.status(500).send('Internal server error.');
+    }
+
+    // Generate JWT token with userId included in the payload
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    res.json({ message: 'Login successful', token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).send('An error occurred during login.');
+  }
+});
+
+
+// User Login
+app.post('/api/user/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      console.log('User not found.');
+      return res.status(401).send('Login failed: User not found.');
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).send('Login failed: Incorrect password.');
+    }
+
+    // Generate JWT token with user-specific payload
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // You might adjust the expiry time based on your use case
+    );
+
+    res.json({ message: 'Login successful', token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).send('An error occurred during login.');
+  }
+});
+
+
+// Middleware to validate token and extract user information
+const checkToken = expressJwt({
+  secret: process.env.JWT_SECRET, // The secret key for JWT
+  algorithms: ['HS256'], // Algorithm to decode the JWT
+});
+
+app.get('/api/validateToken', checkToken, (req, res) => {
+  // If token is valid, expressJwt middleware will attach user info to req.user
+  // We can just return a simple message or any user details necessary
+  res.status(200).send({
+    isValid: true,
+    user: req.user
+  });
+});
+
+// Error handler for token validation errors
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') { // Catch expressJwt errors
+    res.status(401).send('Invalid token');
+  } else {
+    next(err);
+  }
+});
+
+
+app.post('/api/blogposts/:id/comments', checkAuthentication, async (req, res) => {
+  console.log('Received comment data:', req.body);
+  console.log('Authenticated user:', req.user);
+
+  if (!req.user) {
+    console.error('User object is missing in request.');
+    return res.status(401).json({ error: 'Authentication failed. User is not logged in.' });
+  }
+
+  if (!req.user.username) {
+    console.error('User object does not have required properties.');
+    return res.status(400).json({ error: 'User information not available' });
+  }
+
+  const postId = req.params.id;
+
+  try {
+    const newComment = new Comment({
+      username: req.user.username,
+      userProfilePic: req.user.googleProfilePic, // Make sure this exists in your User model
+      googleId: req.user.googleId,  // Ensure you are saving the googleId here
+      userId: req.user.userId, // Corrected from user._id to req.user.userId
+      comment: req.body.comment,
+      date: Date.now(),
+      postId: postId,
+    });
+
+    console.log('Creating comment with data:', newComment);
+    await newComment.save();
+    console.log('Comment saved:', newComment);
+
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error('Error posting comment:', error);
+    res.status(500).json({ error: 'Failed to post comment', details: error.message });
+  }
+});
+
+
+
+app.post('/api/blogposts', async (req, res) => {
+  try {
+    const { title, content, author, image, avatar } = req.body;
+
+    if (!title || !content || !author) {
+      return res.status(400).json({ error: 'Title, content, and author are required' });
+    }
+
+    const newBlogPost = new BlogPost({
+      title,
+      content,
+      author,
+      image,
+      avatar
+    });
+
+    await newBlogPost.save();
+    res.status(201).json(newBlogPost);
+  } catch (error) {
+    console.error('Failed to create blog post:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/blogposts', async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 9;
+  const skip = (page - 1) * limit;
+
+  try {
+    const posts = await BlogPost.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const total = await BlogPost.countDocuments();
+    res.json({
+      posts,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the blog posts.");
+  }
+});
+
+// Fetching a blog post
+app.get('/api/blogposts/:id', async (req, res) => {
+  try {
+    const blogPost = await BlogPost.findById(req.params.id).populate('comments');
+    if (!blogPost) {
+      return res.status(404).send('Blog post not found');
+    }
+    res.status(200).json(blogPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred while fetching the blog post');
+  }
+});
+
+// DELETE a blog post by ID
+app.delete('/api/blogposts/:id', checkAuthentication, adminOnly, async (req, res) => {
+  try {
+    const deletedPost = await BlogPost.findByIdAndDelete(req.params.id);
+    if (!deletedPost) {
+      return res.status(404).send('Blog post not found');
+    }
+    res.status(200).send('Blog post deleted successfully');
+  } catch (error) {
+    res.status(500).send('An error occurred while deleting the blog post');
+  }
+});
+
+// UPDATE a blog post by ID
+app.put('/api/blogposts/:id', checkAuthentication, adminOnly, async (req, res) => {
+  try {
+    const updatedPost = await BlogPost.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedPost) {
+      return res.status(404).send('Blog post not found');
+    }
+    res.status(200).send(updatedPost);
+  } catch (error) {
+    res.status(500).send('An error occurred while updating the blog post');
+  }
+});
+
+
+// User Registration
+app.post('/api/users/register', async (req, res) => {
+  const { email, password, username } = req.body;
+
+  try {
+      // Check if the email or username already exists
+      const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+      if (existingUser) {
+          return res.status(400).json({ message: 'User already exists' });
+      }
+  
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+  
+      // Create a new user with the role set to "user"
+      const newUser = new User({
+        userId: uuidv4(), // Generate a new UUID
+          email,
+          password: hashedPassword,
+          username,
+          role: 'user'
+      });
+  
+      // Save the user to the database
+      await newUser.save();
+  
+      // Respond with a success message
+      return res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+      console.error('Error during registration:', error);
+      return res.status(500).json({ message: 'An error occurred during registration' });
+  }  
+});
+
+app.get('/api/blogposts/:id/comments', async (req, res) => {
+  try {
+    // Fetch comments for the postId and include all fields
+    const comments = await Comment.find({ postId: req.params.id });
+    if (!comments) {
+      return res.status(404).send('Comments not found');
+    }
+    res.status(200).send(comments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+app.get('/logout', (req, res, next) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    req.session.destroy(function(err) {
+      if(err) {
+        console.error('Error destroying session:', err);
+        res.status(500).send('Error logging out');
+      } else {
+        // Send a response with the logout message
+        console.log('Successfully logged out');
+        res.status(200).send('Logged out');
+      }
+    });
+  });
+});
+
+// Google auth route
+app.post('/api/auth/google', async (req, res) => {
+  const { token } = req.body;
+  try {
+    console.log("Verifying Google ID Token with audience (Client ID):", process.env.GOOGLE_CLIENT_ID_1);
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID_1,
+    });
+
+    const payload = ticket.getPayload();
+    console.log("Google Payload:", payload);
+
+    // Correct use of findOne to search by googleId
+    let user = await User.findOne({ googleId: payload.sub }).exec(); // Use exec() for returning a true promise
+
+    if (!user) {
+      user = new User({
+        googleId: payload.sub,
+        email: payload.email,
+        googleName: payload.name, // Ensure you're storing the Google name
+        googleProfilePic: payload.picture, // Ensure you're storing the Google profile picture
+        // Add any additional user info you wish to store
+      });
+      await user.save(); // Save the user if it doesn't exist
+    }
+
+    // Generate a JWT token for the user
+    const jwtToken = jwt.sign(
+      {
+        userId: user._id, // MongoDB's _id of the user document
+        username: user.username,
+        googleId: user.googleId, // This is what's missing and you want to add
+        email: user.email,
+        googleName: user.googleName,
+        googleProfilePic: user.googleProfilePic,
+      },
+    
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    
+    res.json({ token: jwtToken });
+  } catch (error) {
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
+  
+// Update a comment by ID
+app.put('/api/comments/:id', checkAuthentication, canEditComment, async (req, res) => {
+  try {
+    const { id: commentId } = req.params;
+
+    // Include the googleId field in the request body if available
+    const commentUpdate = { ...req.body, googleId: req.user.googleId };
+
+    const updatedComment = await Comment.findByIdAndUpdate(commentId, commentUpdate, { new: true });
+
+    if (!updatedComment) {
+      return res.status(404).send('Comment not found');
+    }
+
+    res.status(200).send(updatedComment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.get('/api/user-comments/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    // Fetch comments by userId and populate post details
+    const comments = await Comment.find({ userId })
+                                  .populate({
+                                    path: 'postId',  // Populate the post information
+                                    select: 'title image'  // Select to only include title and image from the blog post
+                                  });
+
+    // Transform the data to include both post info and the actual comment text
+    const commentsWithPostInfo = comments.map(comment => ({
+      post: {
+        title: comment.postId.title,  // Get title from the populated post data
+        _id: comment.postId._id,      // Get post ID from the populated post data
+        image: comment.postId.image   // Get image URL from the populated post data
+      },
+      commentText: comment.comment,    // Include the comment text
+      date: comment.date,              // Include the date of the comment
+      username: comment.username || 'Anonymous'  // Use the username stored in the comment or default to 'Anonymous'
+    }));
+
+    res.json(commentsWithPostInfo);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the comments', details: error.message });
+  }
+});
+
+app.get('/api/user-comments/:googleId', async (req, res) => {
+  const { googleId } = req.params;
+  try {
+    let comments;
+    if (googleId) {
+      // Fetch comments for Google users and ensure to populate both the user and the post
+      comments = await Comment.find({ googleId })
+                              .populate({
+                                path: 'postId',  // Populate the post information
+                                select: 'title image'  // Select to only include title and image from the blog post
+                              })
+                              .populate({
+                                path: 'userId',  // Populate the user information
+                                select: 'username'  // Select to only include username from the user
+                              });
+    } else {
+      // Fetch all comments for non-Google users
+      comments = await Comment.find({})
+                              .populate({
+                                path: 'postId',  // Populate the post information
+                                select: 'title image'  // Select to only include title and image from the blog post
+                              })
+                              .populate({
+                                path: 'userId',  // Populate the user information
+                                select: 'username'  // Select to only include username from the user
+                              });
+    }
+
+    // Transform the data to include both post info and the actual comment text
+    const commentsWithPostInfo = comments.map(comment => ({
+      post: {
+        title: comment.postId.title,
+        _id: comment.postId._id,
+        image: comment.postId.image  // Ensure the image URL is included
+      },
+      commentText: comment.comment,
+      date: comment.date,
+      username: comment.userId ? comment.userId.username : 'Anonymous'  // Handle cases where user might be missing
+    }));
+
+    res.json(commentsWithPostInfo);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the comments', details: error.message });
+  }
+});
+
+app.delete('/api/comments/:id', async (req, res) => {
+  try {
+    const comment = await Comment.findByIdAndDelete(req.params.id);
+    if (!comment) {
+      return res.status(404).send('Comment not found');
+    }
+
+    // Remove comment from blog post
+    await BlogPost.findByIdAndUpdate(comment.postId, {
+      $pull: { comments: comment._id }
+    });
+
+    res.status(200).send({ message: 'Comment deleted', comment });
+  } catch (error) {
+    console.error(error);
+    res.status(400).send(error);
+  }
+});
+
+// Error-handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
