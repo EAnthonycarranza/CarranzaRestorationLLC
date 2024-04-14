@@ -149,49 +149,60 @@ const fetchUserComments = async (decoded) => {
                 <h5 className="card-title mb-3" style={{ color: '#FD5D14' }}>
                   Comment History
                 </h5>
-                <div className="row row-cols-1 row-cols-md-3 g-4">
-{Array.isArray(blogPosts) && blogPosts.map((post) => (
-                    <div key={post.post._id} className="col mb-4">
-                      <div className="card h-100">
-                        <img src={post.post.image} className="card-img-top" alt="Post" />
-                        <div className="card-body">
-                        <Link to={`/blog/${post.post._id}`} className="text-decoration-none">
-                            <h5 className="card-title" style={{ color: '#FD5D14' }}>{post.post.title}</h5>
-                          </Link>
-                          <img
-                    src={user.googleProfilePic || userProfileImg}
-                    alt="Profile"
-                    className="rounded-circle mb-3"
-                    style={{ width: '50px', height: '50px' }}
-                  />
-                          <p className="card-text comment-text">
-                            {post.commentText.length > 150 ? `${post.commentText.substring(0, 250)}...` : post.commentText}
-                          </p>
-                          {post.commentText.length > 100 && (
-                            <button onClick={() => handleOpenModal(post.commentText)} className="btn btn-link">
-                              Read All
-                            </button>
-                          )}
-                          <p className="card-text">
-                            <small className="text-muted date-text">Posted on {formatDate(post.date)}</small>
-                          </p>
-                          {/* Conditionally render the button based on loading state */}
-                          {loadingPostId === post.post._id ? (
-                            <div className="d-flex justify-content-center">
-                              <TailSpin color="rgb(253, 93, 20)" height={80} width={80} />
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => handleReadMoreClick(post.post._id)}
-                              className="btn btn-primary"
-                            >
-                              Read More
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="row row-cols-1 row-cols-md-3 g-4" style={{ display: 'flex', justifyContent: 'center' }}>
+                {Array.isArray(blogPosts) && blogPosts.length > 0 ? (
+  blogPosts.map((post) => (
+    <div key={post.post._id} className="col mb-4">
+      <div className="card h-100">
+        <img src={post.post.image} className="card-img-top" alt="Post" />
+        <div className="card-body">
+          <Link to={`/blog/${post.post._id}`} className="text-decoration-none">
+            <h5 className="card-title" style={{ color: '#FD5D14' }}>{post.post.title}</h5>
+          </Link>
+          <img
+            src={user.googleProfilePic || userProfileImg}
+            alt="Profile"
+            className="rounded-circle mb-3"
+            style={{ width: '50px', height: '50px' }}
+          />
+          <p className="card-text comment-text">
+            {post.commentText.length > 150 ? `${post.commentText.substring(0, 250)}...` : post.commentText}
+          </p>
+          {post.commentText.length > 100 && (
+            <button onClick={() => handleOpenModal(post.commentText)} className="btn btn-link">
+              Read All
+            </button>
+          )}
+          <p className="card-text">
+            <small className="text-muted date-text">Posted on {formatDate(post.date)}</small>
+          </p>
+          {loadingPostId === post.post._id ? (
+            <div className="d-flex justify-content-center">
+              <TailSpin color="rgb(253, 93, 20)" height={80} width={80} />
+            </div>
+          ) : (
+            <button
+              onClick={() => handleReadMoreClick(post.post._id)}
+              className="btn btn-primary"
+            >
+              Read More
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  ))
+) : (
+<div>
+  <div>
+    <p>No comments available.</p>
+    <Link to="/blog" className="btn btn-primary" style={{ marginTop: '20px' }}>Explore Blog</Link>
+
+  </div>
+</div>
+
+  )}
+
                 </div>
                 <Modal
                   open={openModal}
