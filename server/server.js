@@ -61,16 +61,33 @@ const generateToken = (user) => {
     },
   });
 
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      res.redirect(301, `https://${req.header('host')}${req.url}`);
+    } else {
+      next();
+    }
+  });
+  
+  app.use(helmet.hsts({
+    maxAge: 15552000  // 180 days in seconds
+  }));
 
 const app = express();
-
-
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/build')));
+app.use('/.well-known', express.static(path.join(__dirname, 'public/.well-known'), {
+  dotfiles: 'allow' // this is crucial for .well-known directory
+}));
+// Serve sitemap.xml at the root URL
+app.get('/sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '../sitemap.xml'));
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
