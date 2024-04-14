@@ -51,6 +51,7 @@ const generateToken = (user) => {
     { expiresIn: '1h' }
   );
 };
+const app = express();
 
   // Configure Nodemailer transporter
   const transporter = nodemailer.createTransport({
@@ -73,7 +74,6 @@ const generateToken = (user) => {
     maxAge: 15552000  // 180 days in seconds
   }));
 
-const app = express();
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
