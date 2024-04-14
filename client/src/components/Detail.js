@@ -96,7 +96,7 @@ const Detail = () => {
           axios.get(`/api/blogposts/${id}/comments`)
         ]);
         setPost(postResponse.data);
-        const updatedComments = commentsResponse.data.map(comment => ({
+        const updatedComments = Array.isArray(commentsResponse.data) ? commentsResponse.data.map(comment => ({
           ...comment,
           userId: comment.googleId  // Assuming 'googleId' is the property returned by the server
         }));
@@ -181,7 +181,7 @@ const Detail = () => {
           { comment: editingText, lastEdited: new Date() },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        const updatedComments = comments.map(comment => {
+        const updatedComments = Array.isArray(commentsResponse.data) ? commentsResponse.data.map(comment => ({
           if (comment._id === editingCommentId) {
             return { ...comment, comment: editingText, lastEdited: new Date() };
           }
@@ -273,7 +273,7 @@ return (
     
             <div className="mb-5">
               <h3 className="text-uppercase mb-4">{comments.length} Comments</h3>
-              {comments.map((comment, index) => (
+              {Array.isArray(comments) && comments.map((comment, index) => (
                 <div key={index} className="card mb-4 position-relative">
                   <div className="position-absolute top-0 end-0 p-2">
                     {user && user.googleId === comment.googleId && (
@@ -394,7 +394,7 @@ return (
         {/* Omitted search bar */}
         <div className="mb-5">
           <h3 className="text-uppercase mb-4">Recent Posts</h3>
-          {recentPosts.map((post) => (
+          {Array.isArray(recentPosts) && recentPosts.map((post) => (
             <div key={post._id} className="bg-light mb-3 p-3">
               <Link to={`/blog/${post._id}`}>
                 <img src={post.image} alt={post.title} className="image-preview mb-3 text-center" style={{ maxWidth: '100%', height: 'auto', marginBottom: '20px' }} />
