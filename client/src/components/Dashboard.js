@@ -57,19 +57,21 @@ const Dashboard = () => {
         checkLoginStatus();
       }, [navigate]);
 
-      const fetchUserComments = async (decoded) => {
-        const url = decoded.googleId ? `/api/user-comments/${decoded.googleId}` : `/api/user-comments/user/${decoded.userId}`;
-        try {
-          const response = await axios.get(url, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
-          });
-          setBlogPosts(response.data);
-        } catch (error) {
-          console.error('Error fetching user comments:', error);
-        } finally {
-          setTimeout(() => setIsLoading(false), 750); // Set loading to false after 1.25 seconds
-        }
-      };
+const fetchUserComments = async (decoded) => {
+    const url = decoded.googleId ? `/api/user-comments/${decoded.googleId}` : `/api/user-comments/user/${decoded.userId}`;
+    try {
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+      });
+      setBlogPosts(response.data || []);  // Ensure default to array if undefined or null
+    } catch (error) {
+      console.error('Error fetching user comments:', error);
+      setBlogPosts([]);  // Set to empty array on error
+    } finally {
+      setIsLoading(false);  // Adjusted to set loading false immediately
+    }
+};
+
 
   const handleLogout = () => {
     setLoggingOut(true); // Begin showing the loading animation
