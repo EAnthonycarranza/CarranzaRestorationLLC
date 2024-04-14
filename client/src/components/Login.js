@@ -20,6 +20,7 @@ const Login = () => {
   }, [navigate]);
 
   const handleGoogleLogin = async (credentialResponse) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top of the page
     setError('');
     setLoading(true); // Start loading
   
@@ -54,9 +55,10 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top of the page
     e.preventDefault();
     setError('');
-    setLoading(true); // Start loading
+    setLoading(true);
   
     try {
       const response = await fetch('/api/user/login', {
@@ -67,16 +69,17 @@ const Login = () => {
       const data = await response.json();
       if (response.status === 200) {
         localStorage.setItem('jwtToken', data.token);
-        navigate('/dashboard');  // You might navigate them to a different dashboard if needed
+        navigate('/dashboard');
       } else {
         setError(data.message || 'Login failed. Please try again.');
       }
     } catch (error) {
       setError('An error occurred during login. Please try again.');
     } finally {
-      setLoading(false); // Stop loading regardless of the outcome
+      setLoading(false);
     }
   };
+  
   
 
   return   (
