@@ -99,7 +99,7 @@ const Detail = () => {
         const updatedComments = Array.isArray(commentsResponse.data) ? commentsResponse.data.map(comment => ({
           ...comment,
           userId: comment.googleId  // Assuming 'googleId' is the property returned by the server
-        }));
+        })) : [];        
         setComments(updatedComments);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -166,14 +166,19 @@ const Detail = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('jwtToken');
-
+  
+    if (!Array.isArray(comments)) {
+      console.error('Invalid comments data');
+      return;
+    }
+  
     const commentToEdit = comments.find(comment => comment._id === editingCommentId);
-
+  
     if (!commentToEdit) {
       console.error('Comment not found');
       return;
     }
-
+  
     if (user && commentToEdit.googleId === user.googleId) {
       try {
         const response = await axios.put(
@@ -181,7 +186,7 @@ const Detail = () => {
           { comment: editingText, lastEdited: new Date() },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        const updatedComments = Array.isArray(commentsResponse.data) ? commentsResponse.data.map(comment => ({
+        const updatedComments = comments.map(comment => {
           if (comment._id === editingCommentId) {
             return { ...comment, comment: editingText, lastEdited: new Date() };
           }
@@ -195,7 +200,7 @@ const Detail = () => {
     } else {
       alert('You can only edit your own comments.');
     }
-  };
+  };  
 
   const cancelEdit = () => {
     setEditingCommentId(null);
