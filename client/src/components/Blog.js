@@ -13,10 +13,11 @@ const Blog = () => {
     const fetchPosts = async () => {
       try {
         const response = await axios.get(`/api/blogposts?page=${currentPage}&limit=${postsPerPage}`);
-        setPosts(response.data.posts);
+        setPosts(response.data.posts || []);
         setTotalPages(response.data.totalPages); // Adjust according to your response structure
       } catch (error) {
         console.error('There was an error fetching the blog posts:', error);
+        setPosts([]); // Set to empty array on error
       }
     };
 
@@ -47,7 +48,7 @@ const Blog = () => {
         <h1 className="display-5 text-uppercase mb-4">Latest Articles From Our Blog</h1>
       </div>
       <div className="row g-4">
-      {posts.map((post) => (
+{Array.isArray(posts) && posts.map((post) => (
   <div key={post._id} className="col-lg-4 col-md-6 d-flex" style={{ marginBottom: '1rem' }}>
     <div className="bg-light w-100 d-flex flex-column" style={{ height: '100%' }}>
       <div style={{ height: '200px', overflow: 'hidden' }}>
