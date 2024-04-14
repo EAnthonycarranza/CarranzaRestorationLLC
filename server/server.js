@@ -97,7 +97,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error('Could not connect to MongoDB', err));
 
 const corsOptions = {
-  origin: ['https://www.carranzarestoration.org', 'https://www.carranzarestoration.com', 'http://localhost:3000'],
+  origin: '*',  // Warning: only use for testing, not recommended for production
   credentials: true,
 };
 
