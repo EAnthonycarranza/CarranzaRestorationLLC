@@ -94,10 +94,12 @@ const Navbar = () => {
                 <ScrollToTopLink to="/project" className="dropdown-item" closeDropdown={closeDropdown}>Our Project</ScrollToTopLink>
                 {/*<ScrollToTopLink to="/team" className="dropdown-item" closeDropdown={closeDropdown}>The Team</ScrollToTopLink> */}
                 <ScrollToTopLink to="/testimonial" className="dropdown-item" closeDropdown={closeDropdown}>Testimonial</ScrollToTopLink>
+                <ScrollToTopLink to="/blog" className="dropdown-item" closeDropdown={closeDropdown}>Blog</ScrollToTopLink>
                 {/*<ScrollToTopLink to="/pay" className="dropdown-item" closeDropdown={closeDropdown}>Payment</ScrollToTopLink>*/}
               </div>
             </div>
             <ScrollToTopLink to="/contact" className={`nav-item nav-link ${isActive('/contact') ? 'active' : ''}`}>Contact</ScrollToTopLink>
+            <ScrollToTopLink to="/dashboard" className={`nav-item nav-link ${isActive('/dashboard') ? 'active' : ''}`}>Dashboard</ScrollToTopLink>
           </div>
         </div>
       </nav>
