@@ -79,18 +79,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../client/build')));
 app.use('/.well-known', express.static(path.join(__dirname, 'public/.well-known'), {
   dotfiles: 'allow' // this is crucial for .well-known directory
 }));
-// Serve sitemap.xml at the root URL
-app.get('/sitemap.xml', (req, res) => {
-  res.sendFile(path.join(__dirname, '../sitemap.xml'));
-});
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
@@ -104,7 +96,13 @@ const corsOptions = {
   
   app.use(cors(corsOptions));
   app.options('*', cors(corsOptions)); // Enable pre-flight for all routes
+  
+app.use(express.json());
 
+// Serve sitemap.xml at the root URL
+app.get('/sitemap.xml', (req, res) => {
+  res.sendFile(path.join(__dirname, '../sitemap.xml'));
+});
 
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
@@ -1015,6 +1013,15 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
 });
+
+
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/index.html'));
+});
+
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
