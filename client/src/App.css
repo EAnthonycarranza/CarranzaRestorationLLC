@@ -74,6 +74,37 @@
   color: #FD5D14; /* Change the text color to orange */
 }
 
+/* Style for the modal content */
+.modal-content {
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #f4f4f4;
+  color: #333;
+  max-width: 500px; /* Adjust width as needed */
+  margin: auto; /* Center the modal */
+  overflow-wrap: break-word; /* Ensures the text wraps */
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style for the close button */
+.close-button {
+  cursor: pointer; /* Changes cursor to pointer */
+  float: right; /* Position it to the right corner */
+  font-size: 28px; /* Make the 'X' larger */
+  font-weight: bold;
+}
+
+/* Hover effect for close button */
+.close-button:hover {
+  color: #d9534f; /* Bootstrap's button danger color for feedback */
+}
+
+
+
+.pagination-container {
+  margin-top: 20px !important;
+}
+
 .rdp {
   --rdp-cell-size: 40px;
   --rdp-caption-font-size: 18px;
@@ -369,7 +400,7 @@ textarea.form-control-lg {
 
 /* Hover state */
 .top-page-btn:hover {
-  background-color: #fd5d14ba; /* The new background color on hover */
+  background-color: #FD5D14; /* The new background color on hover */
   border-radius: 10%;
 }
 
