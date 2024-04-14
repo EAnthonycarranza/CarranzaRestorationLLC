@@ -73,7 +73,8 @@ const fetchUserComments = async (decoded) => {
 };
 
 
-  const handleLogout = () => {
+const handleLogout = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top of the page
     setLoggingOut(true); // Begin showing the loading animation
     setTimeout(() => {
       googleLogout();
@@ -82,7 +83,9 @@ const fetchUserComments = async (decoded) => {
       setLoggingOut(false); // Stop showing the loading animation
       navigate('/login');
     }, 1250); // Adjust delay as needed, here it's set to 3 seconds
-  };  
+  };
+  
+  
 
   const formatDate = (dateString) => {
     return moment(dateString).format('MMMM Do YYYY, h:mm:ss a');
