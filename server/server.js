@@ -61,19 +61,18 @@ const generateToken = (user) => {
     },
   });
 
-  app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(301, `https://${req.header('host')}${req.url}`);
-    } else {
-      next();
-    }
-  });
-  
-  app.use(helmet.hsts({
-    maxAge: 15552000  // 180 days in seconds
-  }));
-
 const app = express();
+app.use((req, res, next) => {
+  if (req.header('x-forwarded-proto') !== 'https') {
+    res.redirect(301, `https://${req.header('host')}${req.url}`);
+  } else {
+    next();
+  }
+});
+
+app.use(helmet.hsts({
+  maxAge: 15552000  // 180 days in seconds
+}));
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
