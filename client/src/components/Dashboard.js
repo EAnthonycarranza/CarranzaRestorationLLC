@@ -150,7 +150,7 @@ const fetchUserComments = async (decoded) => {
                   Comment History
                 </h5>
                 <div className="row row-cols-1 row-cols-md-3 g-4">
-                  {blogPosts.map((post) => (
+{Array.isArray(blogPosts) && blogPosts.map((post) => (
                     <div key={post.post._id} className="col mb-4">
                       <div className="card h-100">
                         <img src={post.post.image} className="card-img-top" alt="Post" />
