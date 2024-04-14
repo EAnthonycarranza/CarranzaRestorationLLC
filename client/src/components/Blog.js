@@ -9,20 +9,20 @@ const Blog = () => {
   const postsPerPage = 9; // Adjust based on your preference
   const [totalPages, setTotalPages] = useState(1); // Adjust based on response
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(`/api/blogposts?page=${currentPage}&limit=${postsPerPage}`);
-        setPosts(response.data.posts || []);
-        setTotalPages(response.data.totalPages); // Adjust according to your response structure
-      } catch (error) {
-        console.error('There was an error fetching the blog posts:', error);
-        setPosts([]); // Set to empty array on error
-      }
-    };
+useEffect(() => {
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(`/api/blogposts?page=${currentPage}&limit=${postsPerPage}`);
+      setPosts(Array.isArray(response.data.posts) ? response.data.posts : []);
+      setTotalPages(response.data.totalPages || 1); // Provide a default value for totalPages
+    } catch (error) {
+      console.error('There was an error fetching the blog posts:', error);
+      setPosts([]); // Set to empty array on error
+    }
+  };
 
-    fetchPosts();
-  }, [currentPage]);
+  fetchPosts();
+}, [currentPage]);
 
   const handlePreviousPage = (event) => {
     event.preventDefault();
