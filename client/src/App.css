@@ -655,6 +655,17 @@ textarea.form-control-lg {
   background: rgba(4, 15, 40, .7);
 }
 
+.image-container1 {
+  height: 200px; /* Default height */
+}
+
+/* Media query for screens that are 1290px wide or more */
+@media (min-width: 1290px) {
+  .image-container1 {
+    height: 400px; /* Increased height for larger screens */
+  }
+}
+
 .icon-no-background {
   background: none !important;
   border: none;
