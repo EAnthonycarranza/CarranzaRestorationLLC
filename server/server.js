@@ -1015,7 +1015,8 @@ app.use((err, req, res, next) => {
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/index.html'));
+  // Ensure you are pointing to the correct directory where your React app's build index.html resides
+  res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3001;
