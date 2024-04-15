@@ -653,8 +653,6 @@ app.use(function (err, req, res, next) {
 
 
 app.post('/api/blogposts/:id/comments', checkAuthentication, async (req, res) => {
-  console.log('Received comment data:', req.body);
-  console.log('Authenticated user:', req.user);
 
   if (!req.user) {
     console.error('User object is missing in request.');
@@ -679,9 +677,7 @@ app.post('/api/blogposts/:id/comments', checkAuthentication, async (req, res) =>
       postId: postId,
     });
 
-    console.log('Creating comment with data:', newComment);
     await newComment.save();
-    console.log('Comment saved:', newComment);
 
     res.status(201).json(newComment);
   } catch (error) {
@@ -845,7 +841,6 @@ app.get('/logout', (req, res, next) => {
 app.post('/api/auth/google', async (req, res) => {
   const { token } = req.body;
   try {
-    console.log("Verifying Google ID Token with audience (Client ID):", process.env.GOOGLE_CLIENT_ID_1);
 
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -853,7 +848,6 @@ app.post('/api/auth/google', async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    console.log("Google Payload:", payload);
 
     // Correct use of findOne to search by googleId
     let user = await User.findOne({ googleId: payload.sub }).exec(); // Use exec() for returning a true promise
