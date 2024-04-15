@@ -51,7 +51,7 @@ useEffect(() => {
 {Array.isArray(posts) && posts.map((post) => (
   <div key={post._id} className="col-lg-4 col-md-6 d-flex" style={{ marginBottom: '1rem' }}>
     <div className="bg-light w-100 d-flex flex-column" style={{ height: '100%' }}>
-      <div style={{ height: '200px', overflow: 'hidden' }}>
+    <div className="image-container1" style={{ overflow: 'hidden' }}>
         <img className="img-fluid" src={post.image} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
       </div>
       <div className="p-4 d-flex flex-column justify-content-between" style={{ flex: '1' }}>
