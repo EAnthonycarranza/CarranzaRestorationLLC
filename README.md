@@ -153,7 +153,7 @@ Your Carranza Restoration LLC application is now running and accessible.
 * Deploy the application using **Heroku** for accessibility.
 
 ## Collaborators
-This project is brought to you by the dedicated team at Carranza Restoration LLC. For collaborations or inquiries, please contact [admin@carranzarestoration.com](mailto:admin@carranzarestoration.com).
+This project is brought to you by the dedicated team at Carranza Restoration LLC. For collaborations or inquiries, please contact [admin@carranzarestoration.com](mailto:anthony@carranzarestoration.com).
 
 # License
 
