@@ -27,7 +27,8 @@ import portfolio21 from '../img/portfolio-21.jpg';
 import portfolio22 from '../img/portfolio-22.jpg';
 import portfolio23 from '../img/portfolio-23.jpg';
 import portfolio24 from '../img/portfolio-24.jpg';
-import portfolio25 from '../img/portfolio-25.jpg';
+import portfolio25 from '../img/portfolio-26.jpg';
+import portfolio26 from '../img/portfolio-25.jpg';
 
 class Portfolio extends React.Component {
   render() {
@@ -57,6 +58,7 @@ class Portfolio extends React.Component {
       { original: portfolio23, thumbnail: portfolio23, description: 'Tile flooring renovations'  },
       { original: portfolio24, thumbnail: portfolio24, description: 'Patio additions'  },
       { original: portfolio25, thumbnail: portfolio25, description: 'Full roof system replacements'  },
+      { original: portfolio26, thumbnail: portfolio26, description: 'Patio additions'  },
     ];
 
     return (
