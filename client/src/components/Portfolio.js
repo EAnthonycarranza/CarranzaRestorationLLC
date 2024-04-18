@@ -57,8 +57,8 @@ class Portfolio extends React.Component {
       { original: portfolio22, thumbnail: portfolio22, description: 'Kitchen cabinets and granite counter top renovations' },
       { original: portfolio23, thumbnail: portfolio23, description: 'Tile flooring renovations'  },
       { original: portfolio24, thumbnail: portfolio24, description: 'Patio additions'  },
-      { original: portfolio25, thumbnail: portfolio25, description: 'Full roof system replacements'  },
-      { original: portfolio26, thumbnail: portfolio26, description: 'Patio additions'  },
+      { original: portfolio26, thumbnail: portfolio26, description: 'Full roof system replacements'  },
+      { original: portfolio25, thumbnail: portfolio25, description: 'Patio additions'  },
     ];
 
     return (
