@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fast-gate-418608",
+  "private_key_id": "db386b788691a006b9918ae0da6e46dea72e7617",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEnUfNDsqOaJ1s\nhcTSX3q7Ha50AfRJ3zx5kxzfsBwMr0gc7dUynuWDdkHVIzVjzqNJPyeDamWx/OWy\nNR1skZlyFbml/syc7l75F92PwnOsS8Gl3q7DRSMeRNx6UbQJVH8DtBl9ZHaoqhLu\nl94THIUO599h+XZI29EnKh1kMVMYX/O7leyQiSvEmyaGH61VpDtioE1lXDWK3Tob\nhBffmpZ7HDdNH2SB1rkG3ufTS0Jf5njN/eFPY2Zq3A3oV2salM3Adq/ioT27VYv9\nPREtNe5Ywjuv9u80J85w1ICfxe7XjbhYqSOSiV0j4QnQLRG712CtmZxQ0q3YXwl+\nfD4vPmKxAgMBAAECggEAC9RnbWE+SGWR/JAV4LnURsLelrtGs//QVy5F9qLVeovn\nUQTxpsXkYE2ytfy+1HOqjm3UK6DbX+NWp1YbyvGoY7KxRK65J+4Nsntq83Xgg4Ax\nYBCvFNpUO8N/59os9MIWkaX57KSpS7T5Rk1xPqwgyLNPKklvV6s7gS7prXgW8aiP\n1DZosLapPkM9Xlj8C5IWJHQcTu5g4Rnh/8BYd2Dx5+soRChh5nbdJHiVRIw5mjIW\n/OeQZqiI3UP2BMUIl14Cw4tg9YleOGNmiYTgjUTtabI7MwMKrmG+CL3/VmSJTK+z\ntFxuTJ9dss41TArr6ykDz/vVunVmDO6plko3Nkb7IwKBgQD3lnG+cUGvgRQzM34Z\nJqhOrfjucTdzDOByxsR4NG+618Bp+W61J9oYJ3vaiGg0dHWiwrftxm4zmRFwHnXS\nTWpPeYunEtRzMZ7dbAujN2CfU/O96zbTWsALrZlpyDzjgF5PrCwBYVxOah2ko3wA\n8fynzCsUsCcETWU6LijhziYV7wKBgQDLS3Zr658XGRGo2d/IEFUHFU6PyJGJ7KQ6\nj0Z/K9PrTdoFWy3XQZzqPB/zLKT1Bu8LUvdEYabFTu4T+cplaTNQcC2JUgNdCll9\nlqFnwvI7CUmn635UbyHbCKcKDGw/4X3U2iRijymCXO4j1eMRtrenr+LpQH2T2+NH\nzVX1Jy6xXwKBgHORTvClLxL7/nDT5VVaHQ/01xB92nMinJYWv9iYKVseoFsXKhz3\nSC8kJwTfzTxG7C4YFACyMfh1x5T9MuQCbNBCHPTUrkRC8jPK3jfGfpyAdHK/G21W\nm/QXiVe+NuW+oscvx66xQoP7tnCGOzi5u8SbYbSbcOrqMYkRyNV2A4MTAoGAWV5B\nHswj0bmZg8rTj1Vuq4B4WsjnAeTfhUa6zOjtbkF5GGWuzzPu0SHBQdtcYMK9jxLX\n1F3BPHeoPWvPx6jpf/Dwc69z/xCvqn/vUHfomH9Ku+DQVjnMfkdddxNi+uobsNh8\nqj8ZFk/X+DTsbzsNnU+6xqMtETTWwxfHM9AXvK0CgYEAggT9X3lXzl3nf2tjDr2n\nXSQvAoW+3WDarZyrCvzRzJoFjGoP1aLC33QRfkn1Cp4lAbCRzjKtYtef0FJv3roe\n61JFB5WUbkkg+Vj6e/UExBaEgwGmJCOOoTGzlfI3UTD/SnInVDNp697BV3pVQM1L\nk7iGsLW3lQIBXzIVE/YKPBg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "carranza-restoration-referrals@fast-gate-418608.iam.gserviceaccount.com",
+  "client_id": "117941341867778258693",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/carranza-restoration-referrals%40fast-gate-418608.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
