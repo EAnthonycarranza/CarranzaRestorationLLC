@@ -6,6 +6,7 @@ const cors = require('cors');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const axios = require('axios');
 const mongoose = require('mongoose');
+const Click = require('./models/Click');
 const BlogPost = require('./models/BlogPost');
 const Comment = require('./models/Comment');
 const { checkAuthentication, adminOnly, canEditComment } = require('./middleware/auth');
@@ -1135,6 +1136,31 @@ app.delete('/api/comments/:id', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).send(error);
+  }
+});
+
+// Assuming your server setup code is something like this:
+app.post('/api/track-click', async (req, res) => {
+  const { url } = req.body;
+  try {
+      const clickUpdate = await Click.findOneAndUpdate({ url }, { $inc: { count: 1 } }, { new: true, upsert: true });
+      console.log('Click tracked:', clickUpdate);
+      res.sendStatus(200);
+  } catch (err) {
+      console.error('Error tracking click:', err);
+      res.status(500).send('Failed to track click');
+  }
+});
+
+
+
+app.get('/api/get-popular-links', async (req, res) => {
+  try {
+      const popularLinks = await Click.find({}).sort({ count: -1 });
+      res.json(popularLinks);
+  } catch (error) {
+      console.error('Error fetching popular links:', error);
+      res.status(500).send('Failed to fetch popular links');
   }
 });
 
