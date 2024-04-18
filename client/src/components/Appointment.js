@@ -4,14 +4,13 @@ import ReactQuill from 'react-quill';
 import 'react-day-picker/dist/style.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-quill/dist/quill.snow.css';
-import dayjs from 'dayjs'; // Make sure you've imported dayjs
-// Importing necessary components for TimePicker
+import { TailSpin } from 'react-loader-spinner';
+import dayjs from 'dayjs';
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import axios from 'axios';
 
 const Appointment = () => {
-  // Initial state setup
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -19,6 +18,7 @@ const Appointment = () => {
   const [insuranceClaim, setInsuranceClaim] = useState('');
   const [projectType, setProjectType] = useState('');
   const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
@@ -36,45 +36,30 @@ const Appointment = () => {
 
   const handleNameChange = (e) => {
     const input = e.target.value;
-    const spaceCount = input.split(' ').length - 1; // Count the number of spaces
-  
-    if (spaceCount > 1) {
-    } else {
-      // Update the name as usual
+    const spaceCount = input.split(' ').length - 1; 
+    if (spaceCount <= 1) {
       setName(input);
     }
-  };  
+  };
 
   const handleDaySelect = (date) => {
     setSelectedDay(date);
-    // Format the selected day for display
     const formattedDate = dayjs(date).format('MMMM D, YYYY');
     setSelectedDateText(`You have selected: ${formattedDate}`);
   };
 
   const handleTimeChange = (newValue) => {
-    // Ensure newValue is a Dayjs object; AdapterDayjs should automatically handle this conversion
     setTimeValue(newValue);
   };
 
   const combineDateTime = () => {
     if (!selectedDay || !timeValue) {
-      return null; // or some default value
+      return null;
     }
-  
-    // Use dayjs methods to handle Dayjs objects
-    const hours = timeValue.hour();
-    const minutes = timeValue.minute();
-    const combinedDate = dayjs(selectedDay)
-      .hour(hours)
-      .minute(minutes)
-      .second(0)
-      .millisecond(0)
-      .toDate(); // convert to JavaScript Date if needed
-  
+    const combinedDate = dayjs(selectedDay).hour(timeValue.hour()).minute(timeValue.minute()).second(0).millisecond(0).toDate();
     return combinedDate;
   };
-  
+
   const currentMonth = new Date();
   const twoMonthsFromNow = new Date();
   twoMonthsFromNow.setMonth(twoMonthsFromNow.getMonth() + 2);
@@ -88,105 +73,83 @@ const Appointment = () => {
     }
     const api_key = '29a20688eb5ad490b5477ecf3679e616';
     const url = `https://api.positionstack.com/v1/forward?access_key=${api_key}&query=${encodeURIComponent(inputValue)}`;
-  
     try {
-      // Use axios.get() to make the request
       const response = await axios.get(url);
       if (response.data && response.data.data) {
-        setAddressSuggestions(response.data.data); // Assuming 'data' contains the address suggestions
+        setAddressSuggestions(response.data.data);
       }
     } catch (error) {
       console.error('Error fetching address suggestions:', error);
     }
   };
-  
-  const handlePhoneNumberChange = e => {
+
+  const handlePhoneNumberChange = (e) => {
     const input = e.target.value;
-    const numbersOnly = input.replace(/\D/g, ''); // Remove non-digit characters
-  
+    const numbersOnly = input.replace(/\D/g, '');
     if (input !== numbersOnly) {
-      // Set an error message in state
       setPhoneNumberError('Please enter numbers only.');
     } else {
-      // Clear error message and update state
       setPhoneNumberError('');
       setPhoneNumber(numbersOnly);
     }
   };
 
-// Add a method to handle selection of an address
-// This function should be called when a user selects an address from the suggestions
-const selectAddress = (suggestion) => {
-  // Set the full address from the suggestion
-  setAddress(suggestion.label); // Ensure this is the full address string
+  const selectAddress = (suggestion) => {
+    setAddress(suggestion.label);
+    setIsAddressSelected(true);
+    setAddressSuggestions([]);
+  };
 
-  // Here you could also split the address and set the individual parts to state if needed
-  // const parts = suggestion.label.split(', ');
-  // if (parts.length >= 3) {
-  //   setCity(parts[1].trim());
-  //   setState(parts[2].trim());
-  //   // Further processing might be needed to extract the country from the parts[2] if it contains both state and country
-  // }
-
-  setIsAddressSelected(true);
-  setAddressSuggestions([]); // Clear the suggestions list
-};
-
+  const modules = {
+    toolbar: [
+      [{ 'font': [] }], // Font family
+      [{ 'size': ['small', false, 'large'] }], // Font size
+      [{ 'align': [] }], // Text align
+      ['bold', 'italic', 'underline'], // Bold, italic, underline, strike
+      [{ 'header': '1' }, { 'header': '2' }, { 'header': [] }], // Heading
+      [{ 'indent': '+1' }], // Indent
+      ['clean'] // Remove formatting button
+    ]
+  };
   
-    const modules = {
-      toolbar: [
-        [{ 'font': [] }], // Font family
-        [{ 'size': ['small', false, 'large'] }], // Font size
-        [{ 'align': [] }], // Text align
-        ['bold', 'italic', 'underline'], // Bold, italic, underline, strike
-        [{ 'header': '1' }, { 'header': '2' }, { 'header': [] }], // Heading
-        [{ 'indent': '+1' }], // Indent
-        ['clean'] // Remove formatting button
-      ]
+  const formats = [
+    'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'script', 'header', 'list', 'indent', 'direction', 'align',
+    'link', 'image', 'video', 'blockquote', 'code-block'
+  ];
+
+  const handleQuoteRequest = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    if (!isAddressSelected) {
+      setFeedbackMessage('Please select an address from the dropdown.');
+      setTimeout(() => setLoading(false), 1000); 
+      return;
+    }
+    const formData = {
+      name,
+      email,
+      date: selectedDay.toISOString(),
+      time: combineDateTime().toISOString(),
+      message,
+      address,
+      city,
+      state,
+      country,
+      phoneNumber,
+      projectType,
+      insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
+      insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '',
+      claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
     };
-    
-    const formats = [
-      'font', 'size',
-      'bold', 'italic', 'underline', 'strike',
-      'color', 'background',
-      'script', 'header', 'list', 'indent', 'direction', 'align',
-      'link', 'image', 'video', 'blockquote', 'code-block'
-    ];
-
-    const handleQuoteRequest = async (event) => {
-      event.preventDefault(); // This line should only be here once.
-      setFeedbackMessage('');
-    
-      // Ensure an address has been selected from the dropdown before submitting
-      if (!isAddressSelected) {
-        setFeedbackMessage('Please select an address from the dropdown.');
-        return;
-      }
-    
-      const formData = {
-        name,
-        email,
-        date: selectedDay.toISOString(),
-        time: combineDateTime().toISOString(),
-        message,
-        address, // This is the street address part
-        city,    // New field
-        state,   // New field
-        country, // New field
-        phoneNumber,
-        projectType,
-        insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
-        insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '',
-        claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
-      };
-
     try {
       const response = await fetch('/send-quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
       if (response.ok) {
         setFeedbackMessage(data.success ? 'Message sent successfully. Thank you! We will get back to you as soon as possible!' : `Error: ${data.message}`);
@@ -197,28 +160,14 @@ const selectAddress = (suggestion) => {
       console.error('Error:', error);
       setFeedbackMessage('An error occurred. Please try again later.');
     }
+    setTimeout(() => setLoading(false), 1000); 
   };
-  const isFormValid = () => {
-    // Replace the timeValue check with a Date object validation
-    const timeIsValid = timeValue && timeValue.isValid && timeValue.isValid();
 
-  
-    // Check if insurance claim has been selected
+  const isFormValid = () => {
+    const timeIsValid = timeValue && timeValue.isValid && timeValue.isValid();
     const insuranceClaimSelected = insuranceClaim !== '';
-  
-    return (
-      name &&
-      email &&
-      address &&
-      phoneNumber &&
-      projectType &&
-      isAddressSelected && // Make sure an address has been selected from the suggestions
-      (insuranceClaim !== 'yes' || (insuranceClaim === 'yes' && insuranceCompany && claimNumber)) &&
-      selectedDay && // Make sure a date has been selected
-      timeIsValid && // Check that the time is valid
-      insuranceClaimSelected // Ensure an insurance claim option has been selected
-    );
-  };  
+    return name && email && address && phoneNumber && projectType && isAddressSelected && (insuranceClaim !== 'yes' || (insuranceClaim === 'yes' && insuranceCompany && claimNumber)) && selectedDay && timeIsValid && insuranceClaimSelected;
+  };
 
   return (
     <div className="container-fluid py-6 px-5">
@@ -232,74 +181,66 @@ const selectAddress = (suggestion) => {
             <form onSubmit={handleQuoteRequest}>
               <div className="row g-3">
                 <div className="col-12 col-sm-6">
-                <input type="text" className="form-control border-0" placeholder="Your Name" value={name} onChange={handleNameChange} style={{ height: '55px' }} />
+                  <input type="text" className="form-control border-0" placeholder="Your Name" value={name} onChange={handleNameChange} style={{ height: '55px' }} />
                 </div>
                 <div className="col-12 col-sm-6">
                   <input type="email" className="form-control border-0" placeholder="Your Email" value={email} onChange={e => setEmail(e.target.value)} style={{ height: '55px' }} />
-                </div>     
-                <div className="col-12 col-sm-6"style={{ display: "contents"}}>
-                <DayPicker
-  mode="single"
-  selected={selectedDay}
-  onSelect={handleDaySelect}
-  fromMonth={currentMonth} // Earliest month that can be navigated to
-  toMonth={twoMonthsFromNow} // Latest month that can be navigated to
-  disabled={{ before: new Date() }} // Disable days before today
-  className="mx-auto"
-  styles={{
-    caption: { color: '#FD5D14' }
-  }}
-/>
-
-    </div>
-    {selectedDay && <p>{selectedDateText}</p>}
-
-      {/* Replace the address input with a new implementation */}
-      <div className="col-12 col-sm-6">
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <TimePicker
-          value={timeValue}
-          onChange={handleTimeChange}
-          renderInput={(params) => <input className="form-control border-0" {...params} style={{ height: '55px' }} />}
-        />
-      </LocalizationProvider>
-      </div>
-
-      <div className="col-12">
-        <input
-          type="text"
-          className="form-control border-0"
-          placeholder="Property Address"
-          value={address}
-          onChange={(e) => handleAddressChange(e.target.value)}
-          style={{ height: '55px' }}
-        />
-        {addressSuggestions.length > 0 && (
-          <ul className="address-suggestions">
-  {addressSuggestions.map((suggestion, index) => (
-    <li key={index} onClick={() => selectAddress(suggestion)}>
-      {suggestion.label} {/* Render the address or label from the suggestion here */}
-    </li>
-  ))}
-</ul>
-
-        )}
-      </div>
+                </div>
+                <div className="col-12 col-sm-6" style={{ display: "contents" }}>
+                  <DayPicker
+                    mode="single"
+                    selected={selectedDay}
+                    onSelect={handleDaySelect}
+                    fromMonth={currentMonth}
+                    toMonth={twoMonthsFromNow}
+                    disabled={{ before: new Date() }}
+                    className="mx-auto"
+                    styles={{ caption: { color: '#FD5D14' } }}
+                  />
+                </div>
+                {selectedDay && <p>{selectedDateText}</p>}
+                <div className="col-12 col-sm-6">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <TimePicker
+                      value={timeValue}
+                      onChange={handleTimeChange}
+                      renderInput={(params) => <input className="form-control border-0" {...params} style={{ height: '55px' }} />}
+                    />
+                  </LocalizationProvider>
+                </div>
                 <div className="col-12">
-                <div className="form-group">
-                <input
-  type="tel"
-  inputMode="numeric"
-  pattern="[0-9]*"
-  className="form-control border-0"
-  placeholder="Phone Number"
-  value={phoneNumber}
-  onChange={handlePhoneNumberChange}
-  style={{ height: '55px' }}
-/>
-    {phoneNumberError && <div className="error-message" style={{ color: 'red' }}>{phoneNumberError}</div>}
-  </div>
-
+                  <input
+                    type="text"
+                    className="form-control border-0"
+                    placeholder="Property Address"
+                    value={address}
+                    onChange={(e) => handleAddressChange(e.target.value)}
+                    style={{ height: '55px' }}
+                  />
+                  {addressSuggestions.length > 0 && (
+                    <ul className="address-suggestions">
+                      {addressSuggestions.map((suggestion, index) => (
+                        <li key={index} onClick={() => selectAddress(suggestion)}>
+                          {suggestion.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="col-12">
+                  <div className="form-group">
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      className="form-control border-0"
+                      placeholder="Phone Number"
+                      value={phoneNumber}
+                      onChange={handlePhoneNumberChange}
+                      style={{ height: '55px' }}
+                    />
+                    {phoneNumberError && <div className="error-message" style={{ color: 'red' }}>{phoneNumberError}</div>}
+                  </div>
                 </div>
                 <div className="col-12">
                   <select className="form-control border-0" value={projectType} onChange={e => setProjectType(e.target.value)} style={{ height: '55px' }}>
@@ -310,8 +251,8 @@ const selectAddress = (suggestion) => {
                   </select>
                 </div>
                 <div className="col-12">
-                <select className="form-control border-0" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)} style={{ height: '55px' }}>
-                    <option value="">Is there an insurance claim</option> {/* Improved for clarity */}
+                  <select className="form-control border-0" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)} style={{ height: '55px' }}>
+                    <option value="">Is there an insurance claim</option>
                     <option value="yes">Yes</option>
                     <option value="no">No (OOP)</option>
                     <option value="idk">I don't know</option>
@@ -335,15 +276,26 @@ const selectAddress = (suggestion) => {
                 <div className="col-12">
                   <label htmlFor="additionalNotes">Additional Notes:</label>
                   <ReactQuill theme="snow" value={message} onChange={setMessage} modules={modules} formats={formats} />
-                 </div>
+                </div>
                 <div className="col-12">
-                <button type="submit" className="btn btn-primary py-3 px-5" disabled={!isFormValid()}>
-      Schedule NOW
-    </button>
+                  <button type="submit" className="btn btn-primary py-3 px-5" disabled={!isFormValid()}>
+                    Schedule NOW
+                  </button>
+                  {loading && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '20vh',  // Adjust the height as necessary
+                      marginTop: '20px'  // Provide some top margin for alignment
+                    }}>
+                      <TailSpin color="rgb(253, 93, 20)" height={100} width={100} />
+                    </div>
+                  )}
                 </div>
               </div>
             </form>
-            {feedbackMessage && (
+            {!loading && feedbackMessage && (
               <div className="mt-3">
                 <p>{feedbackMessage}</p>
               </div>
@@ -356,3 +308,8 @@ const selectAddress = (suggestion) => {
 };
 
 export default Appointment;
+
+
+
+
+
