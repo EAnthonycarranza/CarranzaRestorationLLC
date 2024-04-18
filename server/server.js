@@ -1139,25 +1139,29 @@ app.delete('/api/comments/:id', async (req, res) => {
   }
 });
 
-// Assuming your server setup code is something like this:
+// POST endpoint to track clicks on URLs
 app.post('/api/track-click', async (req, res) => {
   const { url } = req.body;
   try {
-      const clickUpdate = await Click.findOneAndUpdate({ url }, { $inc: { count: 1 } }, { new: true, upsert: true });
+      // Ensure the URL is valid or meets certain criteria if necessary
+      const clickUpdate = await Click.findOneAndUpdate(
+          { url }, 
+          { $inc: { count: 1 } }, 
+          { new: true, upsert: true }
+      );
       console.log('Click tracked:', clickUpdate);
-      res.sendStatus(200);
+      res.sendStatus(200);  // Consider sending back some data if needed
   } catch (err) {
       console.error('Error tracking click:', err);
       res.status(500).send('Failed to track click');
   }
 });
 
-
-
+// GET endpoint to retrieve popular links based on click counts
 app.get('/api/get-popular-links', async (req, res) => {
   try {
       const popularLinks = await Click.find({}).sort({ count: -1 });
-      res.json(popularLinks);
+      res.json(popularLinks.map(link => ({ url: link.url, clicks: link.count })));
   } catch (error) {
       console.error('Error fetching popular links:', error);
       res.status(500).send('Failed to fetch popular links');
