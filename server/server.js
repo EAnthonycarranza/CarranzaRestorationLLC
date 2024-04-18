@@ -17,10 +17,31 @@ const { expressjwt: expressJwt } = require('express-jwt');
 const session = require('express-session');
 const passport = require('passport');
 require('./config/passport'); // Import your passport configuration
+const { google } = require('googleapis');
+const keys = require('./config/fast-gate-418608-db386b788691.json'); // path to your JSON key file
 const { OAuth2Client } = require('google-auth-library');
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID_1;
 const client = new OAuth2Client(CLIENT_ID);
 const helmet = require('helmet');
+
+const sheetsClient = new google.auth.JWT(
+  keys.client_email,
+  null,
+  keys.private_key,
+  ['https://www.googleapis.com/auth/spreadsheets']
+);
+
+sheetsClient.authorize((err, tokens) => {
+  if (err) {
+    console.log(err);
+    return;
+  } else {
+    console.log('Connected to Google Sheets API!');
+  }
+});
+
+const googleSheets = google.sheets({ version: 'v4', auth: sheetsClient });
+
 // Passport JWT Strategy Setup
 const JwtStrategy = require('passport-jwt').Strategy,
       ExtractJwt = require('passport-jwt').ExtractJwt;
@@ -456,6 +477,121 @@ let claimNumberHtml = claimNumber
     console.error('Error sending quote request email:', error);
     res.status(500).json({ success: false, message: 'Error sending quote request', error: error.message });
   }
+
+        try {
+    const jobData = {
+      name: req.body.name,
+      record_type_name: "contact",
+      status_name: "Lead",
+      sales_rep_name: "Anthony Carranza",
+      lead_source: "Website",
+    };
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${process.env.JOBNIMBUS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+
+
+      const [firstName, lastName] = req.body.name.split(' ');
+      const addressComponents = req.body.address.split(',').map(component => component.trim());
+      const stateMappings = { "TX": "Texas" };
+
+      const contactData = {
+        type: "contact",
+        first_name: firstName,
+        last_name: lastName,
+        email: req.body.email,
+        home_phone: req.body.phoneNumber,
+        address_line1: addressComponents[0],
+        city: addressComponents[1] || '',
+        state_text: stateMappings[addressComponents[2]] || addressComponents[2],
+        country_name: "United States",
+        description: `Project Type: ${req.body.projectType}\nMessage: ${req.body.message}`,
+        created_by_name: "Anthony Carranza",
+        sales_rep_name: "Anthony Carranza",
+        status_name: "Lead",
+        source_name: "Website",
+      };
+
+      const contactResponse = await axios.post('https://app.jobnimbus.com/api1/contacts', contactData, config);
+
+      if (contactResponse.status !== 200) {
+        console.error('Failed to create contact:', contactResponse.data);
+        return res.status(500).json({ success: false, message: 'Failed to create contact' });
+      }
+
+      console.log('Contact created successfully:', contactResponse.data);
+      return res.status(200).json({ success: true, message: 'Quote request, job, and contact creation successful' });
+
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+      if (!res.headersSent) {
+        return res.status(500).json({ success: false, message: 'An error occurred', error: error.message });
+      }
+    }
+
+    } catch (activityError) {
+    console.error('Error creating activity:', activityError.response ? activityError.response.data : activityError.message);
+    if (!res.headersSent) {
+      return res.status(500).json({ success: false, message: 'Failed to create activity', error: activityError.message });
+    }
+  } 
+  try {
+    // After creating a job and contact successfully, add to Google Sheet
+    const { firstName, lastName, email, phoneNumber, address, projectType, message } = req.body;
+    
+    const spreadsheetId = '1CtMYyWrFbLJJuPdV_2hcKHgbdDFWR5rkaAZpRvwWeds'; // Replace with your actual spreadsheet ID
+
+    function formatPhoneNumberToUS(phoneNumber) {
+      // Extract digits from the phone number
+      const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+      // Check if the number length equals to ten
+      if (cleaned.length === 10) {
+        // Reformat and return the phone number
+        return '(' + cleaned.substring(0, 3) + ') ' + cleaned.substring(3, 6) + '-' + cleaned.substring(6);
+      } else {
+        // If the number length is not equal to ten, return the original phoneNumber
+        return phoneNumber;
+      }
+    }
+    
+    // Example usage:
+    const formattedPhoneNumber = formatPhoneNumberToUS(phoneNumber);    
+
+    // Prepare the data to be written
+    const values = [
+      req.body.name, // Referral (Row A)
+      address, // Referral Address (Row B)
+      formattedPhoneNumber, // Referral phone (Row C)
+      '', // Referral Sent (Row D)
+      '', // Referral Amt. (Row E)
+      "Website (Anthony Carranza)" // Referred (Row F)
+    ];
+  // Log the data that will be written
+  console.log('Data being written to Google Sheet:', values);
+
+  // Write data to Google Sheet
+  const appendResponse = await googleSheets.spreadsheets.values.append({
+    auth: sheetsClient, // Make sure you have the correct auth object here
+    spreadsheetId,
+    range: '2024 Referral List', // Change if your worksheet's name is different
+    valueInputOption: 'USER_ENTERED',
+    resource: { values: [values] }
+  });
+
+  // Log the full response from the Google Sheets API
+  console.log('Append response:', appendResponse.data);
+
+  console.log('Data written to Google Sheet!');
+} catch (err) {
+  console.error('The API returned an error:', err);
+}
+      
 });
 
 const subscribers = [];
