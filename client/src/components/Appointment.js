@@ -34,6 +34,17 @@ const Appointment = () => {
   const [selectedDateText, setSelectedDateText] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
 
+  const handleNameChange = (e) => {
+    const input = e.target.value;
+    const spaceCount = input.split(' ').length - 1; // Count the number of spaces
+  
+    if (spaceCount > 1) {
+    } else {
+      // Update the name as usual
+      setName(input);
+    }
+  };  
+
   const handleDaySelect = (date) => {
     setSelectedDay(date);
     // Format the selected day for display
@@ -221,7 +232,7 @@ const selectAddress = (suggestion) => {
             <form onSubmit={handleQuoteRequest}>
               <div className="row g-3">
                 <div className="col-12 col-sm-6">
-                  <input type="text" className="form-control border-0" placeholder="Your Name" value={name} onChange={e => setName(e.target.value)} style={{ height: '55px' }} />
+                <input type="text" className="form-control border-0" placeholder="Your Name" value={name} onChange={handleNameChange} style={{ height: '55px' }} />
                 </div>
                 <div className="col-12 col-sm-6">
                   <input type="email" className="form-control border-0" placeholder="Your Email" value={email} onChange={e => setEmail(e.target.value)} style={{ height: '55px' }} />
