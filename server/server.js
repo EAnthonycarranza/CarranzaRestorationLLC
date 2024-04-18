@@ -196,9 +196,11 @@ const fetchAndAppendContacts = async () => {
   }
 };
 
-// Ensure that the schedule function is properly required and set up earlier in your code.
-schedule.scheduleJob('55 16 * * *', fetchAndAppendContacts);
+// Schedule to run at 8:00 AM every day
+schedule.scheduleJob('0 8 * * *', fetchAndAppendContacts);
 
+// Schedule to run at 5:00 PM every day
+schedule.scheduleJob('0 17 * * *', fetchAndAppendContacts);
 
 // Serve sitemap.xml at the root URL
 app.get('/sitemap.xml', (req, res) => {
