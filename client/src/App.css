@@ -21,6 +21,115 @@
   
 }
 
+.top-right-icons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5rem; /* Adjust the padding as needed */
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.comment-author-date {
+  display: flex;
+  align-items: center;
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+}
+
+.logos {
+  overflow: hidden;
+  padding: 60px 0;
+  background: white;
+  white-space: nowrap;
+  position: relative;
+}
+
+.logos:before,
+.logos:after {
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  content: "";
+  z-index: 2;
+}
+
+.logos:before {
+  left: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0), white);
+}
+
+.logos:after {
+  right: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), white);
+}
+
+.logos:hover .logos-slide {
+  animation-play-state: paused;
+}
+
+.logos-slide {
+  display: inline-block;
+  animation: 35s slide infinite linear;
+}
+
+.logos-slide img {
+  height: 150px;
+  margin: 0 40px;
+}
+
+.logos-slide img {
+  transition: transform 0.3s ease;
+}
+
+.logos-slide img:hover {
+  transform: scale(1.1);
+}
+
+.logos-slide a {
+  display: inline-block;
+  margin: 0 20px;
+  text-align: center;
+  color: #FD5D14; /* Set text color */
+}
+
+
+
+.logos-slide div {
+  margin-top: 10px; /* Space between image and text */
+  font-size: 12px; /* Adjust font size as needed */
+}
+
+
+@keyframes slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+
+.image-container1 {
+  height: 200px; /* Default height */
+}
+
+/* Media query for screens that are 1290px wide or more */
+@media (min-width: 1290px) {
+  .image-container1 {
+    height: 400px; /* Increased height for larger screens */
+  }
+}
 
 .address-suggestions {
   border: 1px solid #ccc;
@@ -47,6 +156,16 @@
   margin-right: 8px;
   margin-left: 10px;
 }
+
+.slick-track {
+  display: flex !important; /* Establishes this element as a flex container */
+  flex-direction: row; /* Aligns children horizontally */
+  justify-content: center; /* Centers children on the main-axis, which is horizontal in this case */
+  align-items: center !important; /* Centers children on the cross-axis, which is vertical */
+  transition: transform 6000ms linear; /* Smooth transition for the transform property */
+  /* ...other properties like width, opacity, transform... */
+}
+
 
 /* Hypothetical class name; replace with the actual class/ID as necessary */
 .sdk-payment-button {
@@ -653,17 +772,6 @@ textarea.form-control-lg {
   transition: .5s;
   z-index: 1;
   background: rgba(4, 15, 40, .7);
-}
-
-.image-container1 {
-  height: 200px; /* Default height */
-}
-
-/* Media query for screens that are 1290px wide or more */
-@media (min-width: 1290px) {
-  .image-container1 {
-    height: 400px; /* Increased height for larger screens */
-  }
 }
 
 .icon-no-background {
