@@ -68,10 +68,10 @@ const Footer = () => {
           <div className="footer container-fluid position-relative bg-dark bg-light-radial text-white-50 py-6 px-5">
               <div className="row g-5">
                   <div className="col-lg-6 pe-lg-5 d-flex flex-column align-items-center text-center">
-                      <button className="navbar-brand top-page-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                      <div className="navbar-brand top-page-btn" style={{cursor: 'default'}}>
                           <img src={logoSvg} alt="Carranza Logo" className="mb-2 logo-img" style={{ height: '2em' }}/>
-                          <h1 className="m-0 text-3xl text-uppercase text-white">Carranza Restoration LLC</h1>
-                      </button>
+                      </div>
+                      <h1 className="m-0 text-3xl text-uppercase text-white">Carranza Restoration LLC</h1>
                       <p>Welcome to Carranza Restoration LLC, your trusted partner in home improvement. Our comprehensive services include expert estimates, meticulous home renovations, construction cleaning, content manipulation, and interior design solutions. Trust us to transform your vision into reality.</p>
                       <button className="btn btn-link" onClick={() => window.open("https://maps.google.com?q=100%20Commercial%20Place,%20Schertz,%20TX", "_blank")}>
                           <p><i className="fa fa-map-marker-alt me-2"></i>100 Commercial Place, Schertz, TX</p>
