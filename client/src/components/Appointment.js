@@ -33,6 +33,8 @@ const Appointment = () => {
   const [timeValue, setTimeValue] = useState(dayjs().hour(8).minute(0));
   const [selectedDateText, setSelectedDateText] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleNameChange = (e) => {
     const input = e.target.value;
@@ -76,12 +78,15 @@ const Appointment = () => {
     try {
       const response = await axios.get(url);
       if (response.data && response.data.data) {
-        setAddressSuggestions(response.data.data);
+        setAddressSuggestions(response.data.data.map(suggestion => ({
+          label: suggestion.label,
+          postalCode: suggestion.postal_code // Ensure to get the postal_code from the API response
+        })));
       }
     } catch (error) {
       console.error('Error fetching address suggestions:', error);
     }
-  };
+};
 
   const handlePhoneNumberChange = (e) => {
     const input = e.target.value;
@@ -95,10 +100,13 @@ const Appointment = () => {
   };
 
   const selectAddress = (suggestion) => {
-    setAddress(suggestion.label);
+    // Append the postal code to the address
+    const fullAddress = `${suggestion.label}, ${suggestion.postalCode}`;
+    setAddress(fullAddress);
+    setPostalCode(suggestion.postalCode); // Set the postal code
     setIsAddressSelected(true);
     setAddressSuggestions([]);
-  };
+};
 
   const modules = {
     toolbar: [
@@ -122,6 +130,7 @@ const Appointment = () => {
 
   const handleQuoteRequest = async (event) => {
     event.preventDefault();
+    setIsSubmitted(true);
     setLoading(true);
     if (!isAddressSelected) {
       setFeedbackMessage('Please select an address from the dropdown.');
@@ -139,11 +148,12 @@ const Appointment = () => {
       state,
       country,
       phoneNumber,
+      postalCode, // Include postal code
       projectType,
       insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
       insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '',
       claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
-    };
+    };    
     try {
       const response = await fetch('/send-quote', {
         method: 'POST',
@@ -167,6 +177,8 @@ const Appointment = () => {
     const timeIsValid = timeValue && timeValue.isValid && timeValue.isValid();
     const insuranceClaimSelected = insuranceClaim !== '';
     return name && email && address && phoneNumber && projectType && isAddressSelected && (insuranceClaim !== 'yes' || (insuranceClaim === 'yes' && insuranceCompany && claimNumber)) && selectedDay && timeIsValid && insuranceClaimSelected;
+    setIsSubmitted(true); // Indicate that the form has been submitted
+    return /* all required fields are valid */;
   };
 
   return (
@@ -180,26 +192,48 @@ const Appointment = () => {
           <div className="bg-light text-center p-5">
             <form onSubmit={handleQuoteRequest}>
               <div className="row g-3">
+                
+                {/* Name Field */}
                 <div className="col-12 col-sm-6">
-                  <input type="text" className="form-control border-0" placeholder="Your Name" value={name} onChange={handleNameChange} style={{ height: '55px' }} />
+                  {!name && <div className="error-message">* Name is required</div>}
+                  <input type="text" className="form-control border-0" placeholder="Your Name *" value={name} onChange={handleNameChange} style={{ height: '55px' }} />
                 </div>
+  
+                {/* Email Field */}
                 <div className="col-12 col-sm-6">
-                  <input type="email" className="form-control border-0" placeholder="Your Email" value={email} onChange={e => setEmail(e.target.value)} style={{ height: '55px' }} />
+                  {!email && <div className="error-message">* Email is required</div>}
+                  <input type="email" className="form-control border-0" placeholder="Your Email *" value={email} onChange={e => setEmail(e.target.value)} style={{ height: '55px' }} />
                 </div>
-                <div className="col-12 col-sm-6" style={{ display: "contents" }}>
-                  <DayPicker
-                    mode="single"
-                    selected={selectedDay}
-                    onSelect={handleDaySelect}
-                    fromMonth={currentMonth}
-                    toMonth={twoMonthsFromNow}
-                    disabled={{ before: new Date() }}
-                    className="mx-auto"
-                    styles={{ caption: { color: '#FD5D14' } }}
-                  />
-                </div>
-                {selectedDay && <p>{selectedDateText}</p>}
-                <div className="col-12 col-sm-6">
+  
+  {/* Error message for date picker */}
+  {!selectedDay && (
+  <div className="error-message" style={{ marginTop: '70px' }}>* Date is required</div>
+)}
+  
+                                    {/* Display selected date text above the Date Picker */}
+                                    {selectedDay && (
+    <p className="selected-date-display" style={{ marginTop: '55px' }}>
+      {selectedDateText}
+    </p>
+  )}
+
+  {/* Date Picker */}
+  <div className="col-12 col-sm-6" style={{ display: "contents" }}>
+    <DayPicker
+      mode="single"
+      selected={selectedDay}
+      onSelect={handleDaySelect}
+      fromMonth={currentMonth}
+      toMonth={twoMonthsFromNow}
+      disabled={{ before: new Date() }}
+      className="mx-auto"
+      styles={{ caption: { color: '#FD5D14' } }}
+    />
+  </div>
+  
+                {/* Time Picker */}
+                <div className="col-12 col-sm-6" style={{ marginBottom: '50px' }}>
+                  {(!timeValue || !timeValue.isValid()) && <div className="error-message">* Time is required</div>}
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <TimePicker
                       value={timeValue}
@@ -208,11 +242,15 @@ const Appointment = () => {
                     />
                   </LocalizationProvider>
                 </div>
+
+  
+                {/* Address Field */}
                 <div className="col-12">
+                  {!address && <div className="error-message">* Address is required</div>}
                   <input
                     type="text"
                     className="form-control border-0"
-                    placeholder="Property Address"
+                    placeholder="Property Address *"
                     value={address}
                     onChange={(e) => handleAddressChange(e.target.value)}
                     style={{ height: '55px' }}
@@ -221,51 +259,64 @@ const Appointment = () => {
                     <ul className="address-suggestions">
                       {addressSuggestions.map((suggestion, index) => (
                         <li key={index} onClick={() => selectAddress(suggestion)}>
-                          {suggestion.label}
+                          {`${suggestion.label}, ${suggestion.postalCode}`}
                         </li>
                       ))}
                     </ul>
                   )}
                 </div>
+  
+                {/* Phone Number Field */}
                 <div className="col-12">
+                  {(!phoneNumber || phoneNumberError) && <div className="error-message">* Phone number is required</div>}
                   <div className="form-group">
                     <input
                       type="tel"
                       inputMode="numeric"
                       pattern="[0-9]*"
                       className="form-control border-0"
-                      placeholder="Phone Number"
+                      placeholder="Phone Number *"
                       value={phoneNumber}
                       onChange={handlePhoneNumberChange}
                       style={{ height: '55px' }}
                     />
-                    {phoneNumberError && <div className="error-message" style={{ color: 'red' }}>{phoneNumberError}</div>}
                   </div>
                 </div>
+  
+                {/* Project Type Selector */}
                 <div className="col-12">
+                  {!projectType && <div className="error-message">* Project type is required</div>}
                   <select className="form-control border-0" value={projectType} onChange={e => setProjectType(e.target.value)} style={{ height: '55px' }}>
-                    <option value="">Project Type</option>
+                    <option value="">Project Type *</option>
                     <option value="water">Water</option>
                     <option value="fire">Fire</option>
+                    <option value="roofing">Roofing</option> 
                     <option value="other">Other</option>
                   </select>
                 </div>
+  
+                {/* Insurance Claim Selector */}
                 <div className="col-12">
+                  {!insuranceClaim && <div className="error-message">* Insurance claim status is required</div>}
                   <select className="form-control border-0" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)} style={{ height: '55px' }}>
-                    <option value="">Is there an insurance claim</option>
+                    <option value="">Is there an insurance claim *</option>
                     <option value="yes">Yes</option>
                     <option value="no">No (OOP)</option>
                     <option value="idk">I don't know</option>
                   </select>
                 </div>
+  
+                {/* Conditional Insurance Company and Claim Number Fields */}
                 {insuranceClaim === 'yes' && (
                   <>
                     <div className="col-12">
-                      <input type="text" className="form-control border-0" placeholder="Insurance Company" value={insuranceCompany} onChange={e => setInsuranceCompany(e.target.value)} style={{ height: '55px' }} />
+                      {!insuranceCompany && <div className="error-message">* Insurance company is required</div>}
+                      <input type="text" className="form-control border-0" placeholder="Insurance Company *" value={insuranceCompany} onChange={e => setInsuranceCompany(e.target.value)} style={{ height: '55px' }} />
                     </div>
                     <div className="col-12">
+                      {!claimNumber && <div className="error-message">* This field is required</div>}
                       <select className="form-control border-0" value={claimNumber} onChange={e => setClaimNumber(e.target.value)} style={{ height: '55px' }}>
-                        <option value="">Do you have the claim number?</option>
+                        <option value="">Do you have the claim number? *</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="idk">I don't know</option>
@@ -273,12 +324,16 @@ const Appointment = () => {
                     </div>
                   </>
                 )}
+  
+                {/* Additional Notes Field */}
                 <div className="col-12">
                   <label htmlFor="additionalNotes">Additional Notes:</label>
                   <ReactQuill theme="snow" value={message} onChange={setMessage} modules={modules} formats={formats} />
                 </div>
+  
+                {/* Submission Button */}
                 <div className="col-12">
-                  <button type="submit" className="btn btn-primary py-3 px-5" disabled={!isFormValid()}>
+                  <button type="submit" className="btn btn-primary py-3 px-5">
                     Schedule NOW
                   </button>
                   {loading && (
@@ -286,13 +341,14 @@ const Appointment = () => {
                       display: 'flex',
                       justifyContent: 'center',
                       alignItems: 'center',
-                      height: '20vh',  // Adjust the height as necessary
-                      marginTop: '20px'  // Provide some top margin for alignment
+                      height: '20vh',
+                      marginTop: '20px'
                     }}>
                       <TailSpin color="rgb(253, 93, 20)" height={100} width={100} />
                     </div>
                   )}
                 </div>
+                
               </div>
             </form>
             {!loading && feedbackMessage && (
@@ -305,6 +361,8 @@ const Appointment = () => {
       </div>
     </div>
   );
+  
+  
 };
 
 export default Appointment;
