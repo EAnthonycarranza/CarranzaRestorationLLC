@@ -140,53 +140,24 @@ const [errors, setErrors] = useState([]);
 
   const handleQuoteRequest = async (event) => {
     event.preventDefault();
-    setIsSubmitted(true); // Assuming you are using this state to track if form has been submitted
+    setIsSubmitted(true); // Indicate that the form has been submitted
     setLoading(true);
   
-    let count = 0; // Reset error count
-    if (!name) count++;
-    if (!email) count++;
-    if (!address) count++;
-    if (!phoneNumber) count++;
-    if (!projectType) count++;
-    if (insuranceClaim === 'yes' && !insuranceCompany) count++;
-    if (insuranceClaim === 'yes' && !claimNumber) count++;
-    
-    setErrorCount(count); // Update the error count state
-    
-    if (count > 0) {
-      setLoading(false); // Stop the loading indicator
-      return; // Stop the function execution
-    }
-
-  // Check for errors
-  let hasError = false;
-  if (!name) {
-    setNameError('Name is required');
-    hasError = true;
-  }
-  if (!email) {
-    setEmailError('Email is required');
-    hasError = true;
-  }
-  if (!address) {
-    setAddressError('Address is required');
-    hasError = true;
-  }
-  // ... other validation checks
-  if (insuranceClaim === 'yes' && !insuranceCompany) {
-    setInsuranceCompanyError('Insurance company is required');
-    hasError = true;
-  }
-  if (insuranceClaim === 'yes' && !claimNumber) {
-    setClaimNumberError('Claim number is required');
-    hasError = true;
-  }
+    let errors = [];
+    if (!name) errors.push('Name is required');
+    if (!email) errors.push('Email is required');
+    if (!address) errors.push('Address is required');
+    if (!phoneNumber) errors.push('Phone number is required');
+    if (!projectType) errors.push('Project type is required');
+    if (insuranceClaim === 'yes' && !insuranceCompany) errors.push('Insurance company is required');
+    if (insuranceClaim === 'yes' && !claimNumber) errors.push('Claim number is required');
+    if (!selectedDay) errors.push('Please select a date');
   
-  if (hasError) {
-    setLoading(false); // Stop the loading indicator
-    return; // Stop the function execution
-  }
+    if (errors.length > 0) {
+      setFeedbackMessage(errors.length === 1 ? errors[0] : "Multiple fields are required and need to be filled out.");
+      setLoading(false); // Stop the loading spinner if there are errors
+      return; // Exit the function if there are validation errors
+    }
 
     const formData = {
       name,
@@ -407,19 +378,25 @@ const [errors, setErrors] = useState([]);
                 <p>{feedbackMessage}</p>
               </div>
               )}
-  {errorCount >= 2 && (
-    <div className="error-message">Multiple fields are required and need to be filled out.</div>
-  )}
-  {errorCount === 1 && (
-    <div className="error-message">Please make sure all required fields are filled out.</div>
-  )}
+{errorCount >= 2 && (
+  <div>Multiple fields are required and need to be filled out.</div>
+)}
+
+{errorCount === 1 && (
+  <div>Please make sure all required fields are filled out.</div>
+)}
+
+{errors.map((error, index) => (
+  <div key={index}>
+    {error}
+  </div>
+))}
+
             </div>
         </div>
       </div>
     </div>
   );
-  
-  
 };
 
 export default Appointment;
