@@ -222,8 +222,6 @@
   color: #d9534f; /* Bootstrap's button danger color for feedback */
 }
 
-
-
 .pagination-container {
   margin-top: 20px !important;
 }
@@ -512,12 +510,7 @@ textarea.form-control-lg {
   transition: background-color 0.3s ease, border-radius 0.3s ease;
   background-color: initial; /* Your initial background color, could be transparent */
   border-radius: 0%; /* Your initial border-radius */
-}
-
-/* Hover state */
-.top-page-btn:hover {
-  background-color: #FD5D14; /* The new background color on hover */
-  border-radius: 10%;
+  transition: transform 0.3s ease;
 }
 
 /* Styling for the logo image */
