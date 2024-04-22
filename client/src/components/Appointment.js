@@ -35,6 +35,16 @@ const Appointment = () => {
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [dateError, setDateError] = useState('');
+  const [nameError, setNameError] = useState('');
+const [emailError, setEmailError] = useState('');
+const [addressError, setAddressError] = useState('');
+const [projectTypeError, setProjectTypeError] = useState('');
+const [insuranceError, setInsuranceError] = useState('');
+const [insuranceCompanyError, setInsuranceCompanyError] = useState('');
+const [claimNumberError, setClaimNumberError] = useState('');
+const [errorCount, setErrorCount] = useState(0);
+const [errors, setErrors] = useState([]);
 
   const handleNameChange = (e) => {
     const input = e.target.value;
@@ -130,13 +140,54 @@ const Appointment = () => {
 
   const handleQuoteRequest = async (event) => {
     event.preventDefault();
-    setIsSubmitted(true);
+    setIsSubmitted(true); // Assuming you are using this state to track if form has been submitted
     setLoading(true);
-    if (!isAddressSelected) {
-      setFeedbackMessage('Please select an address from the dropdown.');
-      setTimeout(() => setLoading(false), 1000); 
-      return;
+  
+    let count = 0; // Reset error count
+    if (!name) count++;
+    if (!email) count++;
+    if (!address) count++;
+    if (!phoneNumber) count++;
+    if (!projectType) count++;
+    if (insuranceClaim === 'yes' && !insuranceCompany) count++;
+    if (insuranceClaim === 'yes' && !claimNumber) count++;
+    
+    setErrorCount(count); // Update the error count state
+    
+    if (count > 0) {
+      setLoading(false); // Stop the loading indicator
+      return; // Stop the function execution
     }
+
+  // Check for errors
+  let hasError = false;
+  if (!name) {
+    setNameError('Name is required');
+    hasError = true;
+  }
+  if (!email) {
+    setEmailError('Email is required');
+    hasError = true;
+  }
+  if (!address) {
+    setAddressError('Address is required');
+    hasError = true;
+  }
+  // ... other validation checks
+  if (insuranceClaim === 'yes' && !insuranceCompany) {
+    setInsuranceCompanyError('Insurance company is required');
+    hasError = true;
+  }
+  if (insuranceClaim === 'yes' && !claimNumber) {
+    setClaimNumberError('Claim number is required');
+    hasError = true;
+  }
+  
+  if (hasError) {
+    setLoading(false); // Stop the loading indicator
+    return; // Stop the function execution
+  }
+
     const formData = {
       name,
       email,
@@ -355,8 +406,14 @@ const Appointment = () => {
               <div className="mt-3">
                 <p>{feedbackMessage}</p>
               </div>
-            )}
-          </div>
+              )}
+  {errorCount >= 2 && (
+    <div className="error-message">Multiple fields are required and need to be filled out.</div>
+  )}
+  {errorCount === 1 && (
+    <div className="error-message">Please make sure all required fields are filled out.</div>
+  )}
+            </div>
         </div>
       </div>
     </div>
