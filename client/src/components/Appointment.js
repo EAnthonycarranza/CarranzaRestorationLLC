@@ -350,7 +350,7 @@ const [errors, setErrors] = useState([]);
                 <div className="col-12">
                   {!insuranceClaim && <div className="error-message">* Insurance claim status is required</div>}
                   <select className="form-control border-0" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)} style={{ height: '55px' }}>
-                    <option value="">Is there an insurance claim *</option>
+                    <option value="">Is this an insurance related project *</option>
                     <option value="yes">Yes</option>
                     <option value="no">No (OOP)</option>
                     <option value="idk">I don't know</option>
