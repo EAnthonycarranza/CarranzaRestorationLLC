@@ -28,6 +28,7 @@ const CLIENT_ID = process.env.GOOGLE_CLIENT_ID_1;
 const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new OAuth2Client(CLIENT_ID);
 const helmet = require('helmet');
+const Template = require('./models/Templates');
 
 const sheetsClient = new google.auth.JWT(
   keys.client_email,
