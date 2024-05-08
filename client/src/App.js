@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './App.css';
 import './components/Dashboard';
+import Travel from './components/TravelPage'
+// import Browser from './components/BrowserComponent'
 import Topbar from './components/Topbar';
 import Navbar from './components/Navbar';
 import Carousel from './components/Carousel';
@@ -22,6 +24,7 @@ import Portfolio2 from './components/Portfolio-2';
 import FormPage from './components/FormPage';
 import Blog from './components/BlogPage';
 import Detail from './components/Detail';
+import AdminBlogNav from './components/AdminBlogNav';
 import AdminDashboard from './components/AdminDashboard';
 import TypingEffect from './components/TypingEffect';
 //import TeamPage from './components/TeamPage'; // Import ProjectPage
@@ -30,9 +33,10 @@ import ContactPage from './components/ContactPage'; // Import ProjectPage
 import BlogCreatorPage from './components/BlogCreatorPage';
 import AdminEditBlog from './components/AdminEditBlog';
 import Login from './components/LoginPage';
-import Register from './components/Register';
+import Register from './components/RegisterPage';
 import AuthSuccess from './components/AuthSuccess'; // Adjust the path as necessary
 import Dashboard from './components/DashboardPage';
+import AdminGraph from './components/AdminGraph';
 
 const ScrollToTop = ({ children }) => {
   const location = useLocation(); // Now useLocation is defined
@@ -64,7 +68,9 @@ function App() {
             <Routes>
             <Route path="/dashboard" element={<Dashboard/>} />
               <Route path="/AdminEditPage/:id" element={<AdminEditBlog />} />
+              <Route path="/adminblognav" element={<AdminBlogNav />} />
               <Route path="/admindashboard" element={<AdminDashboard />} />
+              <Route path="/graph" element={<AdminGraph/>} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:id" element={<Detail />} />
               <Route path="/about" element={<AboutPage />} />
@@ -74,8 +80,10 @@ function App() {
               <Route path="/createblog" element={<BlogCreatorPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/testimonial" element={<TestimonialPage />} />
+              <Route path="/travel" element={<Travel />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/register" element={<Register />} />
+              {/*<Route path="/browser" element={<Browser />} />*/}
               <Route path="/auth-success" element={<AuthSuccess />} />
               <Route path="/" element={
                 <>
