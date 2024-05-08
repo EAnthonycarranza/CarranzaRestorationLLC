@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron');
+const { Storage } = require('@google-cloud/storage');
 const juice = require('juice');
 const cors = require('cors');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
@@ -9,6 +11,7 @@ const mongoose = require('mongoose');
 const Click = require('./models/Click');
 const BlogPost = require('./models/BlogPost');
 const Comment = require('./models/Comment');
+const Contact = require('./models/Contact');
 const { checkAuthentication, adminOnly, canEditComment } = require('./middleware/auth');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -22,6 +25,7 @@ const { google } = require('googleapis');
 const keys = require('./config/fast-gate-418608-db386b788691.json'); // path to your JSON key file
 const { OAuth2Client } = require('google-auth-library');
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID_1;
+const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new OAuth2Client(CLIENT_ID);
 const helmet = require('helmet');
 
@@ -367,6 +371,150 @@ function generateICSContent(eventStart, eventEnd, name, email, message, address,
   ].join('\r\n');
 }
 
+function formatPhoneNumberToUS(phoneNumber) {
+  const cleaned = ('' + phoneNumber).replace(/\D/g, ''); // Remove non-digit characters
+  if (cleaned.length === 10) {
+      // Format numbers to standard US format
+      return '(' + cleaned.slice(0, 3) + ') ' + cleaned.slice(3, 6) + '-' + cleaned.slice(6);
+  } else {
+      // If the number doesn't match expected length, return it unformatted
+      return phoneNumber;
+  }
+}
+let latestJnid = ''; // Declare latestJnid variable
+
+async function handleContactAndFileOperations(req, res) {
+  try {
+    // Prepare the data for creating a JobNimbus contact
+    const jobData = {
+      name: req.body.name,
+      record_type_name: "contact",
+      status_name: "Lead",
+      sales_rep_name: "Anthony Carranza",
+      lead_source: "Website",
+    };
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${process.env.JOBNIMBUS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    // Split the name into first and last names
+    const [firstName, lastName] = req.body.name.split(' ');
+    const addressComponents = req.body.address.split(',').map(component => component.trim());
+    const stateMappings = { "TX": "Texas" };
+
+    // Create the contact data
+    const contactData = {
+      type: "contact",
+      first_name: firstName,
+      last_name: lastName,
+      email: req.body.email,
+      home_phone: formatPhoneNumberToUS(req.body.phoneNumber),
+      address_line1: addressComponents[0],
+      city: addressComponents[1] || '',
+      state_text: stateMappings[addressComponents[2]] || addressComponents[2],
+      country_name: "United States",
+      description: `Project Type: ${req.body.projectType}\nMessage: ${req.body.message}`,
+      created_by_name: "Anthony Carranza",
+      sales_rep_name: "Anthony Carranza",
+      status_name: "Lead",
+      source_name: "Website",
+    };
+
+    const contactResponse = await axios.post('https://app.jobnimbus.com/api1/contacts', contactData, config);
+
+    if (contactResponse.status === 200) {
+      console.log('Contact created successfully:', contactResponse.data);
+      
+      // Extract the jnid from the response data
+      const jnid = contactResponse.data.jnid;
+      latestJnid = jnid; // Assign jnid to latestJnid
+
+      console.log('Extracted jnid:', jnid); // Logging the extracted jnid separately
+
+      // Check if req.body.fileBuffer exists and is not empty before calling postFileToJobNimbus
+      if (req.body.fileBuffer && req.body.fileBuffer.length > 0) {
+        await postFileToJobNimbus(req.body.fileName, req.body.fileType, req.body.fileBuffer, latestJnid); // Pass latestJnid to postFileToJobNimbus
+      } else {
+        console.error('Error: fileBuffer is undefined or empty');
+        if (!res.headersSent) {
+          res.status(400).json({ success: false, message: 'File buffer is required and cannot be empty' });
+        }
+        return; // Early return if fileBuffer is invalid
+      }
+
+      // Prepare the data to be written to the Google Sheet
+      const values = [
+        [`${firstName} ${lastName}`, req.body.address, formatPhoneNumberToUS(req.body.phoneNumber), '', '', "Website (Anthony Carranza)", `https://app.jobnimbus.com/contact/${jnid}`]
+      ];
+
+      // Write data to Google Sheet
+      await googleSheets.spreadsheets.values.append({
+        spreadsheetId: '1CtMYyWrFbLJJuPdV_2hcKHgbdDFWR5rkaAZpRvwWeds',
+        range: '2024 Referral List', // Adjust if your worksheet's name is different
+        valueInputOption: 'USER_ENTERED',
+        resource: { values: values },
+      });
+
+      if (!res.headersSent) {
+        res.status(200).json({ success: true, message: 'Contact creation and data logging successful', jnid: jnid });
+      }
+    } else {
+      throw new Error(`Failed to create contact: ${contactResponse.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error during the contact creation process:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'An error occurred', error: error.message });
+    }
+  }
+}
+
+const postFileToJobNimbus = async (fileName, fileType, fileBuffer, latestJnid) => {
+  if (!fileBuffer || fileBuffer.length === 0) {
+    console.error('Error: fileBuffer is undefined or empty');
+    return; // Return early if fileBuffer is undefined or empty
+  }
+
+  console.log('fileBuffer length:', fileBuffer.length); // Log the length of the buffer
+
+  const fileContentBase64 = fileBuffer.toString('base64');
+  const currentDateTimestamp = Math.floor(Date.now() / 1000);
+
+  try {
+    const postData = {
+      data: fileContentBase64,
+      is_private: false,
+      related: [latestJnid], // Using latestJnid for file association
+      type: determineType(fileType),  // Ensure fileType is used
+      subtype: "contact",
+      filename: fileName,
+      description: "Uploaded image file from website",
+      date: currentDateTimestamp,
+      persist: true
+    };
+
+    const response = await axios.post('https://app.jobnimbus.com/api1/files', postData, {
+      headers: {
+        'Authorization': `Bearer ${process.env.JOB_NIMBUS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log(`File posted to JobNimbus successfully, response: ${JSON.stringify(response.data)}`);
+    console.log('Posting data:', JSON.stringify(postData.related));  // Logging the 'related' part to ensure correct JNID is being used
+    return response.data;
+  } catch (error) {
+    console.error(`Error posting file to JobNimbus: ${error}`);
+    throw error;
+  }
+};
+
+
+
 app.post('/send-quote', async (req, res) => {
   try {
     const {
@@ -385,6 +533,9 @@ app.post('/send-quote', async (req, res) => {
       insuranceClaim,
       insuranceCompany,
       claimNumber,
+      fileBuffer,
+      fileName,
+      fileType,
     } = req.body;
 
 const fullAddress = req.body.address;
@@ -541,99 +692,13 @@ console.log('Extracted Address:', extractedAddress);
   }
 
   try {
-    // Prepare the data for creating a JobNimbus contact
-    const jobData = {
-      name: req.body.name,
-      record_type_name: "contact",
-      status_name: "Lead",
-      sales_rep_name: "Anthony Carranza",
-      lead_source: "Website",
-    };
-  
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${process.env.JOBNIMBUS_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
-    };
-  
-    // Split the name into first and last names
-    const [firstName, lastName] = req.body.name.split(' ');
-    const addressComponents = req.body.address.split(',').map(component => component.trim());
-    const stateMappings = { "TX": "Texas" };
-  
-    // Create the contact data
-    const contactData = {
-      type: "contact",
-      first_name: firstName,
-      last_name: lastName,
-      email: req.body.email,
-      home_phone: formatPhoneNumberToUS(req.body.phoneNumber),
-      address_line1: addressComponents[0],
-      city: addressComponents[1] || '',
-      state_text: stateMappings[addressComponents[2]] || addressComponents[2],
-      country_name: "United States",
-      description: `Project Type: ${req.body.projectType}\nMessage: ${req.body.message}`,
-      created_by_name: "Anthony Carranza",
-      sales_rep_name: "Anthony Carranza",
-      status_name: "Lead",
-      source_name: "Website",
-    };
-  
-    // Send the contact data to the JobNimbus API
-    const contactResponse = await axios.post('https://app.jobnimbus.com/api1/contacts', contactData, config);
-  
-    if (contactResponse.status === 200) {
-      // Code to handle successful contact creation
-      console.log('Contact created successfully:', contactResponse.data);
-  
-      // Extract the jnid from the response data
-      const jnid = contactResponse.data.jnid;
-  
-      // Prepare the data to be written to the Google Sheet
-      const values = [
-        `${firstName} ${lastName}`, // Referral (Row A)
-        req.body.address, // Referral Address (Row B)
-        formatPhoneNumberToUS(req.body.phoneNumber), // Referral phone (Row C)
-        '', // Referral Sent (Row D)
-        '', // Referral Amt. (Row E)
-        "Website (Anthony Carranza)", // Referred (Row F)
-        `https://app.jobnimbus.com/contact/${jnid}` // Jobnimbus Link (Row G)
-      ];
-  
-      // Write data to Google Sheet
-      const appendResponse = await googleSheets.spreadsheets.values.append({
-        spreadsheetId: '1CtMYyWrFbLJJuPdV_2hcKHgbdDFWR5rkaAZpRvwWeds',
-        range: '2024 Referral List', // Adjust if your worksheet's name is different
-        valueInputOption: 'USER_ENTERED',
-        resource: { values: [values] },
-      });
-  
-      if (!res.headersSent) {
-        return res.status(200).json({ success: true, message: 'Contact creation and data logging successful' });
-      }
-    } else {
-      // Code to handle API failure
-      if (!res.headersSent) {
-        return res.status(contactResponse.status).json({ success: false, message: 'Failed to create contact' });
-      }
-    }
+    await handleContactAndFileOperations(req, res);
   } catch (error) {
-    console.error('Error during the contact creation process:', error);
+    console.error('Error handling operations:', error);
     if (!res.headersSent) {
-      return res.status(500).json({ success: false, message: 'An error occurred', error: error.message });
+      res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
     }
   }
-  
-  // Function to format phone numbers to US format
-  function formatPhoneNumberToUS(phoneNumber) {
-    const cleaned = ('' + phoneNumber).replace(/\D/g, '');
-    if (cleaned.length === 10) {
-      return '(' + cleaned.substring(0, 3) + ') ' + cleaned.substring(3, 6) + '-' + cleaned.substring(6);
-    }
-    return phoneNumber;
-  }
-  
 });
 
 const subscribers = [];
@@ -1208,6 +1273,436 @@ app.get('/api/get-popular-links', async (req, res) => {
       res.status(500).send('Failed to fetch popular links');
   }
 });
+
+const CONTACTS_URL = 'https://app.jobnimbus.com/api1/contacts';
+
+// Function to convert timestamp to 12-hour format with MM:DD:YY
+const formatDate = (timestamp) => {
+    const date = new Date(timestamp * 1000);
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear().toString().substr(-2);
+    return `${month}/${day}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+};
+
+// Endpoint to fetch contacts
+app.get('/contacts', async (req, res) => {
+  console.log('Received query for contacts');
+
+  try {
+    // Fetch contacts from JobNimbus API
+    const response = await axios.get(CONTACTS_URL, {
+      headers: {
+        Authorization: `Bearer ${process.env.JOBNIMBUS_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Log the response data for inspection
+    console.log('Response data:', response.data);
+
+    // Extract contacts from the response data and filter by year 2024
+    const filteredData = response.data.results
+      .filter(contact => {
+        const date = new Date(contact.date_created * 1000);
+        return date.getFullYear() === 2024;
+      })
+      .map(contact => ({
+        jnid: contact.jnid,
+        date_created: contact.date_created,
+        source_name: contact.source_name,
+        first_name: contact.first_name,
+        last_name: contact.last_name,
+        email: contact.email,
+        phone: contact.home_phone
+      }));
+
+    // Log the filtered contacts data
+    console.log('Filtered contacts data:', filteredData);
+
+    // Send the filtered contacts data as a response
+    res.json(filteredData);
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching contacts from JobNimbus:', error);
+    res.status(500).json({
+      message: 'Error fetching contacts from JobNimbus',
+      details: error.message
+    });
+  }
+});
+
+const storage = new Storage({
+  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+  keyFilename: process.env.GOOGLE_CLOUD_KEYFILE
+});
+
+const bucket = storage.bucket(process.env.BUCKET_NAME);
+
+// Queue for batching file uploads
+const fileQueue = [];
+const UPLOAD_WAIT_TIME_MS = 5000; // 5 seconds
+
+// Function to send batch email
+const sendBatchEmail = async () => {
+  const queuedFiles = [...fileQueue];
+  fileQueue.length = 0; // Clear the queue
+
+  const attachments = await Promise.all(
+    queuedFiles.map(async (file) => {
+      const [buffer] = await bucket.file(file.fileName).download();
+      return {
+        filename: file.fileName,
+        content: buffer
+      };
+    })
+  );
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: process.env.RECEIVER_EMAIL,
+    subject: "New Images Made Public",
+    html: "<p>The following images have been made public:</p>" +
+          "<ul>" + queuedFiles.map(f => `<li>${f.fileName}</li>`).join('') + "</ul>",
+    attachments: attachments
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Batch email sent successfully with attachments.');
+  } catch (error) {
+    console.error('Failed to send batch email:', error);
+  }
+};
+
+// Function to queue a file for batch email
+const queueFileForEmail = (fileName) => {
+  fileQueue.push({ fileName });
+
+  // If this is the first file in the queue, start a timer for batch processing
+  if (fileQueue.length === 1) {
+    setTimeout(sendBatchEmail, UPLOAD_WAIT_TIME_MS);
+  }
+};
+
+function determineType(fileType) {
+  const typeMapping = {
+    'image/jpeg': 2,
+    'image/png': 2,
+    'application/pdf': 1,
+    'text/plain': 1,
+    'application/msword': 1,
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 1
+  };
+
+  return typeMapping[fileType] || 1; // Default to type 1 if not found
+}
+
+// Endpoint to get signed URL for uploading
+app.get('/api/sign-url', async (req, res) => {
+  const { fileName, fileType } = req.query;
+
+  if (!fileName || !fileType) {
+    return res.status(400).json({ error: 'Both fileName and fileType parameters are required.' });
+  }
+
+  try {
+    const options = {
+      version: 'v4',
+      action: 'write',
+      expires: Date.now() + 10 * 60 * 1000,
+      contentType: fileType
+    };
+    const [url] = await bucket.file(fileName).getSignedUrl(options);
+    res.json({ signedUrl: url, fileName });
+  } catch (error) {
+    console.error("Error getting signed URL:", error);
+    res.status(500).json({ error: 'Failed to create signed URL.' });
+  }
+});
+
+
+
+// Example of adjusting to include fileType (assuming you send it from the client)
+app.post('/api/make-public', async (req, res, next) => {
+  const { fileName, fileType, jnid } = req.body;  // Now expecting jnid as part of the request
+
+  try {
+    await bucket.file(fileName).makePublic();
+    const [fileBuffer] = await bucket.file(fileName).download();
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${encodeURIComponent(fileName)}`;
+
+    queueFileForEmail(fileName);
+    await postFileToJobNimbus(fileName, fileType, fileBuffer, jnid);  // Using the jnid from the client
+
+    res.json({ message: 'File made public successfully.', publicUrl });
+  } catch (error) {
+    console.error("Error in /api/make-public endpoint:", error);
+    next(error);
+  }
+});
+
+
+
+
+// Scheduled job to delete old files
+cron.schedule('* * * * *', async () => {
+  console.log('Running a task every minute to check for old files');
+  try {
+    const [files] = await bucket.getFiles();
+    files.forEach(async (file) => {
+      const fileAge = Date.now() - new Date(file.metadata.timeCreated).getTime();
+      if (fileAge > 60000) { // 60 seconds
+        await file.delete();
+        console.log(`Deleted ${file.name} because it was older than 1 minute.`);
+      }
+    });
+  } catch (error) {
+    console.error('Error during cron job for deleting files:', error);
+  }
+});
+
+// In-memory storage for templates
+let templates = [
+
+  {
+    id: 1,
+    text: "Hi {first_name}, I am {travelTime} away from your location at {address_line1}, {city}, {state_text}, {zip}.",
+  },
+];
+
+function logErrorAndThrow(error, message) {
+  console.error(message, error);
+  throw new Error(message);
+}
+
+// Fetch customer info
+async function getCustomerInfo(customerId) {
+  try {
+    const response = await axios.get(`https://app.jobnimbus.com/api1/contacts/${customerId}`, {
+      headers: {
+        'Authorization': `Bearer ${process.env.JOBNIMBUS_API_KEY}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    logErrorAndThrow(error, `Could not fetch information for customer ID ${customerId}`);
+  }
+}
+
+// Fetch all customers
+async function fetchAllCustomers() {
+  try {
+    const response = await axios.get('https://app.jobnimbus.com/api1/contacts', {
+      headers: {
+        'Authorization': `Bearer ${process.env.JOBNIMBUS_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.data && Array.isArray(response.data.results)) {
+      return response.data.results;
+    }
+    return [];
+  } catch (error) {
+    logErrorAndThrow(error, "Failed to fetch customers");
+  }
+}
+
+// Endpoint for fetching all customers
+app.get('/customers', async (req, res) => {
+  try {
+    const customers = await fetchAllCustomers();
+    res.json({ customers });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch customers.' });
+  }
+});
+
+// Endpoint to fetch all templates
+app.get('/templates', async (req, res) => {
+  try {
+      const templates = await Template.find();
+      const templatesWithIds = templates.map(template => ({
+          id: template._id.toString(),
+          text: template.text,
+          createdAt: template.createdAt,
+          updatedAt: template.updatedAt,
+      }));
+
+      res.json({ templates: templatesWithIds });
+  } catch (error) {
+      console.error("Error fetching templates:", error);
+      res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Endpoint to create a new template
+app.post('/templates/create', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: "Template text is required." });
+    }
+
+    const newTemplate = new Template({ text });
+    await newTemplate.save();
+
+    res.json({ success: true, template: newTemplate });
+  } catch (error) {
+    console.error("Error creating template:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint to update a template
+app.put('/templates/:id', async (req, res) => {
+  const { id } = req.params;
+  const { text } = req.body;
+
+  try {
+    const template = await Template.findByIdAndUpdate(id, { text }, { new: true });
+    if (template) {
+      res.json({ success: true, template });
+    } else {
+      res.status(404).json({ error: "Template not found." });
+    }
+  } catch (error) {
+    console.error("Error updating template:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint to delete a template
+app.delete('/templates/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await Template.findByIdAndRemove(id);
+    if (result) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: "Template not found." });
+    }
+  } catch (error) {
+    console.error("Error deleting template:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Calculate travel time
+async function getTravelTime(origin, destination) {
+  try {
+    const client = new Client({});
+    const response = await client.directions({
+      params: {
+        origin,
+        destination,
+        key: process.env.GOOGLE_MAPS_API_KEY,
+      },
+    });
+
+    const leg = response.data.routes[0].legs[0];
+    return leg.duration.text;
+  } catch (error) {
+    logErrorAndThrow(error, "Failed to fetch travel time");
+  }
+}
+
+// Endpoint for calculating travel time
+app.post('/calculate', async (req, res) => {
+  try {
+    const { origin, destination } = req.body;
+
+    if (!origin || !destination) {
+      return res.status(400).json({ error: "Origin and destination are required." });
+    }
+
+    const travelTime = await getTravelTime(origin, destination);
+    res.json({ travelTime });
+  } catch (error) {
+    console.error('Error calculating travel time:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+function formatPhoneNumber(phoneNumber) {
+  const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+  }
+  return null;
+}
+
+function replacePlaceholders(template, customer, travelTime) {
+  const formattedPhone = formatPhoneNumber(customer.home_phone);
+  return template
+    .replace("{first_name}", customer.first_name || "")
+    .replace("{last_name}", customer.last_name || "")
+    .replace("{address_line1}", customer.address_line1 || "")
+    .replace("{city}", customer.city || "")
+    .replace("{state_text}", customer.state_text || "")
+    .replace("{zip}", customer.zip || "")
+    .replace("{travelTime}", travelTime || "")
+    .replace("{phone}", formattedPhone || "")
+    .replace("{email}", customer.email || "")
+    .replace("{review_link}", "https://g.page/r/CZUXLaHzvDKhEB0/review" || "")
+    .replace("{company_website}", "https://www.carranzarestoration.org" || "");
+}
+
+// Endpoint to notify customer
+app.post('/notify', async (req, res) => {
+  try {
+      const { customerId, travelTime, templateId } = req.body;
+
+      if (!customerId || !travelTime || !templateId) {
+          return res.status(400).json({ error: "Required fields are missing." });
+      }
+
+      const customer = await getCustomerInfo(customerId);
+      const template = await Template.findById(templateId);
+
+      if (!template) {
+          return res.status(400).json({ error: "Template not found." });
+      }
+
+      const message = replacePlaceholders(template.text, customer, travelTime);
+      console.log(`Sending SMS with message: ${message}`);
+
+      await sendSMS("210 997 2900", message);
+
+      res.json({ success: true, message: `Notified customer: ${customer.first_name} ${customer.last_name}` });
+  } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
+// Function to send an SMS
+async function sendSMS(phoneNumber, message) {
+  try {
+    await axios.post(
+      'https://rest.textmagic.com/api/v2/messages',
+      {
+        phones: phoneNumber,
+        text: message,
+      },
+      {
+        headers: {
+          'X-TM-Username': process.env.TEXTMAGIC_USERNAME,
+          'X-TM-Key': process.env.TEXTMAGIC_API_KEY,
+        },
+      }
+    );
+  } catch (error) {
+    logErrorAndThrow(error, 'Failed to send SMS');
+  }
+}
 
 // Error-handling middleware
 app.use((err, req, res, next) => {
