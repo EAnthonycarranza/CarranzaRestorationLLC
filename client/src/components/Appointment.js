@@ -460,9 +460,9 @@ async function handleFileUpload(jnid) {
                 </div>
 
                 {/* Image Uploader */}
-                <div className="col-12">
-                <ImageUploader onFilesAdded={onFilesAdded} />
-                </div>
+                {/* <div className="col-12">*/}
+                {/*<ImageUploader onFilesAdded={onFilesAdded} />*/}
+                {/*</div>*/}
 
                 {/* Submission Button */}
                 <div className="col-12">
