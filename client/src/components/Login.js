@@ -20,10 +20,9 @@ const Login = () => {
   }, [navigate]);
 
   const handleGoogleLogin = async (credentialResponse) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setError('');
-    setLoading(true); // Start loading
-  
+    setLoading(true);
     setTimeout(async () => {
       try {
         const response = await fetch('/api/auth/google', {
@@ -37,16 +36,14 @@ const Login = () => {
           navigate('/dashboard');
         } else {
           setError('Google login failed. Please try again.');
-          setLoading(false); // Stop loading on error
+          setLoading(false);
         }
       } catch (error) {
         setError('An error occurred during Google login. Please try again.');
-        setLoading(false); // Stop loading on catch
+        setLoading(false);
       }
-    }, 1250); // Ensures the loading spinner shows for at least 10 seconds
+    }, 1250);
   };
-  
-  
 
   const handleLogoutSuccess = () => {
     googleLogout();
@@ -55,11 +52,10 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to the top of the page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     e.preventDefault();
     setError('');
     setLoading(true);
-  
     try {
       const response = await fetch('/api/user/login', {
         method: 'POST',
@@ -79,10 +75,8 @@ const Login = () => {
       setLoading(false);
     }
   };
-  
-  
 
-  return   (
+  return (
     <div className="container my-5">
       <h2 className="mb-4">User Login</h2>
       {error && <div className="alert alert-danger" role="alert">{error}</div>}
@@ -91,18 +85,17 @@ const Login = () => {
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          height: '20vh',  // Adjust the height to place the spinner near the top
-          marginTop: '20px'  // Provide some top margin to line up with "User Login"
+          height: '20vh',
+          marginTop: '20px',
         }}>
           <TailSpin color="rgb(253, 93, 20)" height={100} width={100} />
         </div>
       ) : (
         <div className="card">
-          <div className="card-body">
+          <div className="card-body1">
             <form onSubmit={handleSubmit} className="mt-4">
               <div className="mb-3">
                 <label htmlFor="emailInput" className="form-label">
-                  
                   <i className="fa fa-solid fa-envelope me-2 text-primary"></i>Email address
                 </label>
                 <input
@@ -129,7 +122,6 @@ const Login = () => {
               </div>
               <button type="submit" className="btn btn-primary btn-lg w-100 mb-3">Login</button>
             </form>
-            {/* Divider */}
             <div className="text-center mb-3">
               <hr />
               Or continue with Google
@@ -141,16 +133,18 @@ const Login = () => {
               onError={() => setError('Google Login Failed')}
               className="btn btn-outline-danger btn-lg w-100 mb-3"
             />
-            {/* Sign Up Link */}
             <div className="text-center mt-3">
               <Link to="/register" className="link-primary">Create an account</Link>
             </div>
           </div>
         </div>
       )}
+      {/* Add the Admin Dashboard link outside of the card */}
+      <div>
+        <Link to="/AdminDashboard" className="link-primary">Admin Dashboard</Link>
+      </div>
     </div>
   );
-  
 };
 
 export default Login;
