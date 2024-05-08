@@ -1,5 +1,7 @@
+// Register.jsx
+
 import React, { useState, useEffect } from 'react';
-import { GoogleLogin } from 'react-google-login'; // Import GoogleLogin component
+import { GoogleLogin } from 'react-google-login';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -15,11 +17,11 @@ const Register = () => {
 
   const validatePassword = (password) => {
     const regex = {
-      length: /.{8,}/, // At least 8 characters
-      upper: /[A-Z]/, // At least one upper case letter
-      lower: /[a-z]/, // At least one lower case letter
-      number: /[0-9]/, // At least one digit
-      special: /[^A-Za-z0-9]/ // At least one special character
+      length: /.{8,}/,
+      upper: /[A-Z]/,
+      lower: /[a-z]/,
+      number: /[0-9]/,
+      special: /[^A-Za-z0-9]/
     };
 
     const errors = [];
@@ -51,7 +53,7 @@ const Register = () => {
     });
     window.google?.accounts.id.renderButton(
       document.getElementById('googleSignInButton'),
-      { theme: "outline", size: "large" }  // Customize according to your needs
+      { theme: "outline", size: "large" }
     );
   }, []);
   
@@ -80,7 +82,6 @@ const Register = () => {
     }
   };
   
-  // Updated handleSubmit function to include username
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validatePassword(password);
@@ -106,7 +107,7 @@ const Register = () => {
       if (response.status === 201) {
         console.log('Registration success:', data);
         setRegistered(true);
-        navigate('/dashboard'); // Redirect upon successful registration
+        navigate('/dashboard');
       } else {
         setError(data.message || 'Failed to register');
       }
@@ -116,7 +117,10 @@ const Register = () => {
     }
   };
 
-  // Success handler for Google OAuth
+  const isFormValid = () => {
+    return email.trim() !== '' && password.trim() !== '' && username.trim() !== '';
+  };
+
   const handleGoogleSuccess = async (googleData) => {
     try {
       const res = await fetch('/api/auth/google', {
@@ -124,12 +128,11 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token: googleData.tokenId }), // Send tokenId to your backend
+        body: JSON.stringify({ token: googleData.tokenId }),
       });
 
       const data = await res.json();
       if (res.status === 200) {
-        // Handle successful registration with the token, e.g., store it for future requests
         console.log('Google auth success:', data);
         setRegistered(true);
       } else {
@@ -141,13 +144,6 @@ const Register = () => {
     }
   };
 
-  // Function to check if all input fields are filled and password is valid
-
-  const isFormValid = () => {
-    return email.trim() !== '' && password.trim() !== '' && username.trim() !== '';
-  };
-
-    // Error handler for Google OAuth
   const handleGoogleFailure = (error) => {
     console.error('Google Login Failure:', error);
     setError('Google Login Failed. Please try again.');
@@ -156,10 +152,12 @@ const Register = () => {
 
   return (
     <div className="container my-5">
+      <div className="card">
+          <div className="card-body1">
       <h2>User Registration</h2>
       {registered && <div className="alert alert-success">Registered Successfully!</div>}
       {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
         <div className="mb-3">
           <label htmlFor="usernameInput" className="form-label">Username</label>
           <input type="text" className="form-control" id="usernameInput" value={username} onChange={(e) => setUsername(e.target.value)} required />
@@ -168,19 +166,23 @@ const Register = () => {
           <label htmlFor="emailInput" className="form-label">Email address</label>
           <input type="email" className="form-control" id="emailInput" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
-        <div className="mb-3">
+        <div className="mb-3" style={{ display: 'flex', flexDirection: 'column', marginbotton: '5px' }}>
           <label htmlFor="passwordInput" className="form-label">Password</label>
           <input type="password" className="form-control" id="passwordInput" value={password} onChange={(e) => setPassword(e.target.value)} required />
           {showPasswordErrors && passwordError.map((err, index) => (
             <div key={index} className="text-danger">{err}</div>
           ))}
+                  <button type="submit" className="btn btn-primary" style={{margintop: '10px !important'}} disabled={!isFormValid()}>Register</button>
         </div>
-        <button type="submit" className="btn btn-primary" disabled={!isFormValid()}>Register</button>
       </form>
       <div id="googleSignInButton"></div>
+      <div className="mt-3">
+        <p>Already have an account? <Link to="/login">Login</Link></p>
+      </div>
+      </div>
+    </div>
     </div>
   );
-  
 };
 
 export default Register;

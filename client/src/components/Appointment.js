@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import axios from 'axios';
+import ImageUploader from './ImageUploader'; // Make sure the path is correct
 
 const Appointment = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -45,6 +46,7 @@ const [insuranceCompanyError, setInsuranceCompanyError] = useState('');
 const [claimNumberError, setClaimNumberError] = useState('');
 const [errorCount, setErrorCount] = useState(0);
 const [errors, setErrors] = useState([]);
+const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleNameChange = (e) => {
     const input = e.target.value;
@@ -70,6 +72,11 @@ const [errors, setErrors] = useState([]);
     }
     const combinedDate = dayjs(selectedDay).hour(timeValue.hour()).minute(timeValue.minute()).second(0).millisecond(0).toDate();
     return combinedDate;
+  };
+
+  const onFilesAdded = (newFiles) => {
+    // Handle new files here, e.g., by adding them to a form payload
+    setSelectedFiles(newFiles);
   };
 
   const currentMonth = new Date();
@@ -143,6 +150,144 @@ const [errors, setErrors] = useState([]);
     setIsSubmitted(true); // Indicate that the form has been submitted
     setLoading(true);
   
+    let errors = validateFormData();
+    if (errors.length > 0) {
+        setFeedbackMessage(errors.length === 1 ? errors[0] : "Multiple fields are required and need to be filled out.");
+        setLoading(false);
+        return;
+    }
+  
+    const formData = prepareFormData();
+  
+    try {
+      const contactResponse = await sendQuoteRequest(formData);
+      const contactData = await contactResponse.json();
+
+      if (contactResponse.ok) {
+          setFeedbackMessage(contactData.success ? 'Message sent successfully. Thank you!' : `Error: ${contactData.message}`);
+          const jnid = contactData.jnid;  // Capture the JNID from contact creation
+
+          // Proceed with file upload if there are files and contact creation was successful
+          if (contactData.success && selectedFiles.length > 0) {
+              await handleFileUpload(jnid);  // Pass the JNID for file handling
+          }
+      } else {
+          throw new Error(contactData.message || 'Failed to create contact');
+      }
+  } catch (error) {
+      console.error('Error:', error);
+      setFeedbackMessage(`Error: ${error.message || 'Unknown error occurred'}`);
+  } finally {
+      setTimeout(() => setLoading(false), 1000);
+  }
+};
+
+
+function validateFormData() {
+    let errors = [];
+    // Validation logic goes here, push error messages into the errors array
+    if (!name) errors.push('Name is required');
+    // Add other checks as necessary
+    return errors;
+}
+
+function prepareFormData() {
+    return {
+        name,
+        email,
+        date: selectedDay.toISOString(),
+        time: combineDateTime().toISOString(),
+        message,
+        address,
+        city,
+        state,
+        country,
+        phoneNumber,
+        postalCode,
+        projectType,
+        insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
+        insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '',
+        claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
+    };
+}
+
+async function sendQuoteRequest(formData) {
+  // Implement your request to /send-quote which should create a contact and return JNID
+  return fetch('/send-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+  });
+}
+
+async function handleFileUpload(jnid) {
+    const urls = await Promise.all(selectedFiles.map(file =>
+        fetch(`/api/sign-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}`)
+        .then(res => res.json())
+    ));
+
+    await Promise.all(urls.map((urlData, index) => {
+        const file = selectedFiles[index];
+        return fetch(urlData.signedUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': file.type },
+            body: file,
+        });
+    }));
+
+    // Call make-public endpoint with JNID
+    await Promise.all(urls.map(urlData =>
+        fetch('/api/make-public', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileName: urlData.fileName, jnid: jnid })
+        })
+    ));
+}
+
+  
+  async function sendQuoteRequest(formData) {
+    return fetch('/send-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+  }
+  
+  async function handleFileUpload(jnid) {
+    const urls = await Promise.all(selectedFiles.map(file =>
+      fetch(`/api/sign-url?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}`)
+        .then(res => res.json())
+    ));
+  
+    await Promise.all(urls.map((urlData, index) => {
+      const file = selectedFiles[index];
+      return fetch(urlData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+    }));
+  
+    await Promise.all(urls.map(urlData =>
+      fetch('/api/make-public', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName: urlData.fileName, jnid: jnid }),
+      })
+    ));
+  }
+  
+  function prepareFormData() {
+    return {
+      name, email, date: selectedDay.toISOString(), time: combineDateTime().toISOString(),
+      message, address, city, state, country, phoneNumber, postalCode,
+      projectType, insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
+      insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '', claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
+    };
+  }
+  
+  function validateFormData() {
     let errors = [];
     if (!name) errors.push('Name is required');
     if (!email) errors.push('Email is required');
@@ -152,48 +297,9 @@ const [errors, setErrors] = useState([]);
     if (insuranceClaim === 'yes' && !insuranceCompany) errors.push('Insurance company is required');
     if (insuranceClaim === 'yes' && !claimNumber) errors.push('Claim number is required');
     if (!selectedDay) errors.push('Please select a date');
+    return errors;
+  }
   
-    if (errors.length > 0) {
-      setFeedbackMessage(errors.length === 1 ? errors[0] : "Multiple fields are required and need to be filled out.");
-      setLoading(false); // Stop the loading spinner if there are errors
-      return; // Exit the function if there are validation errors
-    }
-
-    const formData = {
-      name,
-      email,
-      date: selectedDay.toISOString(),
-      time: combineDateTime().toISOString(),
-      message,
-      address,
-      city,
-      state,
-      country,
-      phoneNumber,
-      postalCode, // Include postal code
-      projectType,
-      insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no-oop' ? 'No (OOP)' : 'I do not know'),
-      insuranceCompany: insuranceClaim === 'yes' ? insuranceCompany : '',
-      claimNumber: insuranceClaim === 'yes' ? claimNumber : ''
-    };    
-    try {
-      const response = await fetch('/send-quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setFeedbackMessage(data.success ? 'Message sent successfully. Thank you! We will get back to you as soon as possible!' : `Error: ${data.message}`);
-      } else {
-        setFeedbackMessage('Error sending quote request. Please try again later.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setFeedbackMessage('An error occurred. Please try again later.');
-    }
-    setTimeout(() => setLoading(false), 1000); 
-  };
 
   const isFormValid = () => {
     const timeIsValid = timeValue && timeValue.isValid && timeValue.isValid();
@@ -352,7 +458,12 @@ const [errors, setErrors] = useState([]);
                   <label htmlFor="additionalNotes">Additional Notes:</label>
                   <ReactQuill theme="snow" value={message} onChange={setMessage} modules={modules} formats={formats} />
                 </div>
-  
+
+                {/* Image Uploader */}
+                <div className="col-12">
+                <ImageUploader onFilesAdded={onFilesAdded} />
+                </div>
+
                 {/* Submission Button */}
                 <div className="col-12">
                   <button type="submit" className="btn btn-primary py-3 px-5">

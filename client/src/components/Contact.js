@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; // Include styles for ReactQuill
+//import Browser from './BrowserComponent';
 
 const Contact = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -154,6 +155,8 @@ const Contact = () => {
           )}
         </div>
       </div>
+      {/*<Browser>
+      </Browser>*/}
     </div>
   );
 };
