@@ -20,7 +20,7 @@ const AdminBlogNav = () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await axios.get('http://localhost:3001/api/validateToken', {
+        const response = await axios.get('/api/validateToken', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -38,7 +38,7 @@ const AdminBlogNav = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/blogposts?page=${currentPage}&limit=9`); // Assuming your endpoint supports pagination
+      const response = await axios.get(`/api/blogposts?page=${currentPage}&limit=9`); // Assuming your endpoint supports pagination
       console.log("API Response:", response.data); // Log the entire API response
       if (response.data && Array.isArray(response.data.posts)) {
         setPosts(response.data.posts);
@@ -59,7 +59,7 @@ const AdminBlogNav = () => {
     if (!token) return;
 
     try {
-      await axios.delete(`http://localhost:3001/api/blogposts/${postId}`, {
+      await axios.delete(`/api/blogposts/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPosts(posts.filter(post => post._id !== postId));
