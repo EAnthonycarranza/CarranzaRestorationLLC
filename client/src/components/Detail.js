@@ -270,7 +270,7 @@ return (
                   <img src={post.avatar} alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
                   <span className="fw-bold">{post.author}</span>
                 </div>
-                <span><i className="far fa-calendar-alt text-primary me-2"></i> {moment(post.createdAt).format('MMM DD, YYYY')}</span>
+                <span><i className="far fa-calendar-alt text-primary me-2"></i> {moment(post.date).format('MMM DD, YYYY')}</span>
               </div>
               <h1 className="text-uppercase mb-4" style={{ marginBottom: '20px' }}>{post.title}</h1>
               <div dangerouslySetInnerHTML={{ __html: post.content }} className="blog-content"></div>
@@ -409,7 +409,7 @@ return (
                   <img src={post.avatar} alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
                   <span className="fw-bold">{post.author}</span>
                 </div>
-                <span><i className="far fa-calendar-alt text-primary me-2"></i> {moment(post.createdAt).format('MMM DD, YYYY')}</span>
+                <span><i className="far fa-calendar-alt text-primary me-2"></i> {moment(post.date).format('MMM DD, YYYY')}</span>
               </div>
               <h5 className="mb-1">{post.title}</h5>
               <Link to={`/blog/${post._id}`} className="btn btn-primary" style={{ marginTop: '20px' }}>Read More</Link>
