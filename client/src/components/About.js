@@ -1,6 +1,4 @@
 import React from 'react';
-import signatureImage from '../img/signature.jpg';
-import aboutImage from '../img/about.jpg';
 import BackToTopButton from './BackToTopButton';
 
 const About = () => {
