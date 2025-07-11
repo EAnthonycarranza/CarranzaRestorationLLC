@@ -25,11 +25,9 @@ const About = () => {
               </div>
             </div>
             <p className="mb-4">Our team excels at delivering meticulous craftsmanship and personalized service, ensuring your project is completed to the highest standards. Trust Carranza Restoration LLC to bring your vision to life with professionalism and care.</p>
-            <img src={signatureImage} alt="Signature" />
           </div>
           <div className="col-lg-5 pb-5" style={{ minHeight: '400px' }}>
           <div className="position-relative bg-dark-radial h-100 ms-5">
-  <img className="position-absolute w-100 h-100 mt-5 ms-n5" src={aboutImage} style={{ objectFit: 'cover' }} alt=""/>
 </div>
 
           </div>
