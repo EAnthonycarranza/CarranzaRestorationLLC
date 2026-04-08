@@ -30,11 +30,7 @@ function Testimonial() {
     }, []);
 
     return (
-        <div className="text-center" style={{ paddingTop: "90px" }}>
-            <h1 className="display-5 text-uppercase mb-4">
-                see our <span className="text-primary">amazing</span> testimonies
-            </h1>
-    
+        <div className="text-center">
             {/* Flex container for SVG and paragraph */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {/* Your SVG Image */}
