@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { DayPicker } from 'react-day-picker';
 import ReactQuill from 'react-quill';
+import ReCAPTCHA from 'react-google-recaptcha';
 import 'react-day-picker/dist/style.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-quill/dist/quill.snow.css';
@@ -30,6 +31,7 @@ const Appointment = () => {
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const recaptchaRef = useRef();
   
   const autocompleteRef = useRef(null);
 
@@ -117,16 +119,21 @@ const Appointment = () => {
     }
 
     setLoading(true);
-    const formData = {
-      name, email, address, phoneNumber, projectType, postalCode,
-      date: selectedDay.toISOString(),
-      time: combineDateTime().toISOString(),
-      message,
-      insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no' ? 'No' : 'Unknown'),
-      insuranceCompany, claimNumber
-    };
 
     try {
+      const captchaToken = await recaptchaRef.current.executeAsync();
+      recaptchaRef.current.reset();
+
+      const formData = {
+        name, email, address, phoneNumber, projectType, postalCode,
+        date: selectedDay.toISOString(),
+        time: combineDateTime().toISOString(),
+        message,
+        insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no' ? 'No' : 'Unknown'),
+        insuranceCompany, claimNumber,
+        captchaToken
+      };
+
       const response = await fetch('/send-quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -314,7 +321,11 @@ const Appointment = () => {
                 {feedbackMessage}
               </div>
             )}
-            
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              size="invisible"
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+            />
             <button type="submit" className="btn btn-primary py-3 px-5 shadow-lg w-100" style={{ maxWidth: '400px', fontSize: '1.1rem', fontWeight: '800' }}>
               {loading ? <TailSpin color="#fff" height={30} width={30} /> : 'CONFIRM APPOINTMENT'}
             </button>

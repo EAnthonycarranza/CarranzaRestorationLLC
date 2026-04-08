@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill';
+import ReCAPTCHA from 'react-google-recaptcha';
 import 'react-quill/dist/quill.snow.css'; // Include styles for ReactQuill
 //import Browser from './BrowserComponent';
 
@@ -10,6 +11,7 @@ const Contact = () => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const recaptchaRef = useRef();
 
   const modules = {
     toolbar: [
@@ -22,7 +24,7 @@ const Contact = () => {
       ['clean'] // Remove formatting button
     ]
   };
-  
+
   const formats = [
     'font', 'size',
     'bold', 'italic', 'underline', 'strike',
@@ -42,12 +44,15 @@ const Contact = () => {
       return;
     }
     setIsSubmitting(true);
-    // Assuming your API endpoint for sending email is '/send-email'
+
     try {
+      const captchaToken = await recaptchaRef.current.executeAsync();
+      recaptchaRef.current.reset();
+
       const response = await fetch('/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, subject, message, captchaToken }),
       });
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
@@ -141,6 +146,11 @@ const Contact = () => {
                 />
               </div>
               <div className="col-12">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  size="invisible"
+                  sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                />
                 <button className="btn btn-primary w-100 py-3" type="submit" disabled={isSubmitting}>
                   Send Message
                 </button>

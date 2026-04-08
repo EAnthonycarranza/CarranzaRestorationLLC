@@ -213,7 +213,25 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 app.post('/send-email', async (req, res) => {
-  const { name, email, subject, message } = req.body;
+  const { name, email, subject, message, captchaToken } = req.body;
+
+  // Verify reCAPTCHA
+  if (!captchaToken) {
+    return res.status(400).json({ success: false, message: 'reCAPTCHA token is missing' });
+  }
+
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`
+    );
+
+    if (!response.data.success) {
+      return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
+    }
+  } catch (error) {
+    console.error('reCAPTCHA error:', error);
+    return res.status(500).json({ success: false, message: 'Error verifying reCAPTCHA' });
+  }
   
   const emailStyles = `
     <style>
@@ -537,7 +555,26 @@ app.post('/send-quote', async (req, res) => {
       fileBuffer,
       fileName,
       fileType,
+      captchaToken,
     } = req.body;
+
+    // Verify reCAPTCHA
+    if (!captchaToken) {
+      return res.status(400).json({ success: false, message: 'reCAPTCHA token is missing' });
+    }
+
+    try {
+      const response = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`
+      );
+
+      if (!response.data.success) {
+        return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
+      }
+    } catch (error) {
+      console.error('reCAPTCHA error:', error);
+      return res.status(500).json({ success: false, message: 'Error verifying reCAPTCHA' });
+    }
 
 const fullAddress = req.body.address;
 
