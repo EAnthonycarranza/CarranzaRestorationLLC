@@ -205,7 +205,6 @@ app.get('/sitemap.xml', (req, res) => {
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message, captchaToken } = req.body;
 
-  // Verify reCAPTCHA
   if (!captchaToken) {
     return res.status(400).json({ success: false, message: 'reCAPTCHA token is missing' });
   }
@@ -270,16 +269,14 @@ app.post('/send-email', async (req, res) => {
 
 const emailHtml = juice(`${emailStyles} ${emailHtmlContent}`);
 
-// Email options for /send-email, including CC and structuring the HTML body
 const mailOptions = {
   from: process.env.EMAIL,
-  to: process.env.RECEIVER_EMAIL, // The recipient's email address
-  cc: `${email}`, // CC to the sender
+  to: process.env.RECEIVER_EMAIL,
+  cc: `${email}`,
   subject: subject,
   html: emailHtml,
 };
 
-  // Send email
   try {
     await transporter.sendMail(mailOptions);
     res.status(200).json({ success: true, message: 'Email sent successfully. Thank you for contacting us!' });
@@ -525,25 +522,14 @@ app.post('/send-quote', async (req, res) => {
       name,
       email,
       date,
-      time,
       message,
       address,
-      city,
-      state,
-      country,
-      postalCode,
       phoneNumber,
       projectType,
       insuranceClaim,
-      insuranceCompany,
-      claimNumber,
-      fileBuffer,
-      fileName,
-      fileType,
       captchaToken,
     } = req.body;
 
-    // Verify reCAPTCHA
     if (!captchaToken) {
       return res.status(400).json({ success: false, message: 'reCAPTCHA token is missing' });
     }
@@ -552,7 +538,6 @@ app.post('/send-quote', async (req, res) => {
       const response = await axios.post(
         `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${captchaToken}`
       );
-
       if (!response.data.success) {
         return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
       }
@@ -561,164 +546,50 @@ app.post('/send-quote', async (req, res) => {
       return res.status(500).json({ success: false, message: 'Error verifying reCAPTCHA' });
     }
 
-const fullAddress = req.body.address;
-
-// Adjust the regex to capture the individual components correctly
-const addressRegex = /^(.*),\s*(.*),\s*(.*),\s*(.*)$/;
-const addressMatch = fullAddress.match(addressRegex);
-
-let extractedAddress = {};
-if (addressMatch && addressMatch.length === 5) {
-  // Split the first group into address and city
-  const addressCity = addressMatch[1].trim().split(', ');
-  const address = addressCity[0].trim();
-  const city = addressCity[1].trim();
-
-  extractedAddress = {
-    address: address, // Street address
-    city: city, // City
-    state: addressMatch[2].trim(), // State
-    country: addressMatch[3].trim(), // Country is expected to be the fourth group
-    postalCode: postalCode // Postal code from a separate variable
-  };
-} else {
-  console.error('Address format is not as expected:', fullAddress);
-}
-
-
-
-
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    function formatDateForEmail(isoDateString) {
-      const date = new Date(isoDateString);
-      if (isNaN(date.getTime())) {
-        return "Invalid date";
-      }
-      const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-      const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      };
-      return utcDate.toLocaleDateString('en-US', options);
-    }
-
-    function formatTimeForEmail(isoTimeString) {
-      const time = new Date(isoTimeString);
-      if (isNaN(time.getTime())) {
-        return "Invalid time";
-      }
-      const options = {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'America/Chicago'
-      };
-      return time.toLocaleTimeString('en-US', options);
-    }
-
-    let formattedDate = formatDateForEmail(req.body.date);
-    let formattedTime = formatTimeForEmail(req.body.time);
-
-    let insuranceCompanyHtml = insuranceCompany
-      ? `<p><strong style="color: black;">Insurance Company:</strong> <span style="color: black;">${insuranceCompany}</span></p>`
-      : '';
-
-    let claimNumberHtml = claimNumber
-      ? `<p><strong style="color: black;">Claim Number:</strong> <span style="color: black;">${claimNumber}</span></p>`
-      : '';
-
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-
+    const formattedDate = new Date(date).toLocaleDateString('en-US', { 
+      year: 'numeric', month: 'long', day: 'numeric' 
+    });
 
     const emailBody = `  
       <div>
         <h1 style="color: black;">Inspection/Estimate Request</h1>
         <p><strong style="color: black;">Name:</strong> <span style="color: black;">${name}</span></p>
         <p><strong style="color: black;">Email:</strong> <a href="mailto:${email}" style="color: #15c;">${email}</a></p>
-        <p><strong style="color: black;">Callback Phone Number:</strong> <a href="tel:${formattedPhoneNumber}" style="color: #15c;">${formattedPhoneNumber}</a></p>
+        <p><strong style="color: black;">Phone:</strong> <a href="tel:${formattedPhoneNumber}" style="color: #15c;">${formattedPhoneNumber}</a></p>
         <p><strong style="color: black;">Date:</strong> <span style="color: black;">${formattedDate}</span></p>
-        <p><strong style="color: black;">Time:</strong> <span style="color: black;">${formattedTime}</span></p>
-        <p><strong style="color: black;">Address:</strong> <span style="color: black;">${extractedAddress.address}</span></p>
-        <p><strong style="color: black;">City:</strong> <span style="color: black;">${extractedAddress.city}</span></p>
-        <p><strong style="color: black;">State:</strong> <span style="color: black;">${extractedAddress.state}</span></p>
-        <p><strong style="color: black;">Country:</strong> <span style="color: black;">${extractedAddress.country}</span></p>
-        <p><strong style="color: black;">Postal Code:</strong> <span style="color: black;">${postalCode}</span></p>
+        <p><strong style="color: black;">Address:</strong> <span style="color: black;">${address}</span></p>
         <p><strong style="color: black;">Project Type:</strong> <span style="color: black;">${projectType}</span></p>
         <p><strong>Insurance Claim:</strong> <span style="color: black;">${insuranceClaim}</span></p>
-        ${insuranceCompanyHtml}
-        ${claimNumberHtml} 
         <hr>
         <p><strong style="color: black;">Message:</strong> <span style="color: black;">${message}</span></p>
-        <hr>
-        <div style="margin-top: 30px;">
-          <a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">
-            <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
-          </a>
-          <div style="margin-top: 10px;">
-            <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
-            <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: #15c;">
-              <p style="margin: 5px 0;">100 Commercial Place</p>
-              <p style="margin: 0;">Schertz, TX 78154</p>
-            </a>
-            <p style="margin: 5px 0; color: black;">
-              <a href="tel:+12102671008" style="color: #15c;"> (210) 267-1008</a> <span style="color: black;">Office</span>
-            </p>
-            <p style="margin: 0;">
-              <a href="tel:+12104285610" style="color: #15c;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
-            </p>
-          </div>      
-          <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: #15c;">Google Review</a></p>
-          <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">Carranza Restoration LLC Website</a></p>
-          <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: #15c;">Angi Review</a></p>
-        </div>
       </div>`;
-
-    let eventDateTime = new Date(time);
-    let eventEnd = new Date(eventDateTime.getTime() + 60 * 60 * 1000);
-    const icsContent = generateICSContent(eventDateTime, eventEnd, name, email, message, address, city, state, country);
-    if (!icsContent) {
-      throw new Error('Failed to generate ICS content');
-    }
-    const icsBuffer = Buffer.from(icsContent, 'utf-8');
 
     const mailOptions = {
       from: process.env.EMAIL,
       to: process.env.RECEIVER_EMAIL,
       cc: `${email}, ${process.env.COMPANY_EMAIL}`,
-      subject: `Inspection/Estimate Request from ${name}`,
+      subject: `Inspection Request from ${name}`,
       html: emailBody,
-      attachments: [{
-        filename: 'appointment.ics',
-        content: icsBuffer,
-        contentType: 'text/calendar;charset=utf-8',
-      }],
     };
 
+    // Send email and respond immediately
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true, message: 'Quote request sent successfully' });
-  } catch (error) {
-    console.error('Error sending quote request email:', error);
-    res.status(500).json({ success: false, message: 'Error sending quote request', error: error.message });
-  }
+    res.status(200).json({ success: true, message: 'Quote request sent successfully!' });
 
-  try {
-    await handleContactAndFileOperations(req, res);
+    // Handle heavy operations in background
+    handleContactAndFileOperations(req, { headersSent: true }).catch(err => {
+      console.error("BG Operations Error:", err);
+    });
+
   } catch (error) {
-    console.error('Error handling operations:', error);
+    console.error('Error sending quote request:', error);
     if (!res.headersSent) {
-      res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+      res.status(500).json({ success: false, message: 'Error processing request' });
     }
   }
 });
+
 
 const subscribers = [];
 
@@ -1348,9 +1219,14 @@ app.get('/contacts', async (req, res) => {
 });
 
 let googleCloudKey;
-if (process.env.Google_Cloud_Key) {
+let googleCloudKeyRaw = process.env.Google_Cloud_Key;
+if (googleCloudKeyRaw) {
+  // Strip surrounding single quotes if they exist (common in some env setups)
+  if (googleCloudKeyRaw.startsWith("'") && googleCloudKeyRaw.endsWith("'")) {
+    googleCloudKeyRaw = googleCloudKeyRaw.slice(1, -1);
+  }
   try {
-    googleCloudKey = JSON.parse(process.env.Google_Cloud_Key);
+    googleCloudKey = JSON.parse(googleCloudKeyRaw);
     if (googleCloudKey.private_key) {
       googleCloudKey.private_key = googleCloudKey.private_key.replace(/\\n/g, '\n');
     }

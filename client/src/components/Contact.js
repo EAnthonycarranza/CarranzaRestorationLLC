@@ -11,6 +11,7 @@ const Contact = () => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
   const recaptchaRef = useRef();
 
   const modules = {
@@ -24,36 +25,35 @@ const Contact = () => {
   const formats = ['bold', 'italic', 'underline', 'list', 'bullet'];
 
   const isFormValid = () => {
-    return name.trim() && email.trim() && subject.trim() && message.trim();
+    return name.trim() && email.trim() && subject.trim() && message.trim() && captchaToken;
+  };
+
+  const onCaptchaChange = (token) => {
+    setCaptchaToken(token);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!isFormValid()) {
-      setFeedbackMessage('Please fill in all fields before submitting.');
+      setFeedbackMessage('Please fill in all fields and complete the reCAPTCHA before submitting.');
       return;
     }
     setIsSubmitting(true);
 
     try {
-      const captchaToken = await recaptchaRef.current.executeAsync();
-      recaptchaRef.current.reset();
-
       const response = await fetch('/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, subject, message, captchaToken }),
       });
-      if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      setFeedbackMessage(data.message || 'Email sent successfully. Thank you for contacting us!');
-      
-      // Clear form on success
       if (response.ok) {
-        setName('');
-        setEmail('');
-        setSubject('');
-        setMessage('');
+        setFeedbackMessage(data.message || 'Email sent successfully. Thank you for contacting us!');
+        // Reset form
+        setName(''); setEmail(''); setSubject(''); setMessage(''); setCaptchaToken(null);
+        recaptchaRef.current.reset();
+      } else {
+        setFeedbackMessage(`Error: ${data.message}`);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -174,11 +174,14 @@ const Contact = () => {
                       </div>
                     </div>
                     <div className="col-12">
-                      <ReCAPTCHA
-                        ref={recaptchaRef}
-                        size="invisible"
-                        sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                      />
+                      <div className="d-flex flex-column align-items-center mb-4">
+                        <ReCAPTCHA
+                          ref={recaptchaRef}
+                          sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                          onChange={onCaptchaChange}
+                        />
+                      </div>
+                      
                       {feedbackMessage && (
                         <div className={`alert ${feedbackMessage.includes('Error') || feedbackMessage.includes('Please') ? 'alert-danger' : 'alert-success'} mb-4`}>
                           {feedbackMessage}
@@ -187,7 +190,7 @@ const Contact = () => {
                       <button 
                         className="btn btn-primary w-100 auth-btn" 
                         type="submit" 
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !captchaToken}
                       >
                         {isSubmitting ? 'Sending...' : 'Send Message'}
                       </button>
