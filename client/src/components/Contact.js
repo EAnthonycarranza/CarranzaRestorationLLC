@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import ReCAPTCHA from 'react-google-recaptcha';
-import 'react-quill/dist/quill.snow.css'; // Include styles for ReactQuill
-//import Browser from './BrowserComponent';
+import 'react-quill/dist/quill.snow.css';
+import './Contact.css';
 
 const Contact = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -15,23 +15,13 @@ const Contact = () => {
 
   const modules = {
     toolbar: [
-      [{ 'font': [] }], // Font family
-      [{ 'size': ['small', false, 'large'] }], // Font size
-      [{ 'align': [] }], // Text align
-      ['bold', 'italic', 'underline'], // Bold, italic, underline, strike
-      [{ 'header': '1' }, { 'header': '2' }, { 'header': [] }], // Heading
-      [{ 'indent': '+1' }], // Indent
-      ['clean'] // Remove formatting button
+      ['bold', 'italic', 'underline'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['clean']
     ]
   };
 
-  const formats = [
-    'font', 'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'script', 'header', 'list', 'indent', 'direction', 'align',
-    'link', 'image', 'video', 'blockquote', 'code-block'
-  ];
+  const formats = ['bold', 'italic', 'underline', 'list', 'bullet'];
 
   const isFormValid = () => {
     return name.trim() && email.trim() && subject.trim() && message.trim();
@@ -57,6 +47,14 @@ const Contact = () => {
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setFeedbackMessage(data.message || 'Email sent successfully. Thank you for contacting us!');
+      
+      // Clear form on success
+      if (response.ok) {
+        setName('');
+        setEmail('');
+        setSubject('');
+        setMessage('');
+      }
     } catch (error) {
       console.error('Error:', error);
       setFeedbackMessage('An error occurred. Please try again later.');
@@ -66,108 +64,142 @@ const Contact = () => {
   };
 
   return (
-    <div className="container-fluid py-6 px-5">
-      {/* Page header and introduction */}
-      <div className="text-center mx-auto mb-5" style={{ maxWidth: '600px' }}>
-        <h1 className="display-5 text-uppercase mb-4">
-          Please <span className="text-primary">Feel Free</span> To Contact Us
-        </h1>
-      </div>
-      {/* Contact form and map */}
-      <div className="row gx-0 align-items-center">
-        {/* Google Maps Embed */}
-        <div className="col-lg-6 mb-5 mb-lg-0" style={{ height: '600px' }}>
-          <iframe
-            className="w-100 h-100"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3474.625251593319!2d-98.26973368491834!3d29.55217398207307!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x865cf59af4e1a6f1%3A0x8d3b2171fe7b2a0f!2s100%20Commercial%20Pl%2C%20Schertz%2C%20TX%2078175%2C%20USA!5e0!3m2!1sen!2sbd!4v1666798592923!5m2!1sen!2sbd"
-            frameBorder="0"
-            style={{ border: 0 }}
-            allowFullScreen=""
-            aria-hidden="false"
-            tabIndex="0"
-            title="Map of Our Office"
-          ></iframe>
+    <section className="contact-section">
+      <div className="container-modern">
+        <div className="contact-wrapper">
+          <div className="row g-0">
+            {/* Left Panel: Contact Info */}
+            <div className="col-lg-5">
+              <div className="contact-info-panel">
+                <h2 className="display-6 fw-bold mb-4 text-white">Get In Touch</h2>
+                <p className="mb-5 opacity-75">
+                  We're here to help with your restoration needs. Reach out to us through any of these channels or fill out the form.
+                </p>
+
+                <div className="contact-info-item">
+                  <div className="contact-icon-box">
+                    <i className="fa fa-envelope"></i>
+                  </div>
+                  <div className="contact-info-content">
+                    <h4>Email Us</h4>
+                    <a href="mailto:admin@carranzarestoration.com">admin@carranzarestoration.com</a>
+                  </div>
+                </div>
+
+                <div className="contact-info-item">
+                  <div className="contact-icon-box">
+                    <i className="fa fa-phone"></i>
+                  </div>
+                  <div className="contact-info-content">
+                    <h4>Call Us</h4>
+                    <a href="tel:2102671008">(210) 267-1008</a>
+                  </div>
+                </div>
+
+                <div className="contact-info-item">
+                  <div className="contact-icon-box">
+                    <i className="fa fa-map-marker-alt"></i>
+                  </div>
+                  <div className="contact-info-content">
+                    <h4>Visit Office</h4>
+                    <p>100 Commercial Pl, Schertz, TX 78175</p>
+                  </div>
+                </div>
+
+                <div className="map-container">
+                  <iframe
+                    className="w-100 h-100"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3474.625251593319!2d-98.26973368491834!3d29.55217398207307!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x865cf59af4e1a6f1%3A0x8d3b2171fe7b2a0f!2s100%20Commercial%20Pl%2C%20Schertz%2C%20TX%2078175%2C%20USA!5e0!3m2!1sen!2sbd!4v1666798592923!5m2!1sen!2sbd"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    title="Office Location"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Panel: Form */}
+            <div className="col-lg-7">
+              <div className="contact-form-panel">
+                <h2 className="contact-title">Send a Message</h2>
+                <p className="contact-subtitle">Fill out the form below and our team will get back to you shortly.</p>
+
+                <form onSubmit={handleSubmit} className="auth-form">
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label">Full Name</label>
+                      <input
+                        type="text"
+                        className="form-control contact-input"
+                        placeholder="John Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label">Email Address</label>
+                      <input
+                        type="email"
+                        className="form-control contact-input"
+                        placeholder="john@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label className="form-label">Subject</label>
+                      <input
+                        type="text"
+                        className="form-control contact-input"
+                        placeholder="How can we help?"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label className="form-label">Message</label>
+                      <div className="quill-contact">
+                        <ReactQuill
+                          theme="snow"
+                          value={message}
+                          onChange={setMessage}
+                          modules={modules}
+                          formats={formats}
+                          placeholder="Your message details..."
+                        />
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        size="invisible"
+                        sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                      />
+                      {feedbackMessage && (
+                        <div className={`alert ${feedbackMessage.includes('Error') || feedbackMessage.includes('Please') ? 'alert-danger' : 'alert-success'} mb-4`}>
+                          {feedbackMessage}
+                        </div>
+                      )}
+                      <button 
+                        className="btn btn-primary w-100 auth-btn" 
+                        type="submit" 
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-        {/* Contact form */}
-        <div className="col-lg-6">
-          <form onSubmit={handleSubmit} className="contact-form bg-light p-5">
-            <div className="contact-details mt-5" style={{ textAlign: "center" }}>
-              <h3>Contact Information</h3>
-              <p>Email: <a href="mailto:admin@carranzarestoration.com">admin@carranzarestoration.com</a></p>
-              <p>Phone: <a href="tel:2102671008">(210) 267-1008</a></p>
-              <h3>Contact Us</h3>
-              <p>Enter your information here and we will get back to you shortly.</p>
-            </div>
-            {/* Form fields */}
-            <div className="row g-3">
-              <div className="col-12 col-sm-6">
-                <input
-                  type="text"
-                  className="form-control border-0"
-                  placeholder="Your Name"
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  style={{ height: '55px' }}
-                />
-              </div>
-              <div className="col-12 col-sm-6">
-                <input
-                  type="email"
-                  className="form-control border-0"
-                  placeholder="Your Email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={{ height: '55px' }}
-                />
-              </div>
-              <div className="col-12">
-                <input
-                  type="text"
-                  className="form-control border-0"
-                  placeholder="Subject"
-                  name="subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  required
-                  style={{ height: '55px' }}
-                />
-              </div>
-              <div className="col-12">
-                <ReactQuill
-                  theme="snow"
-                  value={message}
-                  onChange={setMessage}
-                  modules={modules}
-                  formats={formats}
-                />
-              </div>
-              <div className="col-12">
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  size="invisible"
-                  sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                />
-                <button className="btn btn-primary w-100 py-3" type="submit" disabled={isSubmitting}>
-                  Send Message
-                </button>
-              </div>
-            </div>
-          </form>
-          {/* Feedback message */}
-          {feedbackMessage && (
-            <div className="mt-3">
-              <p>{feedbackMessage}</p>
-            </div>
-          )}
-        </div>
       </div>
-      {/*<Browser>
-      </Browser>*/}
-    </div>
+    </section>
   );
 };
 
