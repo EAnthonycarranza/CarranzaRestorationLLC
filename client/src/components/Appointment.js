@@ -1,14 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { DayPicker } from 'react-day-picker';
-import ReactQuill from 'react-quill';
 import 'react-day-picker/dist/style.css';
-import 'react-datepicker/dist/react-datepicker.css';
-import 'react-quill/dist/quill.snow.css';
 import { TailSpin } from 'react-loader-spinner';
 import dayjs from 'dayjs';
-import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useJsApiLoader, Autocomplete } from '@react-google-maps/api';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const libraries = ['places'];
 
@@ -25,13 +21,14 @@ const Appointment = () => {
   const [insuranceCompany, setInsuranceCompany] = useState('');
   const [claimNumber, setClaimNumber] = useState('');
   const [selectedDay, setSelectedDay] = useState(null);
-  const [timeValue, setTimeValue] = useState(dayjs().hour(8).minute(0));
   const [selectedDateText, setSelectedDateText] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-  
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
   const autocompleteRef = useRef(null);
+  const recaptchaRef = useRef(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -41,7 +38,7 @@ const Appointment = () => {
 
   const handleNameChange = (e) => {
     const input = e.target.value;
-    const spaceCount = input.split(' ').length - 1; 
+    const spaceCount = input.split(' ').length - 1;
     if (spaceCount <= 1) {
       setName(input);
     }
@@ -53,36 +50,20 @@ const Appointment = () => {
     setSelectedDateText(`Selected Date: ${formattedDate}`);
   };
 
-  const handleTimeChange = (newValue) => {
-    setTimeValue(newValue);
-  };
-
-  const combineDateTime = () => {
-    if (!selectedDay || !timeValue) {
-      return null;
-    }
-    const combinedDate = dayjs(selectedDay).hour(timeValue.hour()).minute(timeValue.minute()).second(0).millisecond(0).toDate();
-    return combinedDate;
-  };
-
-  const onLoad = (autocomplete) => {
+  const onLoad = useCallback((autocomplete) => {
     autocompleteRef.current = autocomplete;
-  };
+  }, []);
 
   const onPlaceChanged = () => {
     if (autocompleteRef.current !== null) {
       const place = autocompleteRef.current.getPlace();
       if (place.formatted_address) {
         setAddress(place.formatted_address);
-        
-        // Extract postal code if available
         const postCodeObj = place.address_components.find(comp => comp.types.includes('postal_code'));
         if (postCodeObj) {
           setPostalCode(postCodeObj.long_name);
         }
       }
-    } else {
-      console.log('Autocomplete is not loaded yet!');
     }
   };
 
@@ -97,22 +78,21 @@ const Appointment = () => {
     }
   };
 
-  const modules = {
-    toolbar: [
-      ['bold', 'italic', 'underline'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['clean']
-    ]
+  const handleRecaptcha = (token) => {
+    setRecaptchaToken(token);
   };
-  
-  const formats = ['bold', 'italic', 'underline', 'list', 'bullet'];
 
   const handleQuoteRequest = async (event) => {
     event.preventDefault();
     setIsSubmitted(true);
-    
-    if (!name || !email || !address || !phoneNumber || !projectType || !selectedDay || !timeValue) {
+
+    if (!name || !email || !address || !phoneNumber || !projectType || !selectedDay) {
       setFeedbackMessage("Please fill in all required fields marked with *");
+      return;
+    }
+
+    if (!recaptchaToken) {
+      setFeedbackMessage("Please complete the reCAPTCHA verification.");
       return;
     }
 
@@ -120,10 +100,10 @@ const Appointment = () => {
     const formData = {
       name, email, address, phoneNumber, projectType, postalCode,
       date: selectedDay.toISOString(),
-      time: combineDateTime().toISOString(),
       message,
       insuranceClaim: insuranceClaim === 'yes' ? 'Yes' : (insuranceClaim === 'no' ? 'No' : 'Unknown'),
-      insuranceCompany, claimNumber
+      insuranceCompany, claimNumber,
+      recaptchaToken
     };
 
     try {
@@ -142,6 +122,10 @@ const Appointment = () => {
       setFeedbackMessage('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+        setRecaptchaToken(null);
+      }
     }
   };
 
@@ -149,7 +133,7 @@ const Appointment = () => {
     <div className="appointment-card animate-fadeInUp">
       <form onSubmit={handleQuoteRequest}>
         <div className="row g-4">
-          
+
           {/* Section 1: Contact Info */}
           <div className="col-12">
             <h3 className="appointment-section-title">
@@ -181,21 +165,21 @@ const Appointment = () => {
             <div className="position-relative">
               {isLoaded ? (
                 <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-                  <input 
-                    type="text" 
-                    className="form-control appointment-input" 
-                    placeholder="Search address with Google..." 
-                    value={address} 
-                    onChange={(e) => setAddress(e.target.value)} 
+                  <input
+                    type="text"
+                    className="form-control appointment-input"
+                    placeholder="Search address with Google..."
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                   />
                 </Autocomplete>
               ) : (
-                <input 
-                  type="text" 
-                  className="form-control appointment-input" 
-                  placeholder="Loading Maps..." 
-                  value={address} 
-                  onChange={(e) => setAddress(e.target.value)} 
+                <input
+                  type="text"
+                  className="form-control appointment-input"
+                  placeholder="Enter your property address..."
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                 />
               )}
             </div>
@@ -215,7 +199,7 @@ const Appointment = () => {
               <option value="">Select Service...</option>
               <option value="water">Water Damage</option>
               <option value="fire">Fire Damage</option>
-              <option value="roofing">Roofing Restoration</option> 
+              <option value="roofing">Roofing Restoration</option>
               <option value="remodel">Interior Remodeling</option>
               <option value="other">Other</option>
             </select>
@@ -250,76 +234,59 @@ const Appointment = () => {
             <h3 className="appointment-section-title">
               <i className="fa fa-calendar-alt"></i> Schedule Inspection
             </h3>
-            
-            <div className="bg-light p-4 rounded-4 border shadow-sm mt-3">
-              <div className="row align-items-center">
-                {/* Date Side */}
-                <div className="col-lg-7 border-end-lg text-center py-2">
-                  <label className="form-label-custom mb-3">1. Select Preferred Date *</label>
-                  <div className="d-inline-block p-2 bg-white rounded-3 shadow-sm mb-3">
-                    <DayPicker
-                      mode="single"
-                      selected={selectedDay}
-                      onSelect={handleDaySelect}
-                      disabled={{ before: new Date() }}
-                      className="rdp-modern"
-                    />
-                  </div>
-                  {selectedDay && <div className="selected-date-badge d-block mx-auto" style={{ maxWidth: '250px' }}>{selectedDateText}</div>}
-                  {isSubmitted && !selectedDay && <div className="error-msg-small">Please select a date</div>}
-                </div>
 
-                {/* Time Side */}
-                <div className="col-lg-5 text-center py-2 mt-4 mt-lg-0">
-                  <label className="form-label-custom mb-3">2. Select Preferred Time *</label>
-                  <div className="p-4 h-100 d-flex flex-column justify-content-center align-items-center">
-                    <div className="bg-white p-3 rounded-3 shadow-sm w-100 mb-3" style={{ maxWidth: '280px' }}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <TimePicker
-                          value={timeValue}
-                          onChange={handleTimeChange}
-                          renderInput={(params) => <input className="form-control appointment-input text-center" {...params} />}
-                        />
-                      </LocalizationProvider>
-                    </div>
-                    <div className="alert alert-info py-2 px-3 small mb-0" style={{ fontSize: '0.8rem', borderRadius: '10px' }}>
-                      <i className="fa fa-clock me-2"></i>
-                      Standard hours: 8:00 AM - 6:00 PM
-                    </div>
-                    {isSubmitted && !timeValue && <div className="error-msg-small mt-2">Please select a time</div>}
-                  </div>
+            <div className="bg-light p-4 rounded-4 border shadow-sm mt-3">
+              <div className="text-center py-2">
+                <label className="form-label-custom mb-3">Select Preferred Date *</label>
+                <div className="d-inline-block p-2 bg-white rounded-3 shadow-sm mb-3">
+                  <DayPicker
+                    mode="single"
+                    selected={selectedDay}
+                    onSelect={handleDaySelect}
+                    disabled={{ before: new Date() }}
+                    className="rdp-modern"
+                  />
                 </div>
+                {selectedDay && <div className="selected-date-badge d-block mx-auto" style={{ maxWidth: '250px' }}>{selectedDateText}</div>}
+                {isSubmitted && !selectedDay && <div className="error-msg-small">Please select a date</div>}
               </div>
             </div>
           </div>
 
           <div className="col-12 mt-4">
             <label className="form-label-custom">Additional Notes (Optional)</label>
-            <div className="quill-appointment shadow-sm">
-              <ReactQuill 
-                theme="snow" 
-                value={message} 
-                onChange={setMessage} 
-                modules={modules} 
-                formats={formats} 
-                placeholder="Tell us more about your project..." 
-              />
-            </div>
+            <textarea
+              className="form-control appointment-input"
+              rows="5"
+              placeholder="Tell us more about your project..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              style={{ resize: 'vertical', minHeight: '120px' }}
+            />
+          </div>
+
+          {/* reCAPTCHA */}
+          <div className="col-12 d-flex justify-content-center mt-4">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey="6LfJxqksAAAAAHB2daOfU2kVupNcopppGqEGbF3B"
+              onChange={handleRecaptcha}
+            />
           </div>
 
           {/* Feedback & Submit */}
-          <div className="col-12 text-center mt-5">
+          <div className="col-12 text-center mt-4">
             {feedbackMessage && (
               <div className={`alert ${feedbackMessage.includes('Error') || feedbackMessage.includes('Please') ? 'alert-danger' : 'alert-success'} mb-4 animate-fadeInUp`}>
                 {feedbackMessage}
               </div>
             )}
-            
+
             <button type="submit" className="btn btn-primary py-3 px-5 shadow-lg w-100" style={{ maxWidth: '400px', fontSize: '1.1rem', fontWeight: '800' }}>
               {loading ? <TailSpin color="#fff" height={30} width={30} /> : 'CONFIRM APPOINTMENT'}
             </button>
           </div>
-          
+
         </div>
       </form>
     </div>
@@ -327,8 +294,3 @@ const Appointment = () => {
 };
 
 export default Appointment;
-
-
-
-
-

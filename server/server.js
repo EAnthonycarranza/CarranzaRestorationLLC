@@ -68,7 +68,7 @@ function emailLayout(bodyContent, preheader = '') {
     <div class="email-container">
       <div class="email-header">
         <a href="https://carranzarestoration.com" target="_blank">
-          <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC" style="height:50px;">
+          <img src="https://lh3.googleusercontent.com/a-/ALV-UjUz45V8tmU6Ujkn_nPy5Ac16du4Bo7XJRvLYbpXU4jSG1io5ic=s80-p" alt="Carranza Restoration LLC" style="height:50px;">
         </a>
         <p class="email-header-title">Carranza <span class="email-header-accent">Restoration</span> LLC</p>
       </div>
@@ -583,11 +583,22 @@ const postFileToJobNimbus = async (fileName, fileType, fileBuffer, latestJnid) =
 
 app.post('/send-quote', async (req, res) => {
   try {
+    // Verify reCAPTCHA
+    const recaptchaToken = req.body.recaptchaToken;
+    if (!recaptchaToken) {
+      return res.status(400).json({ success: false, message: 'Please complete the reCAPTCHA verification.' });
+    }
+    const recaptchaResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=6LfJxqksAAAAACea4nFzljEmb3pOKDAyme3wPDCN&response=${recaptchaToken}`
+    );
+    if (!recaptchaResponse.data.success) {
+      return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed. Please try again.' });
+    }
+
     const {
       name,
       email,
       date,
-      time,
       message,
       address,
       city,
@@ -604,32 +615,41 @@ app.post('/send-quote', async (req, res) => {
       fileType,
     } = req.body;
 
-const fullAddress = req.body.address;
+const fullAddress = req.body.address || '';
 
-// Adjust the regex to capture the individual components correctly
-const addressRegex = /^(.*),\s*(.*),\s*(.*),\s*(.*)$/;
-const addressMatch = fullAddress.match(addressRegex);
+// Parse address by splitting on commas — handles varying formats from Google Places
+const parts = fullAddress.split(',').map(p => p.trim()).filter(Boolean);
+let extractedAddress = {
+  address: fullAddress,
+  city: '',
+  state: '',
+  country: '',
+  postalCode: postalCode || ''
+};
 
-let extractedAddress = {};
-if (addressMatch && addressMatch.length === 5) {
-  // Split the first group into address and city
-  const addressCity = addressMatch[1].trim().split(', ');
-  const address = addressCity[0].trim();
-  const city = addressCity[1].trim();
-
-  extractedAddress = {
-    address: address, // Street address
-    city: city, // City
-    state: addressMatch[2].trim(), // State
-    country: addressMatch[3].trim(), // Country is expected to be the fourth group
-    postalCode: postalCode // Postal code from a separate variable
-  };
-} else {
-  console.error('Address format is not as expected:', fullAddress);
+if (parts.length >= 4) {
+  // Format: "123 Main St, City, State ZIP, Country"
+  extractedAddress.address = parts[0];
+  extractedAddress.city = parts[1];
+  // State may contain ZIP — split it
+  const stateZip = parts[2].trim().split(/\s+/);
+  extractedAddress.state = stateZip[0] || '';
+  if (stateZip.length > 1 && !postalCode) {
+    extractedAddress.postalCode = stateZip.slice(1).join(' ');
+  }
+  extractedAddress.country = parts[3];
+} else if (parts.length === 3) {
+  extractedAddress.address = parts[0];
+  extractedAddress.city = parts[1];
+  const stateZip = parts[2].trim().split(/\s+/);
+  extractedAddress.state = stateZip[0] || '';
+  if (stateZip.length > 1 && !postalCode) {
+    extractedAddress.postalCode = stateZip.slice(1).join(' ');
+  }
+} else if (parts.length === 2) {
+  extractedAddress.address = parts[0];
+  extractedAddress.city = parts[1];
 }
-
-console.log('Extracted Address:', extractedAddress);
-
 
 console.log('Extracted Address:', extractedAddress);
 
@@ -656,22 +676,7 @@ console.log('Extracted Address:', extractedAddress);
       return utcDate.toLocaleDateString('en-US', options);
     }
 
-    function formatTimeForEmail(isoTimeString) {
-      const time = new Date(isoTimeString);
-      if (isNaN(time.getTime())) {
-        return "Invalid time";
-      }
-      const options = {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'America/Chicago'
-      };
-      return time.toLocaleTimeString('en-US', options);
-    }
-
     let formattedDate = formatDateForEmail(req.body.date);
-    let formattedTime = formatTimeForEmail(req.body.time);
 
 
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
@@ -689,7 +694,7 @@ console.log('Extracted Address:', extractedAddress);
     const emailBody = inlineEmail(`
       <span class="badge">Inspection Request</span>
       <h1>New Estimate Request</h1>
-      <p class="subtitle">From ${name} &mdash; ${formattedDate} at ${formattedTime}</p>
+      <p class="subtitle">From ${name} &mdash; ${formattedDate}</p>
       <hr class="email-divider">
 
       <table class="info-table">
@@ -713,10 +718,6 @@ console.log('Extracted Address:', extractedAddress);
         <tr>
           <td class="label">Date</td>
           <td class="value">${formattedDate}</td>
-        </tr>
-        <tr>
-          <td class="label">Time</td>
-          <td class="value">${formattedTime}</td>
         </tr>
         <tr>
           <td class="label">Address</td>
@@ -762,9 +763,10 @@ console.log('Extracted Address:', extractedAddress);
       </div>` : ''}
     `, `New inspection request from ${name}`);
 
-    let eventDateTime = new Date(time);
+    let eventDateTime = new Date(date);
+    eventDateTime.setHours(8, 0, 0, 0); // Default to 8:00 AM
     let eventEnd = new Date(eventDateTime.getTime() + 60 * 60 * 1000);
-    const icsContent = generateICSContent(eventDateTime, eventEnd, name, email, message, address, city, state, country);
+    const icsContent = generateICSContent(eventDateTime, eventEnd, name, email, message, extractedAddress.address, extractedAddress.city, extractedAddress.state, extractedAddress.country);
     if (!icsContent) {
       throw new Error('Failed to generate ICS content');
     }
