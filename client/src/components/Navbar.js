@@ -1,99 +1,134 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import carranzaLogo from '../img/Carranza Restoration.png';
+import './Navbar.css';
 
-// Navbar Component
 const Navbar = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const navbarRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const navbarRef = useRef(null); // Ref for the navbar
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const closeDropdown = () => {
-    setIsDropdownOpen(false);
-  };
-
-  const isDropdownActive = () => {
-    const paths = ['/project', '/team', '/testimonial'];
-    return paths.includes(location.pathname);
-  };
-
-  // Handle click outside navbar
+  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navbarRef.current && !navbarRef.current.contains(event.target)) {
-        closeDropdown();
+        setIsMobileMenuOpen(false);
+        setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [navbarRef]);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const trackClick = async (url) => {
     try {
-        await fetch('/api/track-click', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ url })
-        });
+      await fetch('/api/track-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
     } catch (error) {
-        console.error('Error sending track data:', error);
+      console.error('Error sending track data:', error);
     }
   };
 
-  const handleClick = async (path) => {
-    await trackClick(path); // Track the click before navigating
+  const handleNavigation = async (path) => {
+    await trackClick(path);
     navigate(path);
-    window.scrollTo(0, 0);
-    closeDropdown(); // Close dropdown when link is clicked
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsMobileMenuOpen(false);
+    setIsDropdownOpen(false);
   };
 
+  const pagesLinks = [
+    { name: 'Our Projects', path: '/project' },
+    { name: 'Testimonials', path: '/testimonial' },
+    { name: 'Blog', path: '/blog' }
+  ];
+
+  const isPagesActive = pagesLinks.some(link => isActive(link.path));
+
   return (
-    <div className="container-fluid sticky-top bg-dark bg-light-radial shadow-sm " ref={navbarRef}>
-      <nav className="navbar navbar-expand-lg bg-dark bg-light-radial navbar-dark ">
-        <Link to="/" className="navbar-brand-1" onClick={() => handleClick('/')}>
-          <h1 className="brand-title">
-            <span className="brand-logo">
-              <img src={carranzaLogo} alt="Carranza Restoration LLC Logo" />
-            </span>
-            <span className="brand-name">Carranza</span>
-            <span className="brand-description">Restoration LLC</span>
-          </h1>
+    <header className={`modern-navbar-wrapper ${scrolled ? 'scrolled' : ''}`} ref={navbarRef}>
+      <nav className="modern-navbar container-modern">
+        {/* Brand */}
+        <Link to="/" className="navbar-brand-modern" onClick={(e) => { e.preventDefault(); handleNavigation('/'); }}>
+          <div className="brand-content">
+            <img src={carranzaLogo} alt="Carranza Restoration" className="brand-logo-img" />
+            <div className="brand-text">
+              <span className="brand-name">Carranza</span>
+              <span className="brand-desc">Restoration LLC</span>
+            </div>
+          </div>
         </Link>
 
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-          <span className="navbar-toggler-icon"></span>
+        {/* Mobile Toggle */}
+        <button 
+          className={`mobile-toggle ${isMobileMenuOpen ? 'active' : ''}`} 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle Navigation"
+        >
+          <span className="toggle-bar"></span>
+          <span className="toggle-bar"></span>
+          <span className="toggle-bar"></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarCollapse">
-          <div className="navbar-nav ms-auto py-0">
-            <Link to="/" className={`nav-item nav-link ${isActive('/') ? 'active' : ''}`} onClick={() => handleClick('/')}>Home</Link>
-            <Link to="/about" className={`nav-item nav-link ${isActive('/about') ? 'active' : ''}`} onClick={() => handleClick('/about')}>About</Link>
-            <Link to="/services" className={`nav-item nav-link ${isActive('/services') ? 'active' : ''}`} onClick={() => handleClick('/services')}>Service</Link>
-            <div className="nav-item dropdown">
-              <button className={`nav-link dropdown-toggle ${isDropdownActive() ? 'active' : ''}`} onClick={toggleDropdown}>Pages</button>
-              <div className={`dropdown-menu m-0 ${isDropdownOpen ? 'show' : ''}`}>
-                <Link to="/project" className="dropdown-item" onClick={() => handleClick('/project')}>Our Project</Link>
-                <Link to="/testimonial" className="dropdown-item" onClick={() => handleClick('/testimonial')}>Testimonial</Link>
-                <Link to="/blog" className="dropdown-item" onClick={() => handleClick('/blog')}>Blog</Link>
-              </div>
-            </div>
-            <Link to="/contact" className={`nav-item nav-link ${isActive('/contact') ? 'active' : ''}`} onClick={() => handleClick('/contact')}>Contact</Link>
-            <Link to="/dashboard" className={`nav-item nav-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => handleClick('/dashboard')}>Dashboard</Link>
-          </div>
+
+        {/* Nav Links */}
+        <div className={`nav-menu-wrapper ${isMobileMenuOpen ? 'show' : ''}`}>
+          <ul className="nav-links">
+            <li className="nav-item">
+              <Link to="/" className={`nav-link-modern ${isActive('/') ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavigation('/'); }}>Home</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/about" className={`nav-link-modern ${isActive('/about') ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavigation('/about'); }}>About</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/services" className={`nav-link-modern ${isActive('/services') ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavigation('/services'); }}>Services</Link>
+            </li>
+
+            <li className={`nav-item dropdown-modern ${isDropdownOpen ? 'open' : ''}`}>
+              <button 
+                className={`nav-link-modern dropdown-toggle-modern ${isPagesActive ? 'active' : ''}`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                Pages <i className={`fa fa-chevron-down ms-1 icon-sm transition ${isDropdownOpen ? 'rotate-180' : ''}`}></i>
+              </button>
+              <ul className={`dropdown-menu-modern ${isDropdownOpen ? 'show' : ''}`}>
+                {pagesLinks.map(link => (
+                  <li key={link.path}>
+                    <Link to={link.path} className={`dropdown-item-modern ${isActive(link.path) ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavigation(link.path); }}>
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
+
+            <li className="nav-item">
+              <Link to="/contact" className={`nav-link-modern ${isActive('/contact') ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavigation('/contact'); }}>Contact</Link>
+            </li>
+
+            <li className="nav-item dashboard-item">
+              <Link to="/dashboard" className={`nav-link-modern dashboard-btn ${isActive('/dashboard') ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavigation('/dashboard'); }}>Dashboard</Link>
+            </li>
+          </ul>
         </div>
       </nav>
-    </div>
+    </header>
   );
 };
 
