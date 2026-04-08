@@ -341,6 +341,21 @@ body {
 }
 
 .dropdown-modern { position: relative; }
+
+.dropdown-toggle-modern {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.dropdown-toggle-modern:focus {
+  outline: none;
+  box-shadow: none;
+}
 .dropdown-menu-modern {
   position: absolute;
   top: 100%;
@@ -587,6 +602,15 @@ body {
   background-color: #040F28;
   padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.topbar-modern .col-lg-4 {
+  border: none !important;
+}
+
+.topbar-modern .col-lg-4::before,
+.topbar-modern .col-lg-4::after {
+  display: none !important;
 }
 
 .topbar-item {
