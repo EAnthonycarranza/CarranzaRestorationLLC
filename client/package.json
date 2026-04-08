@@ -107,7 +107,6 @@
     "concurrently": "^8.2.2",
     "css-loader": "^6.8.1",
     "file-loader": "^6.2.0",
-    "node-sass": "^7.0.3",
     "sass": "^1.69.4",
     "style-loader": "^3.3.3",
     "stylelint": "^15.11.0",
