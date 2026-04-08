@@ -1352,7 +1352,7 @@ const googleCloudKey = {
 
 const storage = new Storage({
   projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-  keyFilename: googleCloudKey
+  credentials: googleCloudKey
 });
 
 const bucket = storage.bucket(process.env.BUCKET_NAME);
