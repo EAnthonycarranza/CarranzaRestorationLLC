@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import carousel1Image from '../img/carousel-1.jpg';
 import carousel2Image from '../img/carousel-2.jpg';
@@ -39,14 +39,24 @@ const slides = [
 
 const Carousel = ({ scrollToAppointment }) => {
   const navigate = useNavigate();
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const handleClick = (btn) => {
+  // Sync with Bootstrap carousel slide events
+  useEffect(() => {
+    const el = document.getElementById('header-carousel');
+    if (!el) return;
+    const handler = (e) => setActiveIndex(e.to);
+    el.addEventListener('slid.bs.carousel', handler);
+    return () => el.removeEventListener('slid.bs.carousel', handler);
+  }, []);
+
+  const handleClick = useCallback((btn) => {
     if (btn.action === 'scroll') {
       scrollToAppointment();
     } else {
       navigate(btn.path);
     }
-  };
+  }, [navigate, scrollToAppointment]);
 
   return (
     <div className="container-fluid p-0">
@@ -61,14 +71,14 @@ const Carousel = ({ scrollToAppointment }) => {
             <div key={idx} className={`carousel-item ${idx === 0 ? 'active' : ''}`}>
               <img className="w-100" src={slide.image} alt={slide.alt} />
               <div className="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                <div className="p-3 text-center" style={{ maxWidth: '1000px' }}>
+                <div className="carousel-caption-content text-center">
                   <div className="carousel-icon-wrapper">
                     <i className={`fa ${slide.icon} carousel-slide-icon`}></i>
                   </div>
                   <h1 className="display-1 text-uppercase text-white mb-4">
                     {slide.heading}
                   </h1>
-                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                  <div className="carousel-btn-group d-flex flex-column flex-sm-row justify-content-center gap-3">
                     {slide.buttons.map((btn, bIdx) => (
                       <button
                         key={bIdx}
@@ -89,8 +99,9 @@ const Carousel = ({ scrollToAppointment }) => {
           ))}
         </div>
 
+        {/* Desktop: side arrows (hidden on mobile) */}
         <button
-          className="carousel-control-prev"
+          className="carousel-control-prev carousel-control-desktop"
           type="button"
           data-bs-target="#header-carousel"
           data-bs-slide="prev"
@@ -101,7 +112,7 @@ const Carousel = ({ scrollToAppointment }) => {
           <span className="visually-hidden">Previous</span>
         </button>
         <button
-          className="carousel-control-next"
+          className="carousel-control-next carousel-control-desktop"
           type="button"
           data-bs-target="#header-carousel"
           data-bs-slide="next"
@@ -111,6 +122,42 @@ const Carousel = ({ scrollToAppointment }) => {
           </div>
           <span className="visually-hidden">Next</span>
         </button>
+
+        {/* Mobile: bottom nav bar with arrows + indicators (hidden on desktop) */}
+        <div className="carousel-mobile-nav">
+          <button
+            className="carousel-mobile-btn"
+            type="button"
+            data-bs-target="#header-carousel"
+            data-bs-slide="prev"
+            aria-label="Previous slide"
+          >
+            <i className="fa fa-chevron-left"></i>
+          </button>
+
+          <div className="carousel-indicators-custom">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                data-bs-target="#header-carousel"
+                data-bs-slide-to={idx}
+                className={`carousel-dot ${activeIndex === idx ? 'active' : ''}`}
+                aria-label={`Slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            className="carousel-mobile-btn"
+            type="button"
+            data-bs-target="#header-carousel"
+            data-bs-slide="next"
+            aria-label="Next slide"
+          >
+            <i className="fa fa-chevron-right"></i>
+          </button>
+        </div>
       </div>
     </div>
   );

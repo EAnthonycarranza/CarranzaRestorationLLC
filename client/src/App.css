@@ -734,6 +734,11 @@ body {
   z-index: 1;
 }
 
+.carousel-caption-content {
+  max-width: 1000px;
+  padding: 1rem;
+}
+
 /* Icon wrapper for animated carousel icons */
 .carousel-icon-wrapper {
   margin-bottom: 1.25rem;
@@ -774,8 +779,8 @@ body {
   animation: fadeInUp 0.8s ease forwards 0.6s;
 }
 
-.carousel-control-prev,
-.carousel-control-next {
+/* Desktop side arrows */
+.carousel-control-desktop {
   width: 10%;
   z-index: 2;
 }
@@ -798,6 +803,11 @@ body {
   background-color: #fff;
   color: var(--nav-accent);
   transform: scale(1.1);
+}
+
+/* Mobile bottom nav — hidden on desktop */
+.carousel-mobile-nav {
+  display: none;
 }
 
 .btn-outline-light-modern {
@@ -828,6 +838,7 @@ body {
   }
 }
 
+/* ---- Tablet ---- */
 @media (max-width: 768px) {
   .carousel-item {
     height: 85vh;
@@ -843,18 +854,84 @@ body {
     font-size: 2rem;
   }
 
-  .carousel-control-custom-icon {
-    width: 44px;
-    height: 44px;
-    font-size: 1.1rem;
+  /* Hide desktop side arrows, show mobile bottom nav */
+  .carousel-control-desktop {
+    display: none !important;
+  }
+
+  .carousel-mobile-nav {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(transparent, rgba(4, 15, 40, 0.7));
+  }
+
+  .carousel-mobile-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .carousel-mobile-btn:active {
+    background: var(--nav-accent);
+    border-color: var(--nav-accent);
+    transform: scale(0.92);
+  }
+
+  /* Dot indicators */
+  .carousel-indicators-custom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.35s ease;
+  }
+
+  .carousel-dot.active {
+    background: var(--nav-accent);
+    width: 28px;
+    border-radius: 5px;
+    box-shadow: 0 0 8px rgba(253, 93, 20, 0.5);
   }
 
   .btn-outline-light-modern {
     padding: 10px 28px;
     font-size: 0.9rem;
   }
+
+  /* Give caption room above bottom nav */
+  .carousel-caption-content {
+    padding-bottom: 70px;
+  }
 }
 
+/* ---- Small phones ---- */
 @media (max-width: 576px) {
   .carousel-item {
     height: 80vh;
@@ -878,6 +955,20 @@ body {
   .carousel-caption .btn {
     font-size: 0.85rem;
     padding: 10px 24px !important;
+  }
+
+  .carousel-mobile-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 0.9rem;
+  }
+
+  .carousel-mobile-nav {
+    padding: 14px 16px;
+  }
+
+  .carousel-caption-content {
+    padding-bottom: 60px;
   }
 }
 
