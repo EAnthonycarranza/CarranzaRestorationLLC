@@ -13,6 +13,93 @@ const BlogPost = require('./models/BlogPost');
 const Comment = require('./models/Comment');
 const Contact = require('./models/Contact');
 const { checkAuthentication, adminOnly, canEditComment } = require('./middleware/auth');
+
+// --- Branded Email Template System ---
+function emailLayout(bodyContent, preheader = '') {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carranza Restoration LLC</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f5f7; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    .email-wrapper { width: 100%; background-color: #f4f5f7; padding: 40px 0; }
+    .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .email-header { background: linear-gradient(135deg, #040F28 0%, #0a1e4a 100%); padding: 32px 40px; text-align: center; }
+    .email-header img { height: 50px; margin-bottom: 8px; }
+    .email-header-title { color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+    .email-header-accent { color: #FD5D14; }
+    .email-body { padding: 40px; }
+    .email-body h1 { color: #040F28; font-size: 24px; font-weight: 800; margin: 0 0 8px; }
+    .email-body .subtitle { color: #666; font-size: 14px; margin: 0 0 28px; }
+    .email-divider { height: 2px; background: linear-gradient(to right, #FD5D14, transparent); margin: 28px 0; border: none; }
+    .info-table { width: 100%; border-collapse: collapse; }
+    .info-table td { padding: 10px 0; vertical-align: top; font-size: 14px; color: #333; }
+    .info-table .label { font-weight: 700; color: #040F28; width: 160px; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; padding-top: 12px; }
+    .info-table .value { color: #444; font-size: 15px; }
+    .info-table .value a { color: #FD5D14; text-decoration: none; font-weight: 600; }
+    .message-box { background: #f8f9fa; border-left: 4px solid #FD5D14; border-radius: 0 8px 8px 0; padding: 20px 24px; margin: 24px 0; }
+    .message-box p { margin: 0; color: #333; font-size: 15px; line-height: 1.7; }
+    .message-box .msg-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 8px; }
+    .badge { display: inline-block; background: rgba(253, 93, 20, 0.1); color: #FD5D14; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: 50px; margin-bottom: 16px; }
+    .email-footer { background: #040F28; padding: 32px 40px; }
+    .footer-info { text-align: center; }
+    .footer-company { color: #ffffff; font-size: 14px; font-weight: 700; margin: 0 0 6px; }
+    .footer-address { color: rgba(255,255,255,0.5); font-size: 13px; margin: 0 0 16px; line-height: 1.6; }
+    .footer-address a { color: rgba(255,255,255,0.7); text-decoration: none; }
+    .footer-links { text-align: center; margin-top: 16px; }
+    .footer-links a { color: #FD5D14; font-size: 12px; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; margin: 0 10px; }
+    .footer-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 20px 0; }
+    .footer-copy { text-align: center; color: rgba(255,255,255,0.3); font-size: 11px; margin: 0; }
+    .preheader { display: none !important; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0; max-height: 0; max-width: 0; overflow: hidden; }
+    @media only screen and (max-width: 620px) {
+      .email-body { padding: 24px 20px !important; }
+      .email-header { padding: 24px 20px !important; }
+      .email-footer { padding: 24px 20px !important; }
+      .info-table .label { width: 120px !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="preheader">${preheader}</div>
+  <div class="email-wrapper">
+    <div class="email-container">
+      <div class="email-header">
+        <a href="https://carranzarestoration.com" target="_blank">
+          <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC" style="height:50px;">
+        </a>
+        <p class="email-header-title">Carranza <span class="email-header-accent">Restoration</span> LLC</p>
+      </div>
+      <div class="email-body">
+        ${bodyContent}
+      </div>
+      <div class="email-footer">
+        <div class="footer-info">
+          <p class="footer-company">Carranza Restoration LLC &bull; FWR General Contractors</p>
+          <p class="footer-address">
+            <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154">100 Commercial Place, Schertz, TX 78154</a><br>
+            <a href="tel:+12102671008">(210) 267-1008</a> Office &bull; <a href="tel:+12104285610">(210) 428-5610</a> Cell
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="https://carranzarestoration.com" target="_blank">Website</a>
+          <a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank">Google Review</a>
+          <a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank">Angi Review</a>
+        </div>
+        <div class="footer-divider"></div>
+        <p class="footer-copy">&copy; ${new Date().getFullYear()} Carranza Restoration LLC. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function inlineEmail(bodyContent, preheader = '') {
+  return juice(emailLayout(bodyContent, preheader));
+}
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User'); // Adjust the path as necessary
@@ -215,52 +302,30 @@ app.get('/sitemap.xml', (req, res) => {
 app.post('/send-email', async (req, res) => {
   const { name, email, subject, message } = req.body;
   
-  const emailStyles = `
-    <style>
-      body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-      p { margin: 0 0 10px; }
-      h1, h2, h3 { margin: 10px 0; }
-      .ql-size-small { font-size: 0.75em; }
-      .ql-size-large { font-size: 1.5em; }
-      .ql-size-huge { font-size: 2.5em; }
-      .ql-align-center { text-align: center; }
-      .ql-align-right { text-align: right; }
-      .ql-align-justify { text-align: justify; }
-    </style>
-  `;
-
-  const emailHtmlContent = `
-  <div>
-    <p><strong style="color: black;">From:</strong> <span style="color: black;">${name} (${email})</span></p>
-    <p><strong style="color: black;">Message:</strong></p>
-    <div style="color: black;">${message}</div>
-    <hr>
-    <div style="margin-top: 20px;">
-      <a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">
-        <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
-      </a>
-      <div style="margin-top: 10px;">
-        <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
-        <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: #15c;">
-          <p style="margin: 5px 0;">100 Commercial Place</p>
-          <p style="margin: 0;">Schertz, TX 78154</p>
-        </a>
-        <p style="margin: 5px 0">
-          <a href="tel:+12102671008" style="color: #15c;"> (210) 267-1008</a> <span style="color: black;">Office</span>
-        </p>
-        <p style="margin: 0;">
-          <a href="tel:+12104285610" style="color: #15c;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
-        </p>
-      </div>      
-      <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: #15c;">Google Review</a></p>
-      <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">Carranza Restoration LLC Website</a></p>
-      <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: #15c;">Angi Review</a></p>
+  const emailHtml = inlineEmail(`
+    <span class="badge">New Contact Message</span>
+    <h1>Message from ${name}</h1>
+    <p class="subtitle">Sent via the website contact form</p>
+    <hr class="email-divider">
+    <table class="info-table">
+      <tr>
+        <td class="label">From</td>
+        <td class="value">${name}</td>
+      </tr>
+      <tr>
+        <td class="label">Email</td>
+        <td class="value"><a href="mailto:${email}">${email}</a></td>
+      </tr>
+      <tr>
+        <td class="label">Subject</td>
+        <td class="value">${subject}</td>
+      </tr>
+    </table>
+    <div class="message-box">
+      <p class="msg-label">Message</p>
+      <p>${message}</p>
     </div>
-  </div>
-`;
-
-
-const emailHtml = juice(`${emailStyles} ${emailHtmlContent}`);
+  `, `New contact message from ${name}`);
 
 // Email options for /send-email, including CC and structuring the HTML body
 const mailOptions = {
@@ -608,61 +673,94 @@ console.log('Extracted Address:', extractedAddress);
     let formattedDate = formatDateForEmail(req.body.date);
     let formattedTime = formatTimeForEmail(req.body.time);
 
-    let insuranceCompanyHtml = insuranceCompany
-      ? `<p><strong style="color: black;">Insurance Company:</strong> <span style="color: black;">${insuranceCompany}</span></p>`
-      : '';
-
-    let claimNumberHtml = claimNumber
-      ? `<p><strong style="color: black;">Claim Number:</strong> <span style="color: black;">${claimNumber}</span></p>`
-      : '';
 
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
     console.log('Extracted Address:', extractedAddress); 
     console.log('Postal Code:', postalCode);
 
-    const emailBody = `  
-      <div>
-        <h1 style="color: black;">Inspection/Estimate Request</h1>
-        <p><strong style="color: black;">Name:</strong> <span style="color: black;">${name}</span></p>
-        <p><strong style="color: black;">Email:</strong> <a href="mailto:${email}" style="color: #15c;">${email}</a></p>
-        <p><strong style="color: black;">Callback Phone Number:</strong> <a href="tel:${formattedPhoneNumber}" style="color: #15c;">${formattedPhoneNumber}</a></p>
-        <p><strong style="color: black;">Date:</strong> <span style="color: black;">${formattedDate}</span></p>
-        <p><strong style="color: black;">Time:</strong> <span style="color: black;">${formattedTime}</span></p>
-        <p><strong style="color: black;">Address:</strong> <span style="color: black;">${extractedAddress.address}</span></p>
-        <p><strong style="color: black;">City:</strong> <span style="color: black;">${extractedAddress.city}</span></p>
-        <p><strong style="color: black;">State:</strong> <span style="color: black;">${extractedAddress.state}</span></p>
-        <p><strong style="color: black;">Country:</strong> <span style="color: black;">${extractedAddress.country}</span></p>
-        <p><strong style="color: black;">Postal Code:</strong> <span style="color: black;">${postalCode}</span></p>
-        <p><strong style="color: black;">Project Type:</strong> <span style="color: black;">${projectType}</span></p>
-        <p><strong>Insurance Claim:</strong> <span style="color: black;">${insuranceClaim}</span></p>
-        ${insuranceCompanyHtml}
-        ${claimNumberHtml} 
-        <hr>
-        <p><strong style="color: black;">Message:</strong> <span style="color: black;">${message}</span></p>
-        <hr>
-        <div style="margin-top: 30px;">
-          <a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">
-            <img src="https://storage.googleapis.com/new13/CarranzaLLCLogo1.png" alt="Carranza Restoration LLC Logo" style="max-width: 200px;">
-          </a>
-          <div style="margin-top: 10px;">
-            <p style="margin: 0; font-weight: bold; color: black;">Carranza Restoration LLC; FWR General Contractors</p>
-            <a href="https://maps.google.com/?q=100+Commercial+Place+Schertz+TX+78154" target="_blank" style="color: #15c;">
-              <p style="margin: 5px 0;">100 Commercial Place</p>
-              <p style="margin: 0;">Schertz, TX 78154</p>
-            </a>
-            <p style="margin: 5px 0; color: black;">
-              <a href="tel:+12102671008" style="color: #15c;"> (210) 267-1008</a> <span style="color: black;">Office</span>
-            </p>
-            <p style="margin: 0;">
-              <a href="tel:+12104285610" style="color: #15c;"> (210) 428-5610</a> <span style="color: black;">Cell</span>
-            </p>
-          </div>      
-          <p><a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" style="color: #15c;">Google Review</a></p>
-          <p><a href="http://www.carranzarestoration.org" target="_blank" style="color: #15c;">Carranza Restoration LLC Website</a></p>
-          <p><a href="https://www.angieslist.com/companylist/us/TX/Cibolo/Carranza-Restoration-LLC-reviews-9611706.htm" target="_blank" style="color: #15c;">Angi Review</a></p>
-        </div>
-      </div>`;
+    const insuranceRows = insuranceCompany
+      ? `<tr><td class="label">Insurance Co.</td><td class="value">${insuranceCompany}</td></tr>`
+      : '';
+    const claimRows = claimNumber
+      ? `<tr><td class="label">Claim Number</td><td class="value">${claimNumber}</td></tr>`
+      : '';
+
+    const emailBody = inlineEmail(`
+      <span class="badge">Inspection Request</span>
+      <h1>New Estimate Request</h1>
+      <p class="subtitle">From ${name} &mdash; ${formattedDate} at ${formattedTime}</p>
+      <hr class="email-divider">
+
+      <table class="info-table">
+        <tr>
+          <td class="label">Name</td>
+          <td class="value">${name}</td>
+        </tr>
+        <tr>
+          <td class="label">Email</td>
+          <td class="value"><a href="mailto:${email}">${email}</a></td>
+        </tr>
+        <tr>
+          <td class="label">Phone</td>
+          <td class="value"><a href="tel:${formattedPhoneNumber}">${formattedPhoneNumber}</a></td>
+        </tr>
+      </table>
+
+      <hr class="email-divider">
+
+      <table class="info-table">
+        <tr>
+          <td class="label">Date</td>
+          <td class="value">${formattedDate}</td>
+        </tr>
+        <tr>
+          <td class="label">Time</td>
+          <td class="value">${formattedTime}</td>
+        </tr>
+        <tr>
+          <td class="label">Address</td>
+          <td class="value">${extractedAddress.address}</td>
+        </tr>
+        <tr>
+          <td class="label">City</td>
+          <td class="value">${extractedAddress.city}</td>
+        </tr>
+        <tr>
+          <td class="label">State</td>
+          <td class="value">${extractedAddress.state}</td>
+        </tr>
+        <tr>
+          <td class="label">Country</td>
+          <td class="value">${extractedAddress.country}</td>
+        </tr>
+        <tr>
+          <td class="label">Postal Code</td>
+          <td class="value">${postalCode}</td>
+        </tr>
+      </table>
+
+      <hr class="email-divider">
+
+      <table class="info-table">
+        <tr>
+          <td class="label">Project Type</td>
+          <td class="value">${projectType}</td>
+        </tr>
+        <tr>
+          <td class="label">Insurance Claim</td>
+          <td class="value">${insuranceClaim}</td>
+        </tr>
+        ${insuranceRows}
+        ${claimRows}
+      </table>
+
+      ${message ? `
+      <div class="message-box">
+        <p class="msg-label">Additional Notes</p>
+        <p>${message}</p>
+      </div>` : ''}
+    `, `New inspection request from ${name}`);
 
     let eventDateTime = new Date(time);
     let eventEnd = new Date(eventDateTime.getTime() + 60 * 60 * 1000);
@@ -1394,8 +1492,16 @@ const sendBatchEmail = async () => {
     from: process.env.EMAIL,
     to: process.env.RECEIVER_EMAIL,
     subject: "New Images Made Public",
-    html: "<p>The following images have been made public:</p>" +
-          "<ul>" + queuedFiles.map(f => `<li>${f.fileName}</li>`).join('') + "</ul>",
+    html: inlineEmail(`
+      <span class="badge">Image Update</span>
+      <h1>New Images Made Public</h1>
+      <p class="subtitle">${queuedFiles.length} image${queuedFiles.length !== 1 ? 's' : ''} published</p>
+      <hr class="email-divider">
+      <div class="message-box">
+        <p class="msg-label">Published Files</p>
+        ${queuedFiles.map(f => `<p style="margin: 4px 0;">&bull; ${f.fileName}</p>`).join('')}
+      </div>
+    `, 'New images have been made public'),
     attachments: attachments
   };
 
