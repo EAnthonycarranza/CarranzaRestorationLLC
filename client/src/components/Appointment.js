@@ -140,37 +140,37 @@ const Appointment = () => {
   };
 
   return (
-    <div className="appointment-card animate-fadeInUp">
+    <div className="appointment-card animate-fadeInUp mx-auto" style={{ maxWidth: '1100px' }}>
       <form onSubmit={handleQuoteRequest}>
-        <div className="row g-4">
+        <div className="row g-4 px-lg-4">
           
           <div className="col-12">
             <h3 className="appointment-section-title">
-              <i className="fa fa-user"></i> Contact Information
+              <i className="fa fa-user me-2"></i> Contact Information
             </h3>
           </div>
 
           <div className="col-md-6">
-            <label className="form-label-custom">Full Name *</label>
+            <label className="form-label-custom">Full Name <span className="text-danger">*</span></label>
             <input type="text" className="form-control appointment-input" placeholder="e.g. John Doe" value={name} onChange={handleNameChange} />
             {isSubmitted && !name && <div className="error-msg-small">Name is required</div>}
           </div>
 
           <div className="col-md-6">
-            <label className="form-label-custom">Email Address *</label>
+            <label className="form-label-custom">Email Address <span className="text-danger">*</span></label>
             <input type="email" className="form-control appointment-input" placeholder="e.g. john@example.com" value={email} onChange={e => setEmail(e.target.value)} />
             {isSubmitted && !email && <div className="error-msg-small">Valid email is required</div>}
           </div>
 
           <div className="col-md-6">
-            <label className="form-label-custom">Phone Number *</label>
+            <label className="form-label-custom">Phone Number <span className="text-danger">*</span></label>
             <input type="tel" className="form-control appointment-input" placeholder="e.g. 2101234567" value={phoneNumber} onChange={handlePhoneNumberChange} />
             {phoneNumberError && <div className="error-msg-small">{phoneNumberError}</div>}
             {isSubmitted && !phoneNumber && <div className="error-msg-small">Phone number is required</div>}
           </div>
 
           <div className="col-md-6">
-            <label className="form-label-custom">Property Address *</label>
+            <label className="form-label-custom">Property Address <span className="text-danger">*</span></label>
             <div className="position-relative">
               {isLoaded ? (
                 <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
@@ -197,16 +197,16 @@ const Appointment = () => {
 
           <div className="col-12 mt-5">
             <h3 className="appointment-section-title">
-              <i className="fa fa-home"></i> Project Details
+              <i className="fa fa-home me-2"></i> Project Details
             </h3>
           </div>
 
           <div className="col-md-6">
-            <label className="form-label-custom">Project Type *</label>
+            <label className="form-label-custom">Project Type <span className="text-danger">*</span></label>
             <select className="form-select appointment-input" value={projectType} onChange={e => setProjectType(e.target.value)}>
               <option value="">Select Service...</option>
-              <option value="water">Water Damage</option>
-              <option value="fire">Fire Damage</option>
+              <option value="water">Water Damage Restoration</option>
+              <option value="fire">Fire Damage Restoration</option>
               <option value="roofing">Roofing Restoration</option> 
               <option value="remodel">Interior Remodeling</option>
               <option value="other">Other</option>
@@ -215,7 +215,7 @@ const Appointment = () => {
           </div>
 
           <div className="col-md-6">
-            <label className="form-label-custom">Insurance Related? *</label>
+            <label className="form-label-custom">Insurance Related? <span className="text-danger">*</span></label>
             <select className="form-select appointment-input" value={insuranceClaim} onChange={e => setInsuranceClaim(e.target.value)}>
               <option value="">Select Option...</option>
               <option value="yes">Yes, insurance claim</option>
@@ -238,12 +238,12 @@ const Appointment = () => {
           )}
 
           <div className="col-12 mt-5">
-            <h3 className="appointment-section-title">
-              <i className="fa fa-calendar-alt"></i> Select Preferred Date
+            <h3 className="appointment-section-title mb-3">
+              <i className="fa fa-calendar-alt me-2"></i> Preferred Appointment Date
             </h3>
             
-            <div className="bg-light p-4 rounded-4 border shadow-sm mt-3 text-center">
-              <div className="d-inline-block p-2 bg-white rounded-3 shadow-sm mb-3">
+            <div className="bg-light p-4 rounded-4 border shadow-sm text-center">
+              <div className="d-inline-block p-3 bg-white rounded-3 shadow-sm mb-3">
                 <DayPicker
                   mode="single"
                   selected={selectedDay}
@@ -252,44 +252,59 @@ const Appointment = () => {
                   className="rdp-modern"
                 />
               </div>
-              {selectedDay && <div className="selected-date-badge d-block mx-auto" style={{ maxWidth: '250px' }}>{selectedDateText}</div>}
+              {selectedDay ? (
+                <div className="selected-date-badge d-block mx-auto mb-2 animate-fadeInUp">
+                  <i className="fa fa-check-circle me-1"></i> {selectedDateText}
+                </div>
+              ) : (
+                <p className="text-muted mb-2">Please pick a date from the calendar</p>
+              )}
               {isSubmitted && !selectedDay && <div className="error-msg-small">Please select a date</div>}
             </div>
           </div>
 
           <div className="col-12 mt-4">
-            <label className="form-label-custom">Additional Notes (Optional)</label>
-            <div className="quill-appointment shadow-sm">
+            <label className="form-label-custom">Additional Details (Optional)</label>
+            <div className="quill-appointment shadow-sm rounded-3">
               <ReactQuill 
                 theme="snow" 
                 value={message} 
                 onChange={setMessage} 
                 modules={modules} 
                 formats={formats} 
-                placeholder="Tell us more about your project..." 
+                placeholder="Briefly describe your project or any specific requirements..." 
               />
             </div>
           </div>
 
           <div className="col-12 text-center mt-5">
-            <div className="d-flex flex-column align-items-center mb-4">
+            <div className="d-flex flex-column align-items-center mb-4 bg-light p-3 rounded-4 shadow-sm border" style={{ maxWidth: '350px', margin: '0 auto' }}>
+              <p className="small text-muted mb-2 fw-bold text-uppercase">Security Check</p>
               <ReCAPTCHA
                 ref={recaptchaRef}
                 sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                 onChange={onCaptchaChange}
               />
-              {isSubmitted && !captchaToken && <div className="error-msg-small">Please complete the reCAPTCHA</div>}
+              {isSubmitted && !captchaToken && <div className="error-msg-small mt-2">Security check required</div>}
             </div>
 
             {feedbackMessage && (
-              <div className={`alert ${feedbackMessage.includes('Error') || feedbackMessage.includes('Please') ? 'alert-danger' : 'alert-success'} mb-4 animate-fadeInUp`}>
+              <div className={`alert ${feedbackMessage.includes('Error') || feedbackMessage.includes('Please') || feedbackMessage.includes('Security') ? 'alert-danger' : 'alert-success'} mb-4 animate-fadeInUp shadow-sm`}>
+                <i className={`fa ${feedbackMessage.includes('Error') || feedbackMessage.includes('Please') || feedbackMessage.includes('Security') ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-2`}></i>
                 {feedbackMessage}
               </div>
             )}
             
-            <button type="submit" className="btn btn-primary py-3 px-5 shadow-lg w-100" style={{ maxWidth: '400px', fontSize: '1.1rem', fontWeight: '800' }}>
-              {loading ? <TailSpin color="#fff" height={30} width={30} /> : 'CONFIRM APPOINTMENT'}
+            <button type="submit" className="btn btn-primary py-3 px-5 shadow-lg w-100" style={{ maxWidth: '450px', fontSize: '1.2rem', fontWeight: '800', letterSpacing: '1px' }}>
+              {loading ? (
+                <span className="d-flex align-items-center justify-content-center">
+                  <TailSpin color="#fff" height={25} width={25} className="me-2" /> PROCESSING...
+                </span>
+              ) : (
+                'CONFIRM APPOINTMENT REQUEST'
+              )}
             </button>
+            <p className="text-muted mt-3 small">We will review your request and contact you within 24 hours.</p>
           </div>
           
         </div>

@@ -7,17 +7,40 @@ import Testimonial from './Testimonial.js'; // Adjust the path as necessary
 function ServicePage() {
   return (
     <div>
-      {/* PageHeader component with a title */}
       <PageHeader title="Services" header="Service"/>
 
-      {/* Services component */}
-      <Services />
+      <section className="section-padding">
+        <div className="container">
+          <div className="section-title-wrapper text-center mb-5">
+            <h1 className="display-4 text-uppercase">Our Professional <span className="text-primary">Services</span></h1>
+            <div className="section-divider mx-auto"></div>
+            <p className="lead mt-3">We offer a wide range of restoration and renovation services tailored to your needs.</p>
+          </div>
+          <Services />
+        </div>
+      </section>
 
-      {/* Appointment component */}
-      <Appointment />
+      <section id="appointment-section" className="section-padding">
+        <div className="container">
+          <div className="section-title-wrapper text-center text-white mb-5">
+            <h1 className="display-4 text-uppercase">Request a <span className="text-primary">Free Quote</span></h1>
+            <div className="section-divider mx-auto"></div>
+            <p className="lead mt-3">Ready to start your project? Schedule an appointment with our experts today.</p>
+          </div>
+          <Appointment />
+        </div>
+      </section>
 
-      {/* Testimonial component */}
-      <Testimonial />
+      <section className="section-padding bg-light">
+        <div className="container">
+          <div className="section-title-wrapper text-center mb-5">
+            <h1 className="display-4 text-uppercase">Client <span className="text-primary">Testimonials</span></h1>
+            <div className="section-divider mx-auto"></div>
+            <p className="lead mt-3">What our valued customers say about our work.</p>
+          </div>
+          <Testimonial />
+        </div>
+      </section>
     </div>
   );
 }

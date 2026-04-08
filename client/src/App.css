@@ -889,7 +889,19 @@ body {
 
 
 .section-padding {
-  padding: 100px 0;
+  padding: 120px 0;
+}
+
+@media (max-width: 991px) {
+  .section-padding {
+    padding: 80px 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .section-padding {
+    padding: 60px 0;
+  }
 }
 
 .section-bg-light {
@@ -902,22 +914,23 @@ body {
 }
 
 .section-title-wrapper {
-  text-align: center;
-  margin-bottom: 60px;
-  position: relative;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .section-title-wrapper h1 {
-  font-weight: 800;
-  letter-spacing: -1px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: 15px;
 }
 
 .section-divider {
-  width: 80px;
-  height: 4px;
+  width: 100px;
+  height: 5px;
   background-color: var(--nav-accent);
-  margin: 20px auto 0;
   border-radius: 10px;
+  margin-bottom: 25px;
 }
 
 /* Section specific enhancements */
@@ -929,17 +942,43 @@ body {
 }
 
 #appointment-section {
-  background: linear-gradient(rgba(4, 15, 40, 0.9), rgba(4, 15, 40, 0.9)), url('./img/carousel-1.jpg');
+  background: linear-gradient(rgba(4, 15, 40, 0.85), rgba(4, 15, 40, 0.85)), url('./img/carousel-1.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   color: #fff;
 }
 
+@media (max-width: 1024px) {
+  #appointment-section {
+    background-attachment: scroll; /* Fixed background can be laggy on mobile/tablets */
+  }
+}
+
 #appointment-section .bg-light {
-  background-color: rgba(255, 255, 255, 0.95) !important;
+  background-color: rgba(255, 255, 255, 1) !important;
   border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.appointment-card {
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+  padding: 60px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+@media (max-width: 991px) {
+  .appointment-card {
+    padding: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .appointment-card {
+    padding: 30px 20px;
+    border-radius: 20px;
+  }
 }
 
 .portfolio-wrapper {
