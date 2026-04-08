@@ -8,136 +8,161 @@ import OwenImage from '../img/OwensCorningimg.png';
 import BImage from '../img/BBBimg.png';
 import NRCA from '../img/NRCA.png';
 
-
 const Footer = () => {
   const [popularLinks, setPopularLinks] = useState([]);
 
   useEffect(() => {
-      fetchPopularLinks();
+    fetchPopularLinks();
   }, []);
 
   const fetchPopularLinks = async () => {
-      try {
-          const response = await fetch('/api/get-popular-links');
-          if (response.ok) {
-              const data = await response.json();
-              setPopularLinks(data);
-          } else {
-              throw new Error(`Failed to fetch popular links: ${response.status}`);
-          }
-      } catch (error) {
-          console.error('Error fetching popular links:', error);
+    try {
+      const response = await fetch('/api/get-popular-links');
+      if (response.ok) {
+        const data = await response.json();
+        setPopularLinks(data);
       }
+    } catch (error) {
+      console.error('Error fetching popular links:', error);
+    }
   };
 
   const trackClick = async (url) => {
-      try {
-          await fetch('/api/track-click', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ url })
-          });
-      } catch (error) {
-          console.error('Error sending track data:', error);
-      }
+    try {
+      await fetch('/api/track-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+    } catch (error) {
+      console.error('Error sending track data:', error);
+    }
   };
 
   const handleLinkClick = (url) => {
-      trackClick(url);
-      fetchPopularLinks();  // Refetch the popular links to update the list immediately
+    trackClick(url);
+    fetchPopularLinks();
   };
 
   const linkNames = {
-      '/': 'Home',
-      '/about': 'About Us',
-      '/services': 'Our Services',
-      '/contact': 'Contact Us',
-      '/testimonial': 'Our Testimonials',
-      '/dashboard': 'User Dashboard',
-      '/blog': 'Blogs',
-      '/project': 'Our Projects'
+    '/': 'Home',
+    '/about': 'About Us',
+    '/services': 'Our Services',
+    '/contact': 'Contact Us',
+    '/testimonial': 'Testimonials',
+    '/dashboard': 'Dashboard',
+    '/blog': 'Blog',
+    '/project': 'Projects'
   };
 
-  // Sorting and filtering links based on clicks
   const visibleLinks = popularLinks.filter(link => link.clicks >= 4).sort((a, b) => b.clicks - a.clicks).slice(0, 4);
 
-    return (
-      <>
-          <div className="footer container-fluid position-relative bg-dark bg-light-radial text-white-50 py-6 px-5">
-              <div className="row g-5">
-                  <div className="col-lg-6 pe-lg-5 d-flex flex-column align-items-center text-center">
-                      <div className="navbar-brand top-page-btn" style={{cursor: 'default'}}>
-                          <img src={logoSvg} alt="Carranza Logo" className="mb-2 logo-img" style={{ height: '2em' }}/>
-                      </div>
-                      <h1 className="m-0 text-3xl text-uppercase text-white">Carranza Restoration LLC</h1>
-                      <p>Welcome to Carranza Restoration LLC, your trusted partner in home improvement. Our comprehensive services include expert estimates, meticulous home renovations, construction cleaning, content manipulation, and interior design solutions. Trust us to transform your vision into reality.</p>
-                      <button className="btn btn-link" onClick={() => window.open("https://maps.google.com?q=100%20Commercial%20Place,%20Schertz,%20TX", "_blank")}>
-                          <p><i className="fa fa-map-marker-alt me-2"></i>100 Commercial Place, Schertz, TX</p>
-                      </button>
-                      <button className="btn btn-link" onClick={() => window.location.href = "tel:(210) 267-1008"}>
-                          <p><i className="fa fa-phone-alt me-2"></i>(210) 267-1008</p>
-                      </button>
-                      <button className="btn btn-link" onClick={() => window.location.href = "mailto:admin@carranzarestoration.com"}>
-                          <p><i className="fa fa-envelope me-2"></i>admin@carranzarestoration.com</p>
-                      </button>
-                      <div className="d-flex justify-content-start mt-4">
-                          <a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" rel="noopener noreferrer">
-                              <button className="btn btn-lg btn-primary btn-lg-square rounded-0 me-2">
-                                  <i className="fab fa-google"></i>
-                              </button>
-                          </a>
-                      </div>
-                  </div>
-                  <div className="col-lg-6 ps-lg-5">
-                      <div className="row g-5">
-                          <div className="col-sm-6">
-                              <h4 className="text-white text-uppercase mb-4 text-center">Quick Links</h4>
-                              <div className="d-flex flex-column justify-content-start">
-                              {Array.isArray(['/', '/about', '/services', '/contact']) && ['/', '/about', '/services', '/contact'].map(path => (
-                                      <Link key={path} to={path} className="btn btn-link text-white-50 mb-2" onClick={() => handleLinkClick(path)}>
-                                          <i className="fa fa-angle-right me-2"></i>{linkNames[path]}
-                                      </Link>
-                                  ))}
-                              </div>
-                          </div>
-                          <div className="col-sm-6">
-                              <h4 className="text-white text-uppercase mb-4 text-center">Popular Links</h4>
-                              <div className="d-flex flex-column justify-content-start">
-                              {Array.isArray(visibleLinks) && visibleLinks.map(link => (
-                                      <Link key={link.url} to={link.url} className="btn btn-link text-white-50 mb-2" onClick={() => handleLinkClick(link.url)}>
-                                          <i className="fa fa-angle-right me-2"></i>{linkNames[link.url] || link.url}
-                                      </Link>
-                                  ))}
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div className="footer-images">
-                  <div className="left-images">
-                      <img src={AngleImage} alt="Angel" className="footer-image angel-image" />
-                      <img src={EliteImage} alt="Elite" className="footer-image elite-image" />
-                      <img src={FWRImage} alt="FWR" className="footer-image fwr-image" />
-                  </div>
-                  <div className="right-images">
-                      <img src={OwenImage} alt="Owen" className="footer-image owen-image" />
-                      <img src={BImage} alt="B" className="footer-image b-image" />
-                      <img src={NRCA} alt="NRCA" className="footer-image nrca-image" />
-                  </div>
-              </div>
+  return (
+    <footer className="footer pt-5">
+      <div className="container-modern">
+        <div className="row g-5">
+          {/* Brand Column */}
+          <div className="col-lg-4 col-md-6">
+            <Link to="/" className="d-inline-block mb-4" onClick={() => handleLinkClick('/')}>
+              <img src={logoSvg} alt="Carranza Logo" height="60" />
+            </Link>
+            <h2 className="footer-brand-title">Carranza Restoration LLC</h2>
+            <p className="footer-text">
+              Your trusted partner in home improvement. We transform your vision into reality with expert craftsmanship and unwavering integrity.
+            </p>
+            <div className="d-flex gap-3">
+              <a href="https://g.page/r/CZUXLaHzvDKhEB0/review" target="_blank" rel="noopener noreferrer" className="footer-social-btn">
+                <i className="fab fa-google"></i>
+              </a>
+              <a href="#" className="footer-social-btn">
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" className="footer-social-btn">
+                <i className="fab fa-instagram"></i>
+              </a>
+            </div>
           </div>
-          <div className="container-fluid bg-dark bg-light-radial text-white border-top border-primary px-0">
-              <div className="d-flex flex-column flex-md-row justify-content-between">
-                  <div className="py-4 px-5 text-center text-md-start">
-                      <p className="mb-0">&copy; <button className="btn btn-link text-primary">Carranza Restoration LLC</button>. All Rights Reserved.</p>
-                  </div>
-              </div>
+
+          {/* Quick Links Column */}
+          <div className="col-lg-2 col-md-6">
+            <h4 className="text-white text-uppercase mb-4 fw-bold">Explore</h4>
+            <div className="d-flex flex-column">
+              {['/', '/about', '/services', '/project'].map(path => (
+                <Link key={path} to={path} className="footer-link" onClick={() => handleLinkClick(path)}>
+                  <i className="fa fa-chevron-right me-2 small" style={{ fontSize: '0.7rem' }}></i>
+                  {linkNames[path]}
+                </Link>
+              ))}
+            </div>
           </div>
-      </>
+
+          {/* Popular Links Column */}
+          <div className="col-lg-2 col-md-6">
+            <h4 className="text-white text-uppercase mb-4 fw-bold">Trending</h4>
+            <div className="d-flex flex-column">
+              {visibleLinks.length > 0 ? visibleLinks.map(link => (
+                <Link key={link.url} to={link.url} className="footer-link" onClick={() => handleLinkClick(link.url)}>
+                  <i className="fa fa-chevron-right me-2 small" style={{ fontSize: '0.7rem' }}></i>
+                  {linkNames[link.url] || link.url}
+                </Link>
+              )) : ['/blog', '/testimonial', '/contact', '/dashboard'].map(path => (
+                <Link key={path} to={path} className="footer-link" onClick={() => handleLinkClick(path)}>
+                  <i className="fa fa-chevron-right me-2 small" style={{ fontSize: '0.7rem' }}></i>
+                  {linkNames[path]}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact Column */}
+          <div className="col-lg-4 col-md-6">
+            <h4 className="text-white text-uppercase mb-4 fw-bold">Contact Us</h4>
+            <button className="footer-contact-item" onClick={() => window.open("https://maps.google.com?q=100%20Commercial%20Place,%20Schertz,%20TX", "_blank")}>
+              <i className="fa fa-map-marker-alt"></i>
+              <span>100 Commercial Place, Schertz, TX 78154</span>
+            </button>
+            <button className="footer-contact-item" onClick={() => window.location.href = "tel:2102671008"}>
+              <i className="fa fa-phone-alt"></i>
+              <span>(210) 267-1008</span>
+            </button>
+            <button className="footer-contact-item" onClick={() => window.location.href = "mailto:admin@carranzarestoration.com"}>
+              <i className="fa fa-envelope"></i>
+              <span>admin@carranzarestoration.com</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Partners Section */}
+        <div className="footer-images">
+          <img src={AngleImage} alt="Angie's List" className="footer-image" />
+          <img src={EliteImage} alt="Elite Service" className="footer-image" />
+          <img src={FWRImage} alt="FWR" className="footer-image" />
+          <img src={OwenImage} alt="Owens Corning" className="footer-image" />
+          <img src={BImage} alt="BBB" className="footer-image" />
+          <img src={NRCA} alt="NRCA" className="footer-image" />
+        </div>
+      </div>
+
+      {/* Copyright Bar */}
+      <div className="copyright-bar">
+        <div className="container-modern">
+          <div className="row">
+            <div className="col-md-6 text-center text-md-start">
+              <p className="mb-0 text-white-50">
+                &copy; {new Date().getFullYear()} <span className="text-white fw-bold">Carranza Restoration LLC</span>. All Rights Reserved.
+              </p>
+            </div>
+            <div className="col-md-6 text-center text-md-end mt-2 mt-md-0">
+              <div className="d-flex justify-content-center justify-content-md-end gap-4">
+                <Link to="/" className="text-white-50 small text-decoration-none">Privacy Policy</Link>
+                <Link to="/" className="text-white-50 small text-decoration-none">Terms of Service</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
-  
-}
+};
 
 export default Footer;

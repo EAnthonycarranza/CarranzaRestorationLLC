@@ -5,12 +5,14 @@ import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TextField, Box, Button, Select, MenuItem, List, ListItem, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { Autocomplete as MUIAutocomplete } from '@mui/lab';
-import { LoadScript } from '@react-google-maps/api';
+import { useJsApiLoader, Autocomplete } from '@react-google-maps/api';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Hourglass } from 'react-loader-spinner';
 import AdminLogin from './AdminLogin'; // Ensure this is correctly imported
+
+const libraries = ['places'];
 
 const Travel = () => {
     const [customers, setCustomers] = useState([]);
@@ -33,6 +35,13 @@ const Travel = () => {
     const [loadingLocation, setLoadingLocation] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const autocompleteRef = useRef(null);
+    
+    const { isLoaded } = useJsApiLoader({
+        id: 'google-map-script',
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+        libraries: libraries
+    });
+
     const tags = [
         "{first_name}",
         "{last_name}",
@@ -280,8 +289,7 @@ const Travel = () => {
       }
 
     return (
-        <LoadScript googleMapsApiKey="YOUR_API_KEY" libraries={['places']}>
-            <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "800px", margin: "0 auto" }}>
+        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "800px", margin: "0 auto" }}>
                 <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "10px" }}>Travel Notification</h1>
 
                 {/* Template Tags and Text Area */}
@@ -491,11 +499,9 @@ const Travel = () => {
                     <p style={{ fontSize: "16px" }}>{message}</p>
                 </div>
                 <button onClick={handleLogout} className="btn btn-warning">Logout</button>
-            </div>
-        </LoadScript>
-    );
-}
-
+                </div>
+                );
+                }
 function DraggableTag({ tag }) {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'TAG',

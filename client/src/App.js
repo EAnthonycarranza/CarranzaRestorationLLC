@@ -86,15 +86,67 @@ function App() {
               {/*<Route path="/browser" element={<Browser />} />*/}
               <Route path="/auth-success" element={<AuthSuccess />} />
               <Route path="/" element={
-                <>
-                  <Carousel scrollToAppointment={scrollToAppointment} />
-                  <About />
-                  <Portfolio2 />
-                  <Services />
-                  <div ref={appointmentRef}><Appointment /></div>
-                  <Portfolio />
-                  <Testimonial />
-                </>
+                <main className="main-content">
+                  <section id="home">
+                    <Carousel scrollToAppointment={scrollToAppointment} />
+                  </section>
+
+                  <section id="about" className="section-padding animate-fadeInUp">
+                    <div className="container-modern">
+                      <div className="section-title-wrapper">
+                        <h1 className="display-5 text-uppercase">About Our Company</h1>
+                        <div className="section-divider"></div>
+                      </div>
+                      <About />
+                    </div>
+                  </section>
+
+                  <section id="partners-section" className="section-bg-light">
+                    <div className="container-modern">
+                      <Portfolio2 />
+                    </div>
+                  </section>
+
+                  <section id="services" className="section-padding">
+                    <div className="container-modern">
+                      <div className="section-title-wrapper">
+                        <h1 className="display-5 text-uppercase">Our Premium Services</h1>
+                        <div className="section-divider"></div>
+                      </div>
+                      <Services />
+                    </div>
+                  </section>
+
+                  <section id="appointment-section" className="section-padding" ref={appointmentRef}>
+                    <div className="container-modern">
+                      <div className="section-title-wrapper">
+                        <h1 className="display-5 text-uppercase text-white">Schedule an Inspection</h1>
+                        <div className="section-divider"></div>
+                      </div>
+                      <Appointment />
+                    </div>
+                  </section>
+
+                  <section id="portfolio" className="section-padding section-bg-light">
+                    <div className="container-modern">
+                      <div className="section-title-wrapper">
+                        <h1 className="display-5 text-uppercase">Our Featured Projects</h1>
+                        <div className="section-divider"></div>
+                      </div>
+                      <Portfolio />
+                    </div>
+                  </section>
+
+                  <section id="testimonials" className="section-padding">
+                    <div className="container-modern">
+                      <div className="section-title-wrapper">
+                        <h1 className="display-5 text-uppercase">Customer Testimonials</h1>
+                        <div className="section-divider"></div>
+                      </div>
+                      <Testimonial />
+                    </div>
+                  </section>
+                </main>
               } />
             </Routes>
           </ScrollToTop>
