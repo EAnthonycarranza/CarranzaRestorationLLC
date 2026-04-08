@@ -35,7 +35,8 @@ const Carousel = ({ scrollToAppointment }) => {
                 <div className="p-3" style={{ maxWidth: '900px' }}>
                   <i className="fa fa-home fa-4x text-primary mb-4 d-none d-sm-block"></i>
                   <h1 className="display-2 text-uppercase text-white mb-md-4">Restoring Homes, Rebuilding Hope</h1>
-                  <button className="btn btn-primary py-md-3 px-md-5 mt-2" onClick={handleContactUs}>Contact Us</button>
+                  <button className="btn btn-primary py-md-3 px-md-5 mt-2 me-3" onClick={handleContactUs}>Contact Us</button>
+                  <button className="btn py-md-3 px-md-5 mt-2" style={{ border: '1px solid #e65100', color: '#e65100' }} onClick={() => navigate('/about')}>Learn More</button>
                 </div>
               </div>
             </div>

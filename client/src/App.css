@@ -938,3 +938,8 @@ textarea.form-control-lg {
     justify-content: center;
   }
 }
+
+/* Dashboard link hover styling */
+.navbar-nav .nav-link:hover {
+    color: #fff !important;
+}
