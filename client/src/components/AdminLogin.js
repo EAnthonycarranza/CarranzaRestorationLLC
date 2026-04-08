@@ -1,62 +1,75 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { TailSpin } from 'react-loader-spinner';
+import './Auth.css';
 
 const AdminLogin = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Clear any previous errors
+    setError('');
+    setLoading(true);
 
     try {
-      // Replace this URL with your API endpoint
       const response = await axios.post('/api/admin/login', {
         email,
         password,
       });
 
-      // Assuming your server responds with a token upon successful authentication
       const token = response.data.token;
-      localStorage.setItem('token', token); // Store the token in localStorage
+      localStorage.setItem('token', token);
 
-      onLoginSuccess(); // Notify the parent component about the successful login
+      onLoginSuccess();
     } catch (error) {
       console.error('Login failed:', error);
-      setError('Login failed. Please check your credentials and try again.');
+      setError('Admin login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container my-5">
-      <h2>Admin Login</h2>
-      {error && <div className="alert alert-danger" role="alert">{error}</div>}
-      <form onSubmit={handleSubmit} className="mt-4">
-        <div className="mb-3">
-          <label htmlFor="emailInput" className="form-label">Email address</label>
-          <input
-            type="email"
-            className="form-control"
-            id="emailInput"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="passwordInput" className="form-label">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            id="passwordInput"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Login</button>
-      </form>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Admin Access</h2>
+        {error && <div className="alert alert-danger" role="alert">{error}</div>}
+        
+        {loading ? (
+          <div className="text-center my-5">
+            <TailSpin color="var(--nav-accent)" height={80} width={80} />
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="mb-4">
+              <label className="form-label">Admin Email</label>
+              <input
+                type="email"
+                className="form-control auth-input"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control auth-input"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary w-100 auth-btn">Secure Login</button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

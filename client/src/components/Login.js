@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { TailSpin } from 'react-loader-spinner';
-
-const clientId = "30495169830-n8gedt6t0sl5b7v6ur0t9hkrn4j2uako.apps.googleusercontent.com"; // Replace with your actual Google Client ID
+import './Auth.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,35 +19,26 @@ const Login = () => {
   }, [navigate]);
 
   const handleGoogleLogin = async (credentialResponse) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setError('');
     setLoading(true);
-    setTimeout(async () => {
-      try {
-        const response = await fetch('/api/auth/google', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: credentialResponse.credential }),
-        });
-        const data = await response.json();
-        if (response.ok) {
-          localStorage.setItem('jwtToken', data.token);
-          navigate('/dashboard');
-        } else {
-          setError('Google login failed. Please try again.');
-          setLoading(false);
-        }
-      } catch (error) {
-        setError('An error occurred during Google login. Please try again.');
+    try {
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('jwtToken', data.token);
+        navigate('/dashboard');
+      } else {
+        setError('Google login failed. Please try again.');
         setLoading(false);
       }
-    }, 1250);
-  };
-
-  const handleLogoutSuccess = () => {
-    googleLogout();
-    localStorage.removeItem('jwtToken');
-    navigate('/');
+    } catch (error) {
+      setError('An error occurred during Google login. Please try again.');
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -77,71 +67,65 @@ const Login = () => {
   };
 
   return (
-    <div className="container my-5">
-      <h2 className="mb-4">User Login</h2>
-      {error && <div className="alert alert-danger" role="alert">{error}</div>}
-      {loading ? (
-        <div style={{
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '20vh',
-          marginTop: '20px',
-        }}>
-          <TailSpin color="rgb(253, 93, 20)" height={100} width={100} />
-        </div>
-      ) : (
-        <div className="card">
-          <div className="card-body1">
-            <form onSubmit={handleSubmit} className="mt-4">
-              <div className="mb-3">
-                <label htmlFor="emailInput" className="form-label">
-                  <i className="fa fa-solid fa-envelope me-2 text-primary"></i>Email address
-                </label>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Welcome Back</h2>
+        {error && <div className="alert alert-danger" role="alert">{error}</div>}
+        
+        {loading ? (
+          <div className="text-center my-5">
+            <TailSpin color="var(--nav-accent)" height={80} width={80} />
+          </div>
+        ) : (
+          <>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="mb-4">
+                <label className="form-label">Email Address</label>
                 <input
                   type="email"
-                  className="form-control"
-                  id="emailInput"
+                  className="form-control auth-input"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="passwordInput" className="form-label">
-                  <i className="fa fa-solid fa-lock me-2 text-primary"></i>Password
-                </label>
+              <div className="mb-4">
+                <label className="form-label">Password</label>
                 <input
                   type="password"
-                  className="form-control"
-                  id="passwordInput"
+                  className="form-control auth-input"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary btn-lg w-100 mb-3">Login</button>
+              <button type="submit" className="btn btn-primary w-100 auth-btn">Login</button>
             </form>
-            <div className="text-center mb-3">
-              <hr />
-              Or continue with Google
+
+            <div className="auth-divider">Or continue with</div>
+
+            <div className="google-btn-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => setError('Google Login Failed')}
+                useOneTap
+                theme="outline"
+                size="large"
+                width="100%"
+              />
             </div>
-            <GoogleLogin
-              clientId={clientId}
-              buttonText="Register with Google"
-              onSuccess={handleGoogleLogin}
-              onError={() => setError('Google Login Failed')}
-              className="btn btn-outline-danger btn-lg w-100 mb-3"
-            />
-            <div className="text-center mt-3">
-              <Link to="/register" className="link-primary">Create an account</Link>
+
+            <p className="auth-footer-text">
+              Don't have an account? <Link to="/register">Sign up</Link>
+            </p>
+
+            <div className="admin-link-wrapper">
+              <Link to="/admindashboard" className="admin-link">Admin Dashboard</Link>
             </div>
-          </div>
-        </div>
-      )}
-      {/* Add the Admin Dashboard link outside of the card */}
-      <div>
-        <Link to="/AdminDashboard" className="link-primary">Admin Dashboard</Link>
+          </>
+        )}
       </div>
     </div>
   );

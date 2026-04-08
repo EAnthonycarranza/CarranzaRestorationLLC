@@ -39,10 +39,8 @@ const sheetsClient = new google.auth.JWT(
 
 sheetsClient.authorize((err, tokens) => {
   if (err) {
-    console.log(err);
     return;
   } else {
-    console.log('Connected to Google Sheets API!');
   }
 });
 
@@ -112,7 +110,6 @@ app.use('/.well-known', express.static(path.join(__dirname, 'public/.well-known'
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Could not connect to MongoDB', err));
 
 const corsOptions = {
@@ -144,7 +141,6 @@ const fetchAndAppendContacts = async () => {
       }
     });
 
-    console.log('Response data:', JSON.stringify(response.data, null, 2));
 
     if (response.data && Array.isArray(response.data.results)) {
       // First, sort the contacts by the date created in ascending order
@@ -153,11 +149,9 @@ const fetchAndAppendContacts = async () => {
       const contacts = sortedContacts.filter(contact => {
         const date = new Date(contact.date_created * 1000); // Convert Unix timestamp to JavaScript Date
         const year = date.getFullYear(); // Extract year from Date object
-        console.log(`Checking contact: ${contact.display_name}, Year: ${year}`);
         return year === 2024;
       });
 
-      console.log('Filtered contacts:', contacts);
 
       // Retrieve existing data from Google Sheets to check against duplicates
       const existingDataResponse = await googleSheets.spreadsheets.values.get({
@@ -178,7 +172,6 @@ const fetchAndAppendContacts = async () => {
           `https://app.jobnimbus.com/contact/${contact.jnid}`
         ]));
 
-      console.log('New entries to append to Google Sheets:', newEntries);
 
       if (newEntries.length > 0) {
         const sheetsResponse = await googleSheets.spreadsheets.values.append({
@@ -188,10 +181,7 @@ const fetchAndAppendContacts = async () => {
           resource: { values: newEntries },
         });
 
-        console.log('Response from Google Sheets API:', JSON.stringify(sheetsResponse, null, 2));
-        console.log('Updated Google Sheet with new contacts.');
       } else {
-        console.log('No new entries to append to Google Sheets.');
       }
     } else {
       console.error('Response data is not in expected format:', JSON.stringify(response.data, null, 2));
@@ -446,13 +436,11 @@ async function handleContactAndFileOperations(req, res) {
     const contactResponse = await axios.post('https://app.jobnimbus.com/api1/contacts', contactData, config);
 
     if (contactResponse.status === 200) {
-      console.log('Contact created successfully:', contactResponse.data);
       
       // Extract the jnid from the response data
       const jnid = contactResponse.data.jnid;
       latestJnid = jnid; // Assign jnid to latestJnid
 
-      console.log('Extracted jnid:', jnid); // Logging the extracted jnid separately
 
       // Check if req.body.fileBuffer exists and is not empty before calling postFileToJobNimbus
       if (req.body.fileBuffer && req.body.fileBuffer.length > 0) {
@@ -498,7 +486,6 @@ const postFileToJobNimbus = async (fileName, fileType, fileBuffer, latestJnid) =
     return; // Return early if fileBuffer is undefined or empty
   }
 
-  console.log('fileBuffer length:', fileBuffer.length); // Log the length of the buffer
 
   const fileContentBase64 = fileBuffer.toString('base64');
   const currentDateTimestamp = Math.floor(Date.now() / 1000);
@@ -523,8 +510,6 @@ const postFileToJobNimbus = async (fileName, fileType, fileBuffer, latestJnid) =
       }
     });
 
-    console.log(`File posted to JobNimbus successfully, response: ${JSON.stringify(response.data)}`);
-    console.log('Posting data:', JSON.stringify(postData.related));  // Logging the 'related' part to ensure correct JNID is being used
     return response.data;
   } catch (error) {
     console.error(`Error posting file to JobNimbus: ${error}`);
@@ -600,10 +585,8 @@ if (addressMatch && addressMatch.length === 5) {
   console.error('Address format is not as expected:', fullAddress);
 }
 
-console.log('Extracted Address:', extractedAddress);
 
 
-console.log('Extracted Address:', extractedAddress);
 
 
     const transporter = nodemailer.createTransport({
@@ -655,8 +638,6 @@ console.log('Extracted Address:', extractedAddress);
 
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
 
-    console.log('Extracted Address:', extractedAddress); 
-    console.log('Postal Code:', postalCode);
 
     const emailBody = `  
       <div>
@@ -839,13 +820,11 @@ app.post('/api/admin/login', async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (!user) {
-      console.log('User not found.');
       return res.status(401).send('Login failed: User not found.');
     }
 
     // Ensure user has admin role
     if (user.role !== 'admin') {
-      console.log('Access denied: Admin only area.');
       return res.status(403).send('Access denied: Admin only area.');
     }
 
@@ -882,7 +861,6 @@ app.post('/api/user/login', async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (!user) {
-      console.log('User not found.');
       return res.status(401).send('Login failed: User not found.');
     }
 
@@ -1111,7 +1089,6 @@ app.get('/logout', (req, res, next) => {
         res.status(500).send('Error logging out');
       } else {
         // Send a response with the logout message
-        console.log('Successfully logged out');
         res.status(200).send('Logged out');
       }
     });
@@ -1293,7 +1270,6 @@ app.post('/api/track-click', async (req, res) => {
           { $inc: { count: 1 } }, 
           { new: true, upsert: true }
       );
-      console.log('Click tracked:', clickUpdate);
       res.sendStatus(200);  // Consider sending back some data if needed
   } catch (err) {
       console.error('Error tracking click:', err);
@@ -1329,7 +1305,6 @@ const formatDate = (timestamp) => {
 
 // Endpoint to fetch contacts
 app.get('/contacts', async (req, res) => {
-  console.log('Received query for contacts');
 
   try {
     // Fetch contacts from JobNimbus API
@@ -1341,7 +1316,6 @@ app.get('/contacts', async (req, res) => {
     });
 
     // Log the response data for inspection
-    console.log('Response data:', response.data);
 
     // Extract contacts from the response data and filter by year 2024
     const filteredData = response.data.results
@@ -1360,7 +1334,6 @@ app.get('/contacts', async (req, res) => {
       }));
 
     // Log the filtered contacts data
-    console.log('Filtered contacts data:', filteredData);
 
     // Send the filtered contacts data as a response
     res.json(filteredData);
@@ -1438,7 +1411,6 @@ const sendBatchEmail = async () => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Batch email sent successfully with attachments.');
   } catch (error) {
     console.error('Failed to send batch email:', error);
   }
@@ -1516,14 +1488,12 @@ app.post('/api/make-public', async (req, res, next) => {
 
 // Scheduled job to delete old files
 cron.schedule('* * * * *', async () => {
-  console.log('Running a task every minute to check for old files');
   try {
     const [files] = await bucket.getFiles();
     files.forEach(async (file) => {
       const fileAge = Date.now() - new Date(file.metadata.timeCreated).getTime();
       if (fileAge > 60000) { // 60 seconds
         await file.delete();
-        console.log(`Deleted ${file.name} because it was older than 1 minute.`);
       }
     });
   } catch (error) {
@@ -1737,7 +1707,6 @@ app.post('/notify', async (req, res) => {
       }
 
       const message = replacePlaceholders(template.text, customer, travelTime);
-      console.log(`Sending SMS with message: ${message}`);
 
       await sendSMS("210 997 2900", message);
 
@@ -1782,5 +1751,4 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
 });
