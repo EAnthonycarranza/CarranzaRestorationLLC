@@ -65,7 +65,7 @@ body {
 .logos {
   overflow: hidden;
   padding: 60px 0;
-  background: white;
+  background: #040F28;
   white-space: nowrap;
   position: relative;
 }
@@ -79,8 +79,8 @@ body {
   z-index: 2;
 }
 
-.logos:before { left: 0; background: linear-gradient(to left, rgba(255, 255, 255, 0), white); }
-.logos:after { right: 0; background: linear-gradient(to right, rgba(255, 255, 255, 0), white); }
+.logos:before { left: 0; background: linear-gradient(to left, rgba(4, 15, 40, 0), #040F28); }
+.logos:after { right: 0; background: linear-gradient(to right, rgba(4, 15, 40, 0), #040F28); }
 .logos:hover .logos-slide { animation-play-state: paused; }
 
 .logos-slide {

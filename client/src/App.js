@@ -101,7 +101,7 @@ function App() {
                     </div>
                   </section>
 
-                  <section id="partners-section" className="section-bg-light">
+                  <section id="partners-section" className="section-bg-dark">
                     <div className="container-modern">
                       <Portfolio2 />
                     </div>

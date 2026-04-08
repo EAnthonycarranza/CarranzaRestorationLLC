@@ -216,9 +216,151 @@ app.post('/send-quote', async (req, res) => {
   }
 });
 
-// ... (Existing Routes: /contacts, /api/sign-url, /api/make-public, /api/auth/google, /api/users/register, etc.)
-// For brevity, I am assuming the rest of the file logic is maintained below.
-// I will include the critical Google Cloud Key fix and the rest of the routes in the final write.
+// Admin Registration
+app.post('/api/admin/register', async (req, res) => {
+  const { email, password, username } = req.body;
+
+  try {
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create a new user
+    const newUser = new User({
+      email,
+      username,
+      password: hashedPassword, // Store the hashed password in the database
+      role: 'admin' // Assuming all registered users are admins
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Respond with a success message
+    return res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Error during registration:', error);
+    return res.status(500).json({ message: 'An error occurred during registration' });
+  }
+});
+
+// Admin Login
+app.post('/api/admin/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      console.log('User not found.');
+      return res.status(401).send('Login failed: User not found.');
+    }
+
+    // Ensure user has admin role
+    if (user.role !== 'admin') {
+      console.log('Access denied: Admin only area.');
+      return res.status(403).send('Access denied: Admin only area.');
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).send('Login failed: Incorrect password.');
+    }
+
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not defined.');
+      return res.status(500).send('Internal server error.');
+    }
+
+    // Generate JWT token with userId included in the payload
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    res.json({ message: 'Login successful', token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).send('An error occurred during login.');
+  }
+});
+
+
+// User Login
+app.post('/api/user/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      console.log('User not found.');
+      return res.status(401).send('Login failed: User not found.');
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).send('Login failed: Incorrect password.');
+    }
+
+    // Generate JWT token with user-specific payload
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } // You might adjust the expiry time based on your use case
+    );
+
+    res.json({ message: 'Login successful', token });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).send('An error occurred during login.');
+  }
+});
+
+// User Registration
+app.post('/api/users/register', async (req, res) => {
+  const { email, password, username } = req.body;
+
+  try {
+      // Check if the email or username already exists
+      const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+      if (existingUser) {
+          return res.status(400).json({ message: 'User already exists' });
+      }
+  
+      // Hash the password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+  
+      const { v4: uuidv4 } = require('uuid');
+
+      // Create a new user with the role set to "user"
+      const newUser = new User({
+        userId: uuidv4(), // Generate a new UUID
+          email,
+          password: hashedPassword,
+          username,
+          role: 'user'
+      });
+  
+      // Save the user to the database
+      await newUser.save();
+  
+      // Respond with a success message
+      return res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+      console.error('Error during registration:', error);
+      return res.status(500).json({ message: 'An error occurred during registration' });
+  }  
+});
 
 let googleCloudKey;
 let googleCloudKeyRaw = process.env.Google_Cloud_Key;
