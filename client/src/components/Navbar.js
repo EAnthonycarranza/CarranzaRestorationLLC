@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import carranzaLogo from '../img/0juOOO01.svg';
+import carranzaLogo from '../img/Carranza Restoration.png';
 
 // Navbar Component
 const Navbar = () => {
