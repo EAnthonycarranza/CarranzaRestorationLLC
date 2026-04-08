@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const Contact = () => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -8,6 +9,8 @@ const Contact = () => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const recaptchaRef = useRef(null);
 
   const isFormValid = () => {
     return name.trim() && email.trim() && subject.trim() && message.trim();
@@ -20,12 +23,17 @@ const Contact = () => {
       setFeedbackMessage('Please fill in all fields before submitting.');
       return;
     }
+    if (!recaptchaToken) {
+      setFeedbackType('error');
+      setFeedbackMessage('Please complete the reCAPTCHA verification.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const response = await fetch('/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify({ name, email, subject, message, recaptchaToken }),
       });
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
@@ -41,6 +49,10 @@ const Contact = () => {
       setFeedbackMessage('An error occurred. Please try again later.');
     } finally {
       setIsSubmitting(false);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+        setRecaptchaToken(null);
+      }
     }
   };
 
@@ -144,6 +156,13 @@ const Contact = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   required
                 ></textarea>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey="6LfJxqksAAAAAHB2daOfU2kVupNcopppGqEGbF3B"
+                  onChange={(token) => setRecaptchaToken(token)}
+                />
               </div>
               <button className="contact-submit-btn" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (

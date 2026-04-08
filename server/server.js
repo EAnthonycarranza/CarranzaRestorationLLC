@@ -300,6 +300,22 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 app.post('/send-email', async (req, res) => {
+  // Verify reCAPTCHA
+  const recaptchaToken = req.body.recaptchaToken;
+  if (!recaptchaToken) {
+    return res.status(400).json({ success: false, message: 'Please complete the reCAPTCHA verification.' });
+  }
+  try {
+    const recaptchaResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=6LfJxqksAAAAACea4nFzljEmb3pOKDAyme3wPDCN&response=${recaptchaToken}`
+    );
+    if (!recaptchaResponse.data.success) {
+      return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed. Please try again.' });
+    }
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'reCAPTCHA verification error.' });
+  }
+
   const { name, email, subject, message } = req.body;
   
   const emailHtml = inlineEmail(`
