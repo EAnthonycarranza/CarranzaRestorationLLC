@@ -21,6 +21,16 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isMobileMenuOpen]);
+
   // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -85,6 +95,9 @@ const Navbar = () => {
           <span className="toggle-bar"></span>
           <span className="toggle-bar"></span>
         </button>
+
+        {/* Mobile Overlay */}
+        {isMobileMenuOpen && <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)} />}
 
         {/* Nav Links */}
         <div className={`nav-menu-wrapper ${isMobileMenuOpen ? 'show' : ''}`}>
