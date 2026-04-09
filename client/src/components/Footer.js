@@ -149,7 +149,7 @@ const Footer = () => {
           <div className="row">
             <div className="col-md-6 text-center text-md-start">
               <p className="mb-0 text-white-50">
-                &copy; {new Date().getFullYear()} <span className="text-white fw-bold">Carranza Restoration LLC</span>. All Rights Reserved.
+                &copy; {new Date().getFullYear()} <span className="text-white fw-bold">Carranza Restoration LLC</span>. All Rights Reserved. | Created by <a href="https://codingcarranza.com/" target="_blank" rel="noopener noreferrer" className="text-white fw-bold text-decoration-none">Coding Carranza</a>
               </p>
             </div>
             <div className="col-md-6 text-center text-md-end mt-2 mt-md-0">
